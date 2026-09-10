@@ -1,0 +1,3177 @@
+{
+ "version": 1,
+ "generatedAt": "2026-09-10T02:36:10Z",
+ "source": "OpenStreetMap via Overpass API (ODbL)",
+ "modes": [
+  {
+   "mode": "KRL",
+   "lines": [
+    {
+     "id": "krl-bandara",
+     "name": "Lin Bandara Soekarno-Hatta",
+     "stations": [
+      {
+       "id": "krl-bandara:bandara-soekarno-2",
+       "name": "Bandara Soekarno 2",
+       "lat": -6.127881,
+       "lng": 106.651044,
+       "sequence": 0
+      },
+      {
+       "id": "krl-bandara:batu-ceper",
+       "name": "Batu Ceper",
+       "lat": -6.171932,
+       "lng": 106.665915,
+       "sequence": 1
+      },
+      {
+       "id": "krl-bandara:rawa-buaya",
+       "name": "Rawa Buaya",
+       "lat": -6.162756,
+       "lng": 106.72278,
+       "sequence": 2
+      },
+      {
+       "id": "krl-bandara:duri",
+       "name": "Duri",
+       "lat": -6.154564,
+       "lng": 106.801265,
+       "sequence": 3
+      },
+      {
+       "id": "krl-bandara:bni-city",
+       "name": "BNI City",
+       "lat": -6.201833,
+       "lng": 106.820741,
+       "sequence": 4
+      },
+      {
+       "id": "krl-bandara:sudirman",
+       "name": "Sudirman",
+       "lat": -6.202636,
+       "lng": 106.824335,
+       "sequence": 5
+      },
+      {
+       "id": "krl-bandara:manggarai",
+       "name": "Manggarai",
+       "lat": -6.211096,
+       "lng": 106.850094,
+       "sequence": 6
+      }
+     ]
+    },
+    {
+     "id": "krl-bogor",
+     "name": "Lin Bogor",
+     "stations": [
+      {
+       "id": "krl-bogor:jakarta-kota",
+       "name": "Jakarta Kota",
+       "lat": -6.137467,
+       "lng": 106.816119,
+       "sequence": 0
+      },
+      {
+       "id": "krl-bogor:jayakarta",
+       "name": "Jayakarta",
+       "lat": -6.142096,
+       "lng": 106.823524,
+       "sequence": 1
+      },
+      {
+       "id": "krl-bogor:mangga-besar",
+       "name": "Mangga Besar",
+       "lat": -6.151273,
+       "lng": 106.827222,
+       "sequence": 2
+      },
+      {
+       "id": "krl-bogor:sawah-besar",
+       "name": "Sawah Besar",
+       "lat": -6.161792,
+       "lng": 106.82804,
+       "sequence": 3
+      },
+      {
+       "id": "krl-bogor:juanda",
+       "name": "Juanda",
+       "lat": -6.167562,
+       "lng": 106.830468,
+       "sequence": 4
+      },
+      {
+       "id": "krl-bogor:gondangdia",
+       "name": "Gondangdia",
+       "lat": -6.186933,
+       "lng": 106.832889,
+       "sequence": 5
+      },
+      {
+       "id": "krl-bogor:cikini",
+       "name": "Cikini",
+       "lat": -6.199375,
+       "lng": 106.841857,
+       "sequence": 6
+      },
+      {
+       "id": "krl-bogor:manggarai",
+       "name": "Manggarai",
+       "lat": -6.211095,
+       "lng": 106.850246,
+       "sequence": 7
+      },
+      {
+       "id": "krl-bogor:tebet",
+       "name": "Tebet",
+       "lat": -6.227533,
+       "lng": 106.858419,
+       "sequence": 8
+      },
+      {
+       "id": "krl-bogor:cawang",
+       "name": "Cawang",
+       "lat": -6.24255,
+       "lng": 106.858673,
+       "sequence": 9
+      },
+      {
+       "id": "krl-bogor:duren-kalibata",
+       "name": "Duren Kalibata",
+       "lat": -6.255446,
+       "lng": 106.855031,
+       "sequence": 10
+      },
+      {
+       "id": "krl-bogor:pasar-minggu-baru",
+       "name": "Pasar Minggu Baru",
+       "lat": -6.264298,
+       "lng": 106.851099,
+       "sequence": 11
+      },
+      {
+       "id": "krl-bogor:pasar-minggu",
+       "name": "Pasar Minggu",
+       "lat": -6.283767,
+       "lng": 106.844757,
+       "sequence": 12
+      },
+      {
+       "id": "krl-bogor:tanjung-barat",
+       "name": "Tanjung Barat",
+       "lat": -6.309692,
+       "lng": 106.838647,
+       "sequence": 13
+      },
+      {
+       "id": "krl-bogor:lenteng-agung",
+       "name": "Lenteng Agung",
+       "lat": -6.330624,
+       "lng": 106.834817,
+       "sequence": 14
+      },
+      {
+       "id": "krl-bogor:universitas-pancasila",
+       "name": "Universitas Pancasila",
+       "lat": -6.340663,
+       "lng": 106.833922,
+       "sequence": 15
+      },
+      {
+       "id": "krl-bogor:universitas-indonesia",
+       "name": "Universitas Indonesia",
+       "lat": -6.360531,
+       "lng": 106.831776,
+       "sequence": 16
+      },
+      {
+       "id": "krl-bogor:pondok-cina",
+       "name": "Pondok Cina",
+       "lat": -6.368954,
+       "lng": 106.832094,
+       "sequence": 17
+      },
+      {
+       "id": "krl-bogor:depok-baru",
+       "name": "Depok Baru",
+       "lat": -6.392071,
+       "lng": 106.821211,
+       "sequence": 18
+      },
+      {
+       "id": "krl-bogor:depok",
+       "name": "Depok",
+       "lat": -6.405023,
+       "lng": 106.816942,
+       "sequence": 19
+      },
+      {
+       "id": "krl-bogor:citayam",
+       "name": "Citayam",
+       "lat": -6.450029,
+       "lng": 106.802056,
+       "sequence": 20
+      },
+      {
+       "id": "krl-bogor:bojonggede",
+       "name": "Bojonggede",
+       "lat": -6.494016,
+       "lng": 106.794959,
+       "sequence": 21
+      },
+      {
+       "id": "krl-bogor:cilebut",
+       "name": "Cilebut",
+       "lat": -6.532102,
+       "lng": 106.800513,
+       "sequence": 22
+      },
+      {
+       "id": "krl-bogor:bogor",
+       "name": "Bogor",
+       "lat": -6.594287,
+       "lng": 106.790716,
+       "sequence": 23
+      }
+     ]
+    },
+    {
+     "id": "krl-cikarang-manggarai",
+     "name": "Lin Lingkar Cikarang via Manggarai",
+     "stations": [
+      {
+       "id": "krl-cikarang-manggarai:cikarang",
+       "name": "Cikarang",
+       "lat": -6.255552,
+       "lng": 107.145764,
+       "sequence": 0
+      },
+      {
+       "id": "krl-cikarang-manggarai:metland-telagamurni",
+       "name": "Metland Telagamurni",
+       "lat": -6.25761,
+       "lng": 107.110235,
+       "sequence": 1
+      },
+      {
+       "id": "krl-cikarang-manggarai:cibitung",
+       "name": "Cibitung",
+       "lat": -6.261863,
+       "lng": 107.083237,
+       "sequence": 2
+      },
+      {
+       "id": "krl-cikarang-manggarai:tambun",
+       "name": "Tambun",
+       "lat": -6.258129,
+       "lng": 107.054383,
+       "sequence": 3
+      },
+      {
+       "id": "krl-cikarang-manggarai:bekasi-timur",
+       "name": "Bekasi Timur",
+       "lat": -6.246315,
+       "lng": 107.016976,
+       "sequence": 4
+      },
+      {
+       "id": "krl-cikarang-manggarai:bekasi",
+       "name": "Bekasi",
+       "lat": -6.235239,
+       "lng": 106.997128,
+       "sequence": 5
+      },
+      {
+       "id": "krl-cikarang-manggarai:kranji",
+       "name": "Kranji",
+       "lat": -6.223832,
+       "lng": 106.978889,
+       "sequence": 6
+      },
+      {
+       "id": "krl-cikarang-manggarai:cakung",
+       "name": "Cakung",
+       "lat": -6.219089,
+       "lng": 106.952061,
+       "sequence": 7
+      },
+      {
+       "id": "krl-cikarang-manggarai:klender-baru",
+       "name": "Klender Baru",
+       "lat": -6.217489,
+       "lng": 106.939262,
+       "sequence": 8
+      },
+      {
+       "id": "krl-cikarang-manggarai:buaran",
+       "name": "Buaran",
+       "lat": -6.215326,
+       "lng": 106.921403,
+       "sequence": 9
+      },
+      {
+       "id": "krl-cikarang-manggarai:klender",
+       "name": "Klender",
+       "lat": -6.21324,
+       "lng": 106.898647,
+       "sequence": 10
+      },
+      {
+       "id": "krl-cikarang-manggarai:jatinegara",
+       "name": "Jatinegara",
+       "lat": -6.215015,
+       "lng": 106.869276,
+       "sequence": 11
+      },
+      {
+       "id": "krl-cikarang-manggarai:matraman",
+       "name": "Matraman",
+       "lat": -6.212894,
+       "lng": 106.858905,
+       "sequence": 12
+      },
+      {
+       "id": "krl-cikarang-manggarai:manggarai",
+       "name": "Manggarai",
+       "lat": -6.209471,
+       "lng": 106.849436,
+       "sequence": 13
+      },
+      {
+       "id": "krl-cikarang-manggarai:sudirman",
+       "name": "Sudirman",
+       "lat": -6.202605,
+       "lng": 106.824342,
+       "sequence": 14
+      },
+      {
+       "id": "krl-cikarang-manggarai:bni-city",
+       "name": "BNI City",
+       "lat": -6.201353,
+       "lng": 106.818681,
+       "sequence": 15
+      },
+      {
+       "id": "krl-cikarang-manggarai:tanah-abang",
+       "name": "Tanah Abang",
+       "lat": -6.18259,
+       "lng": 106.810653,
+       "sequence": 16
+      },
+      {
+       "id": "krl-cikarang-manggarai:duri",
+       "name": "Duri",
+       "lat": -6.154437,
+       "lng": 106.801355,
+       "sequence": 17
+      },
+      {
+       "id": "krl-cikarang-manggarai:angke",
+       "name": "Angke",
+       "lat": -6.143541,
+       "lng": 106.80069,
+       "sequence": 18
+      },
+      {
+       "id": "krl-cikarang-manggarai:kampung-bandan",
+       "name": "Kampung Bandan",
+       "lat": -6.132701,
+       "lng": 106.828931,
+       "sequence": 19
+      },
+      {
+       "id": "krl-cikarang-manggarai:rajawali",
+       "name": "Rajawali",
+       "lat": -6.146312,
+       "lng": 106.837182,
+       "sequence": 20
+      },
+      {
+       "id": "krl-cikarang-manggarai:kemayoran",
+       "name": "Kemayoran",
+       "lat": -6.162554,
+       "lng": 106.841741,
+       "sequence": 21
+      },
+      {
+       "id": "krl-cikarang-manggarai:gang-sentiong",
+       "name": "Gang Sentiong",
+       "lat": -6.186416,
+       "lng": 106.851052,
+       "sequence": 22
+      },
+      {
+       "id": "krl-cikarang-manggarai:kramat",
+       "name": "Kramat",
+       "lat": -6.194051,
+       "lng": 106.856794,
+       "sequence": 23
+      },
+      {
+       "id": "krl-cikarang-manggarai:pondok-jati",
+       "name": "Pondok Jati",
+       "lat": -6.210505,
+       "lng": 106.862761,
+       "sequence": 24
+      },
+      {
+       "id": "krl-cikarang-manggarai:jatinegara-2",
+       "name": "Jatinegara",
+       "lat": -6.214797,
+       "lng": 106.871999,
+       "sequence": 25
+      },
+      {
+       "id": "krl-cikarang-manggarai:klender-2",
+       "name": "Klender",
+       "lat": -6.213407,
+       "lng": 106.900642,
+       "sequence": 26
+      },
+      {
+       "id": "krl-cikarang-manggarai:buaran-2",
+       "name": "Buaran",
+       "lat": -6.215728,
+       "lng": 106.923636,
+       "sequence": 27
+      },
+      {
+       "id": "krl-cikarang-manggarai:klender-baru-2",
+       "name": "Klender Baru",
+       "lat": -6.217884,
+       "lng": 106.941761,
+       "sequence": 28
+      },
+      {
+       "id": "krl-cikarang-manggarai:cakung-2",
+       "name": "Cakung",
+       "lat": -6.219378,
+       "lng": 106.954269,
+       "sequence": 29
+      },
+      {
+       "id": "krl-cikarang-manggarai:kranji-2",
+       "name": "Kranji",
+       "lat": -6.225136,
+       "lng": 106.980746,
+       "sequence": 30
+      },
+      {
+       "id": "krl-cikarang-manggarai:bekasi-2",
+       "name": "Bekasi",
+       "lat": -6.23695,
+       "lng": 106.999782,
+       "sequence": 31
+      },
+      {
+       "id": "krl-cikarang-manggarai:bekasi-timur-2",
+       "name": "Bekasi Timur",
+       "lat": -6.247259,
+       "lng": 107.019218,
+       "sequence": 32
+      },
+      {
+       "id": "krl-cikarang-manggarai:tambun-2",
+       "name": "Tambun",
+       "lat": -6.258796,
+       "lng": 107.056438,
+       "sequence": 33
+      },
+      {
+       "id": "krl-cikarang-manggarai:cibitung-2",
+       "name": "Cibitung",
+       "lat": -6.261559,
+       "lng": 107.085654,
+       "sequence": 34
+      },
+      {
+       "id": "krl-cikarang-manggarai:metland-telagamurni-2",
+       "name": "Metland Telagamurni",
+       "lat": -6.257305,
+       "lng": 107.112397,
+       "sequence": 35
+      },
+      {
+       "id": "krl-cikarang-manggarai:cikarang-2",
+       "name": "Cikarang",
+       "lat": -6.255585,
+       "lng": 107.145748,
+       "sequence": 36
+      }
+     ]
+    },
+    {
+     "id": "krl-cikarang-senen",
+     "name": "Lin Lingkar Cikarang via Pasar Senen",
+     "stations": [
+      {
+       "id": "krl-cikarang-senen:cikarang",
+       "name": "Cikarang",
+       "lat": -6.255552,
+       "lng": 107.145764,
+       "sequence": 0
+      },
+      {
+       "id": "krl-cikarang-senen:metland-telagamurni",
+       "name": "Metland Telagamurni",
+       "lat": -6.25761,
+       "lng": 107.110235,
+       "sequence": 1
+      },
+      {
+       "id": "krl-cikarang-senen:cibitung",
+       "name": "Cibitung",
+       "lat": -6.261863,
+       "lng": 107.083237,
+       "sequence": 2
+      },
+      {
+       "id": "krl-cikarang-senen:tambun",
+       "name": "Tambun",
+       "lat": -6.258129,
+       "lng": 107.054383,
+       "sequence": 3
+      },
+      {
+       "id": "krl-cikarang-senen:bekasi-timur",
+       "name": "Bekasi Timur",
+       "lat": -6.246315,
+       "lng": 107.016976,
+       "sequence": 4
+      },
+      {
+       "id": "krl-cikarang-senen:bekasi",
+       "name": "Bekasi",
+       "lat": -6.235239,
+       "lng": 106.997128,
+       "sequence": 5
+      },
+      {
+       "id": "krl-cikarang-senen:kranji",
+       "name": "Kranji",
+       "lat": -6.223832,
+       "lng": 106.978889,
+       "sequence": 6
+      },
+      {
+       "id": "krl-cikarang-senen:cakung",
+       "name": "Cakung",
+       "lat": -6.219089,
+       "lng": 106.952061,
+       "sequence": 7
+      },
+      {
+       "id": "krl-cikarang-senen:klender-baru",
+       "name": "Klender Baru",
+       "lat": -6.217489,
+       "lng": 106.939262,
+       "sequence": 8
+      },
+      {
+       "id": "krl-cikarang-senen:buaran",
+       "name": "Buaran",
+       "lat": -6.215326,
+       "lng": 106.921403,
+       "sequence": 9
+      },
+      {
+       "id": "krl-cikarang-senen:klender",
+       "name": "Klender",
+       "lat": -6.21324,
+       "lng": 106.898647,
+       "sequence": 10
+      },
+      {
+       "id": "krl-cikarang-senen:jatinegara",
+       "name": "Jatinegara",
+       "lat": -6.214745,
+       "lng": 106.869526,
+       "sequence": 11
+      },
+      {
+       "id": "krl-cikarang-senen:pondok-jati",
+       "name": "Pondok Jati",
+       "lat": -6.208563,
+       "lng": 106.862212,
+       "sequence": 12
+      },
+      {
+       "id": "krl-cikarang-senen:kramat",
+       "name": "Kramat",
+       "lat": -6.192261,
+       "lng": 106.85549,
+       "sequence": 13
+      },
+      {
+       "id": "krl-cikarang-senen:gang-sentiong",
+       "name": "Gang Sentiong",
+       "lat": -6.185241,
+       "lng": 106.850198,
+       "sequence": 14
+      },
+      {
+       "id": "krl-cikarang-senen:pasar-senen",
+       "name": "Pasar Senen",
+       "lat": -6.172757,
+       "lng": 106.844095,
+       "sequence": 15
+      },
+      {
+       "id": "krl-cikarang-senen:kemayoran",
+       "name": "Kemayoran",
+       "lat": -6.160763,
+       "lng": 106.841246,
+       "sequence": 16
+      },
+      {
+       "id": "krl-cikarang-senen:rajawali",
+       "name": "Rajawali",
+       "lat": -6.144426,
+       "lng": 106.836615,
+       "sequence": 17
+      },
+      {
+       "id": "krl-cikarang-senen:kampung-bandan",
+       "name": "Kampung Bandan",
+       "lat": -6.131988,
+       "lng": 106.827287,
+       "sequence": 18
+      },
+      {
+       "id": "krl-cikarang-senen:angke",
+       "name": "Angke",
+       "lat": -6.145839,
+       "lng": 106.800736,
+       "sequence": 19
+      },
+      {
+       "id": "krl-cikarang-senen:duri",
+       "name": "Duri",
+       "lat": -6.156606,
+       "lng": 106.801416,
+       "sequence": 20
+      },
+      {
+       "id": "krl-cikarang-senen:tanah-abang",
+       "name": "Tanah Abang",
+       "lat": -6.184807,
+       "lng": 106.810859,
+       "sequence": 21
+      },
+      {
+       "id": "krl-cikarang-senen:bni-city",
+       "name": "BNI City",
+       "lat": -6.201833,
+       "lng": 106.820741,
+       "sequence": 22
+      },
+      {
+       "id": "krl-cikarang-senen:sudirman",
+       "name": "Sudirman",
+       "lat": -6.202636,
+       "lng": 106.824335,
+       "sequence": 23
+      },
+      {
+       "id": "krl-cikarang-senen:manggarai",
+       "name": "Manggarai",
+       "lat": -6.211396,
+       "lng": 106.850861,
+       "sequence": 24
+      },
+      {
+       "id": "krl-cikarang-senen:matraman",
+       "name": "Matraman",
+       "lat": -6.212133,
+       "lng": 106.860879,
+       "sequence": 25
+      },
+      {
+       "id": "krl-cikarang-senen:jatinegara-2",
+       "name": "Jatinegara",
+       "lat": -6.215075,
+       "lng": 106.871941,
+       "sequence": 26
+      },
+      {
+       "id": "krl-cikarang-senen:klender-2",
+       "name": "Klender",
+       "lat": -6.213407,
+       "lng": 106.900642,
+       "sequence": 27
+      },
+      {
+       "id": "krl-cikarang-senen:buaran-2",
+       "name": "Buaran",
+       "lat": -6.215728,
+       "lng": 106.923636,
+       "sequence": 28
+      },
+      {
+       "id": "krl-cikarang-senen:klender-baru-2",
+       "name": "Klender Baru",
+       "lat": -6.217884,
+       "lng": 106.941761,
+       "sequence": 29
+      },
+      {
+       "id": "krl-cikarang-senen:cakung-2",
+       "name": "Cakung",
+       "lat": -6.219378,
+       "lng": 106.954269,
+       "sequence": 30
+      },
+      {
+       "id": "krl-cikarang-senen:kranji-2",
+       "name": "Kranji",
+       "lat": -6.225136,
+       "lng": 106.980746,
+       "sequence": 31
+      },
+      {
+       "id": "krl-cikarang-senen:bekasi-2",
+       "name": "Bekasi",
+       "lat": -6.23695,
+       "lng": 106.999782,
+       "sequence": 32
+      },
+      {
+       "id": "krl-cikarang-senen:bekasi-timur-2",
+       "name": "Bekasi Timur",
+       "lat": -6.247259,
+       "lng": 107.019218,
+       "sequence": 33
+      },
+      {
+       "id": "krl-cikarang-senen:tambun-2",
+       "name": "Tambun",
+       "lat": -6.258796,
+       "lng": 107.056438,
+       "sequence": 34
+      },
+      {
+       "id": "krl-cikarang-senen:cibitung-2",
+       "name": "Cibitung",
+       "lat": -6.261559,
+       "lng": 107.085654,
+       "sequence": 35
+      },
+      {
+       "id": "krl-cikarang-senen:metland-telagamurni-2",
+       "name": "Metland Telagamurni",
+       "lat": -6.257305,
+       "lng": 107.112397,
+       "sequence": 36
+      },
+      {
+       "id": "krl-cikarang-senen:cikarang-2",
+       "name": "Cikarang",
+       "lat": -6.255585,
+       "lng": 107.145748,
+       "sequence": 37
+      }
+     ]
+    },
+    {
+     "id": "krl-nambo",
+     "name": "Lin Bogor (Nambo)",
+     "stations": [
+      {
+       "id": "krl-nambo:jakarta-kota",
+       "name": "Jakarta Kota",
+       "lat": -6.137467,
+       "lng": 106.816119,
+       "sequence": 0
+      },
+      {
+       "id": "krl-nambo:jayakarta",
+       "name": "Jayakarta",
+       "lat": -6.142096,
+       "lng": 106.823524,
+       "sequence": 1
+      },
+      {
+       "id": "krl-nambo:mangga-besar",
+       "name": "Mangga Besar",
+       "lat": -6.151273,
+       "lng": 106.827222,
+       "sequence": 2
+      },
+      {
+       "id": "krl-nambo:sawah-besar",
+       "name": "Sawah Besar",
+       "lat": -6.161792,
+       "lng": 106.82804,
+       "sequence": 3
+      },
+      {
+       "id": "krl-nambo:juanda",
+       "name": "Juanda",
+       "lat": -6.167562,
+       "lng": 106.830468,
+       "sequence": 4
+      },
+      {
+       "id": "krl-nambo:gondangdia",
+       "name": "Gondangdia",
+       "lat": -6.186933,
+       "lng": 106.832889,
+       "sequence": 5
+      },
+      {
+       "id": "krl-nambo:cikini",
+       "name": "Cikini",
+       "lat": -6.199375,
+       "lng": 106.841857,
+       "sequence": 6
+      },
+      {
+       "id": "krl-nambo:manggarai",
+       "name": "Manggarai",
+       "lat": -6.211095,
+       "lng": 106.850246,
+       "sequence": 7
+      },
+      {
+       "id": "krl-nambo:tebet",
+       "name": "Tebet",
+       "lat": -6.227533,
+       "lng": 106.858419,
+       "sequence": 8
+      },
+      {
+       "id": "krl-nambo:cawang",
+       "name": "Cawang",
+       "lat": -6.24255,
+       "lng": 106.858673,
+       "sequence": 9
+      },
+      {
+       "id": "krl-nambo:duren-kalibata",
+       "name": "Duren Kalibata",
+       "lat": -6.255446,
+       "lng": 106.855031,
+       "sequence": 10
+      },
+      {
+       "id": "krl-nambo:pasar-minggu-baru",
+       "name": "Pasar Minggu Baru",
+       "lat": -6.264298,
+       "lng": 106.851099,
+       "sequence": 11
+      },
+      {
+       "id": "krl-nambo:pasar-minggu",
+       "name": "Pasar Minggu",
+       "lat": -6.283767,
+       "lng": 106.844757,
+       "sequence": 12
+      },
+      {
+       "id": "krl-nambo:tanjung-barat",
+       "name": "Tanjung Barat",
+       "lat": -6.309692,
+       "lng": 106.838647,
+       "sequence": 13
+      },
+      {
+       "id": "krl-nambo:lenteng-agung",
+       "name": "Lenteng Agung",
+       "lat": -6.330624,
+       "lng": 106.834817,
+       "sequence": 14
+      },
+      {
+       "id": "krl-nambo:universitas-pancasila",
+       "name": "Universitas Pancasila",
+       "lat": -6.340663,
+       "lng": 106.833922,
+       "sequence": 15
+      },
+      {
+       "id": "krl-nambo:universitas-indonesia",
+       "name": "Universitas Indonesia",
+       "lat": -6.360531,
+       "lng": 106.831776,
+       "sequence": 16
+      },
+      {
+       "id": "krl-nambo:pondok-cina",
+       "name": "Pondok Cina",
+       "lat": -6.368954,
+       "lng": 106.832094,
+       "sequence": 17
+      },
+      {
+       "id": "krl-nambo:depok-baru",
+       "name": "Depok Baru",
+       "lat": -6.392071,
+       "lng": 106.821211,
+       "sequence": 18
+      },
+      {
+       "id": "krl-nambo:depok",
+       "name": "Depok",
+       "lat": -6.405023,
+       "lng": 106.816942,
+       "sequence": 19
+      },
+      {
+       "id": "krl-nambo:citayam",
+       "name": "Citayam",
+       "lat": -6.450029,
+       "lng": 106.802056,
+       "sequence": 20
+      },
+      {
+       "id": "krl-nambo:cibinong",
+       "name": "Cibinong",
+       "lat": -6.463978,
+       "lng": 106.853341,
+       "sequence": 21
+      },
+      {
+       "id": "krl-nambo:nambo",
+       "name": "Nambo",
+       "lat": -6.466816,
+       "lng": 106.905519,
+       "sequence": 22
+      }
+     ]
+    },
+    {
+     "id": "krl-rangkasbitung",
+     "name": "Lin Rangkasbitung",
+     "stations": [
+      {
+       "id": "krl-rangkasbitung:rangkasbitung",
+       "name": "Rangkasbitung",
+       "lat": -6.353075,
+       "lng": 106.253132,
+       "sequence": 0
+      },
+      {
+       "id": "krl-rangkasbitung:citeras",
+       "name": "Citeras",
+       "lat": -6.334886,
+       "lng": 106.333934,
+       "sequence": 1
+      },
+      {
+       "id": "krl-rangkasbitung:maja",
+       "name": "Maja",
+       "lat": -6.332695,
+       "lng": 106.396918,
+       "sequence": 2
+      },
+      {
+       "id": "krl-rangkasbitung:tigaraksa",
+       "name": "Tigaraksa",
+       "lat": -6.328449,
+       "lng": 106.435089,
+       "sequence": 3
+      },
+      {
+       "id": "krl-rangkasbitung:tenjo",
+       "name": "Tenjo",
+       "lat": -6.327527,
+       "lng": 106.462044,
+       "sequence": 4
+      },
+      {
+       "id": "krl-rangkasbitung:daru",
+       "name": "Daru",
+       "lat": -6.338796,
+       "lng": 106.492956,
+       "sequence": 5
+      },
+      {
+       "id": "krl-rangkasbitung:cilejit",
+       "name": "Cilejit",
+       "lat": -6.354845,
+       "lng": 106.510504,
+       "sequence": 6
+      },
+      {
+       "id": "krl-rangkasbitung:parungpanjang",
+       "name": "Parungpanjang",
+       "lat": -6.344393,
+       "lng": 106.570299,
+       "sequence": 7
+      },
+      {
+       "id": "krl-rangkasbitung:jatake",
+       "name": "Jatake",
+       "lat": -6.334764,
+       "lng": 106.607738,
+       "sequence": 8
+      },
+      {
+       "id": "krl-rangkasbitung:cicayur",
+       "name": "Cicayur",
+       "lat": -6.329233,
+       "lng": 106.620189,
+       "sequence": 9
+      },
+      {
+       "id": "krl-rangkasbitung:cisauk",
+       "name": "Cisauk",
+       "lat": -6.324032,
+       "lng": 106.642465,
+       "sequence": 10
+      },
+      {
+       "id": "krl-rangkasbitung:serpong",
+       "name": "Serpong",
+       "lat": -6.32018,
+       "lng": 106.66663,
+       "sequence": 11
+      },
+      {
+       "id": "krl-rangkasbitung:rawa-buntu",
+       "name": "Rawa Buntu",
+       "lat": -6.31455,
+       "lng": 106.676784,
+       "sequence": 12
+      },
+      {
+       "id": "krl-rangkasbitung:sudimara",
+       "name": "Sudimara",
+       "lat": -6.296251,
+       "lng": 106.713736,
+       "sequence": 13
+      },
+      {
+       "id": "krl-rangkasbitung:jurangmangu",
+       "name": "Jurangmangu",
+       "lat": -6.288528,
+       "lng": 106.729262,
+       "sequence": 14
+      },
+      {
+       "id": "krl-rangkasbitung:pondok-ranji",
+       "name": "Pondok Ranji",
+       "lat": -6.276332,
+       "lng": 106.745208,
+       "sequence": 15
+      },
+      {
+       "id": "krl-rangkasbitung:kebayoran",
+       "name": "Kebayoran",
+       "lat": -6.235995,
+       "lng": 106.782959,
+       "sequence": 16
+      },
+      {
+       "id": "krl-rangkasbitung:palmerah",
+       "name": "Palmerah",
+       "lat": -6.206222,
+       "lng": 106.798055,
+       "sequence": 17
+      },
+      {
+       "id": "krl-rangkasbitung:tanah-abang",
+       "name": "Tanah Abang",
+       "lat": -6.183904,
+       "lng": 106.810677,
+       "sequence": 18
+      }
+     ]
+    },
+    {
+     "id": "krl-tangerang",
+     "name": "Lin Tangerang",
+     "stations": [
+      {
+       "id": "krl-tangerang:tangerang",
+       "name": "Tangerang",
+       "lat": -6.176857,
+       "lng": 106.630716,
+       "sequence": 0
+      },
+      {
+       "id": "krl-tangerang:tanah-tinggi",
+       "name": "Tanah Tinggi",
+       "lat": -6.174997,
+       "lng": 106.647857,
+       "sequence": 1
+      },
+      {
+       "id": "krl-tangerang:batu-ceper",
+       "name": "Batu Ceper",
+       "lat": -6.172113,
+       "lng": 106.666007,
+       "sequence": 2
+      },
+      {
+       "id": "krl-tangerang:poris",
+       "name": "Poris",
+       "lat": -6.16948,
+       "lng": 106.682396,
+       "sequence": 3
+      },
+      {
+       "id": "krl-tangerang:kalideres",
+       "name": "Kalideres",
+       "lat": -6.165878,
+       "lng": 106.704335,
+       "sequence": 4
+      },
+      {
+       "id": "krl-tangerang:rawa-buaya",
+       "name": "Rawa Buaya",
+       "lat": -6.162787,
+       "lng": 106.722786,
+       "sequence": 5
+      },
+      {
+       "id": "krl-tangerang:bojong-indah",
+       "name": "Bojong Indah",
+       "lat": -6.159796,
+       "lng": 106.737192,
+       "sequence": 6
+      },
+      {
+       "id": "krl-tangerang:taman-kota",
+       "name": "Taman Kota",
+       "lat": -6.158661,
+       "lng": 106.75672,
+       "sequence": 7
+      },
+      {
+       "id": "krl-tangerang:pesing",
+       "name": "Pesing",
+       "lat": -6.161515,
+       "lng": 106.773795,
+       "sequence": 8
+      },
+      {
+       "id": "krl-tangerang:grogol",
+       "name": "Grogol",
+       "lat": -6.162127,
+       "lng": 106.789334,
+       "sequence": 9
+      },
+      {
+       "id": "krl-tangerang:duri",
+       "name": "Duri",
+       "lat": -6.154584,
+       "lng": 106.801184,
+       "sequence": 10
+      }
+     ]
+    },
+    {
+     "id": "krl-tanjung-priuk",
+     "name": "Lin Tanjung Priuk",
+     "stations": [
+      {
+       "id": "krl-tanjung-priuk:jakarta-kota",
+       "name": "Jakarta Kota",
+       "lat": -6.137294,
+       "lng": 106.816071,
+       "sequence": 0
+      },
+      {
+       "id": "krl-tanjung-priuk:kampung-bandan",
+       "name": "Kampung Bandan",
+       "lat": -6.132891,
+       "lng": 106.828745,
+       "sequence": 1
+      },
+      {
+       "id": "krl-tanjung-priuk:ancol",
+       "name": "Ancol",
+       "lat": -6.127855,
+       "lng": 106.846456,
+       "sequence": 2
+      },
+      {
+       "id": "krl-tanjung-priuk:tanjung-priuk",
+       "name": "Tanjung Priuk",
+       "lat": -6.110601,
+       "lng": 106.88145,
+       "sequence": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "mode": "MRT",
+   "lines": [
+    {
+     "id": "mrt-north-south",
+     "name": "MRT Lin Utara-Selatan",
+     "stations": [
+      {
+       "id": "mrt-north-south:lebak-bulus-bank-syariah-indonesia",
+       "name": "Lebak Bulus Bank Syariah Indonesia",
+       "lat": -6.289296,
+       "lng": 106.774932,
+       "sequence": 0
+      },
+      {
+       "id": "mrt-north-south:fatmawati-indomaret",
+       "name": "Fatmawati Indomaret",
+       "lat": -6.292471,
+       "lng": 106.792463,
+       "sequence": 1
+      },
+      {
+       "id": "mrt-north-south:cipete-raya-tuku",
+       "name": "Cipete Raya TUKU",
+       "lat": -6.278372,
+       "lng": 106.797342,
+       "sequence": 2
+      },
+      {
+       "id": "mrt-north-south:haji-nawi",
+       "name": "Haji Nawi",
+       "lat": -6.266696,
+       "lng": 106.797344,
+       "sequence": 3
+      },
+      {
+       "id": "mrt-north-south:blok-a-visa",
+       "name": "Blok A VISA",
+       "lat": -6.255787,
+       "lng": 106.797172,
+       "sequence": 4
+      },
+      {
+       "id": "mrt-north-south:blok-m-bca",
+       "name": "Blok M BCA",
+       "lat": -6.244423,
+       "lng": 106.798239,
+       "sequence": 5
+      },
+      {
+       "id": "mrt-north-south:asean-headquarters",
+       "name": "ASEAN Headquarters",
+       "lat": -6.238771,
+       "lng": 106.79847,
+       "sequence": 6
+      },
+      {
+       "id": "mrt-north-south:senayan-mastercard",
+       "name": "Senayan Mastercard",
+       "lat": -6.226784,
+       "lng": 106.802524,
+       "sequence": 7
+      },
+      {
+       "id": "mrt-north-south:istora-mandiri",
+       "name": "Istora Mandiri",
+       "lat": -6.222442,
+       "lng": 106.808665,
+       "sequence": 8
+      },
+      {
+       "id": "mrt-north-south:bendungan-hilir",
+       "name": "Bendungan Hilir",
+       "lat": -6.215063,
+       "lng": 106.817995,
+       "sequence": 9
+      },
+      {
+       "id": "mrt-north-south:setiabudi-astra",
+       "name": "Setiabudi Astra",
+       "lat": -6.209095,
+       "lng": 106.821762,
+       "sequence": 10
+      },
+      {
+       "id": "mrt-north-south:dukuh-atas-bni",
+       "name": "Dukuh Atas BNI",
+       "lat": -6.200802,
+       "lng": 106.822828,
+       "sequence": 11
+      },
+      {
+       "id": "mrt-north-south:bundaran-hi-bank-jakarta",
+       "name": "Bundaran HI Bank Jakarta",
+       "lat": -6.191849,
+       "lng": 106.823062,
+       "sequence": 12
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "mode": "TRANSJAKARTA",
+   "lines": [
+    {
+     "id": "tj-koridor-1",
+     "name": "Koridor 1",
+     "stations": [
+      {
+       "id": "tj-koridor-1:blok-m",
+       "name": "Blok M",
+       "lat": -6.243351,
+       "lng": 106.80201,
+       "sequence": 0
+      },
+      {
+       "id": "tj-koridor-1:asean",
+       "name": "ASEAN",
+       "lat": -6.239935,
+       "lng": 106.799104,
+       "sequence": 1
+      },
+      {
+       "id": "tj-koridor-1:masjid-agung",
+       "name": "Masjid Agung",
+       "lat": -6.23642,
+       "lng": 106.798413,
+       "sequence": 2
+      },
+      {
+       "id": "tj-koridor-1:bundaran-senayan",
+       "name": "Bundaran Senayan",
+       "lat": -6.227831,
+       "lng": 106.800946,
+       "sequence": 3
+      },
+      {
+       "id": "tj-koridor-1:senayan-bank-jakarta",
+       "name": "Senayan Bank Jakarta",
+       "lat": -6.224243,
+       "lng": 106.805675,
+       "sequence": 4
+      },
+      {
+       "id": "tj-koridor-1:polda-metro-jaya",
+       "name": "Polda Metro Jaya",
+       "lat": -6.221044,
+       "lng": 106.810258,
+       "sequence": 5
+      },
+      {
+       "id": "tj-koridor-1:bendungan-hilir",
+       "name": "Bendungan Hilir",
+       "lat": -6.217053,
+       "lng": 106.815326,
+       "sequence": 6
+      },
+      {
+       "id": "tj-koridor-1:karet",
+       "name": "Karet",
+       "lat": -6.212406,
+       "lng": 106.82001,
+       "sequence": 7
+      },
+      {
+       "id": "tj-koridor-1:dukuh-atas",
+       "name": "Dukuh Atas",
+       "lat": -6.20522,
+       "lng": 106.822252,
+       "sequence": 8
+      },
+      {
+       "id": "tj-koridor-1:tosari",
+       "name": "Tosari",
+       "lat": -6.196514,
+       "lng": 106.823073,
+       "sequence": 9
+      },
+      {
+       "id": "tj-koridor-1:bundaran-hi-astra",
+       "name": "Bundaran HI ASTRA",
+       "lat": -6.193683,
+       "lng": 106.822988,
+       "sequence": 10
+      },
+      {
+       "id": "tj-koridor-1:m-h-thamrin",
+       "name": "M.H. Thamrin",
+       "lat": -6.188074,
+       "lng": 106.822981,
+       "sequence": 11
+      },
+      {
+       "id": "tj-koridor-1:kebon-sirih",
+       "name": "Kebon Sirih",
+       "lat": -6.182595,
+       "lng": 106.822782,
+       "sequence": 12
+      },
+      {
+       "id": "tj-koridor-1:monumen-nasional",
+       "name": "Monumen Nasional",
+       "lat": -6.176178,
+       "lng": 106.822788,
+       "sequence": 13
+      },
+      {
+       "id": "tj-koridor-1:harmoni-temporer",
+       "name": "Harmoni Temporer",
+       "lat": -6.162477,
+       "lng": 106.819803,
+       "sequence": 14
+      },
+      {
+       "id": "tj-koridor-1:sawah-besar-temporer",
+       "name": "Sawah Besar Temporer",
+       "lat": -6.157283,
+       "lng": 106.818607,
+       "sequence": 15
+      },
+      {
+       "id": "tj-koridor-1:mangga-besar-temporer",
+       "name": "Mangga Besar Temporer",
+       "lat": -6.153231,
+       "lng": 106.817422,
+       "sequence": 16
+      },
+      {
+       "id": "tj-koridor-1:taman-sari",
+       "name": "Taman Sari",
+       "lat": -6.149323,
+       "lng": 106.816627,
+       "sequence": 17
+      },
+      {
+       "id": "tj-koridor-1:glodok",
+       "name": "Glodok",
+       "lat": -6.143415,
+       "lng": 106.815114,
+       "sequence": 18
+      },
+      {
+       "id": "tj-koridor-1:kali-besar",
+       "name": "Kali Besar",
+       "lat": -6.135331,
+       "lng": 106.811409,
+       "sequence": 19
+      }
+     ]
+    },
+    {
+     "id": "tj-koridor-10",
+     "name": "Koridor 10",
+     "stations": [
+      {
+       "id": "tj-koridor-10:pgc",
+       "name": "PGC",
+       "lat": -6.261994,
+       "lng": 106.865428,
+       "sequence": 0
+      },
+      {
+       "id": "tj-koridor-10:ciliitan",
+       "name": "Ciliitan",
+       "lat": -6.262466,
+       "lng": 106.86632,
+       "sequence": 1
+      },
+      {
+       "id": "tj-koridor-10:cawang-cililitan",
+       "name": "Cawang Cililitan",
+       "lat": -6.257708,
+       "lng": 106.869967,
+       "sequence": 2
+      },
+      {
+       "id": "tj-koridor-10:cawang-sentral",
+       "name": "Cawang Sentral",
+       "lat": -6.250721,
+       "lng": 106.873347,
+       "sequence": 3
+      },
+      {
+       "id": "tj-koridor-10:simpang-cawang",
+       "name": "Simpang Cawang",
+       "lat": -6.244719,
+       "lng": 106.875945,
+       "sequence": 4
+      },
+      {
+       "id": "tj-koridor-10:halim",
+       "name": "Halim",
+       "lat": -6.23906,
+       "lng": 106.878054,
+       "sequence": 5
+      },
+      {
+       "id": "tj-koridor-10:kebon-nanas",
+       "name": "Kebon Nanas",
+       "lat": -6.231532,
+       "lng": 106.876329,
+       "sequence": 6
+      },
+      {
+       "id": "tj-koridor-10:pedati-prumpung",
+       "name": "Pedati Prumpung",
+       "lat": -6.220082,
+       "lng": 106.874379,
+       "sequence": 7
+      },
+      {
+       "id": "tj-koridor-10:flyover-jatinegara",
+       "name": "Flyover Jatinegara",
+       "lat": -6.215553,
+       "lng": 106.874052,
+       "sequence": 8
+      },
+      {
+       "id": "tj-koridor-10:pisangan",
+       "name": "Pisangan",
+       "lat": -6.205493,
+       "lng": 106.873731,
+       "sequence": 9
+      },
+      {
+       "id": "tj-koridor-10:utan-kayu-rawamangun",
+       "name": "Utan Kayu Rawamangun",
+       "lat": -6.197505,
+       "lng": 106.874009,
+       "sequence": 10
+      },
+      {
+       "id": "tj-koridor-10:pemuda-pramuka",
+       "name": "Pemuda Pramuka",
+       "lat": -6.193017,
+       "lng": 106.874871,
+       "sequence": 11
+      },
+      {
+       "id": "tj-koridor-10:kayu-putih-rawasari",
+       "name": "Kayu Putih Rawasari",
+       "lat": -6.187479,
+       "lng": 106.875372,
+       "sequence": 12
+      },
+      {
+       "id": "tj-koridor-10:pulomas-bypass",
+       "name": "Pulomas Bypass",
+       "lat": -6.176906,
+       "lng": 106.875985,
+       "sequence": 13
+      },
+      {
+       "id": "tj-koridor-10:cempaka-putih",
+       "name": "Cempaka Putih",
+       "lat": -6.174152,
+       "lng": 106.87642,
+       "sequence": 14
+      },
+      {
+       "id": "tj-koridor-10:simpang-cempaka",
+       "name": "Simpang Cempaka",
+       "lat": -6.165737,
+       "lng": 106.879258,
+       "sequence": 15
+      },
+      {
+       "id": "tj-koridor-10:kodamar",
+       "name": "Kodamar",
+       "lat": -6.161998,
+       "lng": 106.881691,
+       "sequence": 16
+      },
+      {
+       "id": "tj-koridor-10:sunter-kelapa-gading",
+       "name": "Sunter Kelapa Gading",
+       "lat": -6.142736,
+       "lng": 106.890571,
+       "sequence": 17
+      },
+      {
+       "id": "tj-koridor-10:plumpang",
+       "name": "Plumpang",
+       "lat": -6.128448,
+       "lng": 106.893415,
+       "sequence": 18
+      },
+      {
+       "id": "tj-koridor-10:walikota-jakarta-utara",
+       "name": "Walikota Jakarta Utara",
+       "lat": -6.118853,
+       "lng": 106.893087,
+       "sequence": 19
+      },
+      {
+       "id": "tj-koridor-10:koja",
+       "name": "Koja",
+       "lat": -6.114091,
+       "lng": 106.892963,
+       "sequence": 20
+      },
+      {
+       "id": "tj-koridor-10:mambo",
+       "name": "Mambo",
+       "lat": -6.110169,
+       "lng": 106.892466,
+       "sequence": 21
+      },
+      {
+       "id": "tj-koridor-10:tanjung-priok",
+       "name": "Tanjung Priok",
+       "lat": -6.109831,
+       "lng": 106.881305,
+       "sequence": 22
+      }
+     ]
+    },
+    {
+     "id": "tj-koridor-11",
+     "name": "Koridor 11",
+     "stations": [
+      {
+       "id": "tj-koridor-11:terminal-pulogebang",
+       "name": "Terminal Pulogebang",
+       "lat": -6.213296,
+       "lng": 106.953196,
+       "sequence": 0
+      },
+      {
+       "id": "tj-koridor-11:walikota-jakarta-timur",
+       "name": "Walikota Jakarta Timur",
+       "lat": -6.212584,
+       "lng": 106.945397,
+       "sequence": 1
+      },
+      {
+       "id": "tj-koridor-11:penggilingan",
+       "name": "Penggilingan",
+       "lat": -6.213931,
+       "lng": 106.939668,
+       "sequence": 2
+      },
+      {
+       "id": "tj-koridor-11:flyover-pondok-kopi",
+       "name": "Flyover Pondok Kopi",
+       "lat": -6.216743,
+       "lng": 106.930511,
+       "sequence": 3
+      },
+      {
+       "id": "tj-koridor-11:simpang-buaran",
+       "name": "Simpang Buaran",
+       "lat": -6.216029,
+       "lng": 106.924373,
+       "sequence": 4
+      },
+      {
+       "id": "tj-koridor-11:buaran",
+       "name": "Buaran",
+       "lat": -6.215195,
+       "lng": 106.91771,
+       "sequence": 5
+      },
+      {
+       "id": "tj-koridor-11:kampung-sumur",
+       "name": "Kampung Sumur",
+       "lat": -6.214459,
+       "lng": 106.911868,
+       "sequence": 6
+      },
+      {
+       "id": "tj-koridor-11:klender",
+       "name": "Klender",
+       "lat": -6.213683,
+       "lng": 106.903023,
+       "sequence": 7
+      },
+      {
+       "id": "tj-koridor-11:cipinang",
+       "name": "Cipinang",
+       "lat": -6.213828,
+       "lng": 106.88949,
+       "sequence": 8
+      },
+      {
+       "id": "tj-koridor-11:flyover-cipinang",
+       "name": "Flyover Cipinang",
+       "lat": -6.214668,
+       "lng": 106.882396,
+       "sequence": 9
+      },
+      {
+       "id": "tj-koridor-11:pasar-enjo",
+       "name": "Pasar Enjo",
+       "lat": -6.214904,
+       "lng": 106.87836,
+       "sequence": 10
+      },
+      {
+       "id": "tj-koridor-11:flyover-jatinegara",
+       "name": "Flyover Jatinegara",
+       "lat": -6.215203,
+       "lng": 106.87366,
+       "sequence": 11
+      },
+      {
+       "id": "tj-koridor-11:jatinegara",
+       "name": "Jatinegara",
+       "lat": -6.215465,
+       "lng": 106.869426,
+       "sequence": 12
+      },
+      {
+       "id": "tj-koridor-11:kampung-melayu",
+       "name": "Kampung Melayu",
+       "lat": -6.224513,
+       "lng": 106.867176,
+       "sequence": 13
+      }
+     ]
+    },
+    {
+     "id": "tj-koridor-12",
+     "name": "Koridor 12",
+     "stations": [
+      {
+       "id": "tj-koridor-12:pluit",
+       "name": "Pluit",
+       "lat": -6.115731,
+       "lng": 106.791209,
+       "sequence": 0
+      },
+      {
+       "id": "tj-koridor-12:pluit-selatan",
+       "name": "Pluit Selatan",
+       "lat": -6.125215,
+       "lng": 106.799702,
+       "sequence": 1
+      },
+      {
+       "id": "tj-koridor-12:pakin",
+       "name": "Pakin",
+       "lat": -6.127448,
+       "lng": 106.804707,
+       "sequence": 2
+      },
+      {
+       "id": "tj-koridor-12:gedong-panjang",
+       "name": "Gedong Panjang",
+       "lat": -6.132576,
+       "lng": 106.806022,
+       "sequence": 3
+      },
+      {
+       "id": "tj-koridor-12:museum-sejarah-jakarta",
+       "name": "Museum Sejarah Jakarta",
+       "lat": -6.13396,
+       "lng": 106.812119,
+       "sequence": 4
+      },
+      {
+       "id": "tj-koridor-12:kota",
+       "name": "Kota",
+       "lat": -6.136903,
+       "lng": 106.815079,
+       "sequence": 5
+      },
+      {
+       "id": "tj-koridor-12:mangga-dua-raya",
+       "name": "Mangga Dua Raya",
+       "lat": -6.137562,
+       "lng": 106.817938,
+       "sequence": 6
+      },
+      {
+       "id": "tj-koridor-12:mangga-dua",
+       "name": "Mangga Dua",
+       "lat": -6.136128,
+       "lng": 106.82598,
+       "sequence": 7
+      },
+      {
+       "id": "tj-koridor-12:gunung-sahari",
+       "name": "Gunung Sahari",
+       "lat": -6.136785,
+       "lng": 106.832414,
+       "sequence": 8
+      },
+      {
+       "id": "tj-koridor-12:jembatan-merah",
+       "name": "Jembatan Merah",
+       "lat": -6.146731,
+       "lng": 106.834322,
+       "sequence": 9
+      },
+      {
+       "id": "tj-koridor-12:landasan-pacu",
+       "name": "Landasan Pacu",
+       "lat": -6.152102,
+       "lng": 106.854238,
+       "sequence": 10
+      },
+      {
+       "id": "tj-koridor-12:danau-agung",
+       "name": "Danau Agung",
+       "lat": -6.146794,
+       "lng": 106.857989,
+       "sequence": 11
+      },
+      {
+       "id": "tj-koridor-12:danau-sunter",
+       "name": "Danau Sunter",
+       "lat": -6.140821,
+       "lng": 106.856907,
+       "sequence": 12
+      },
+      {
+       "id": "tj-koridor-12:sunter-utara",
+       "name": "Sunter Utara",
+       "lat": -6.139654,
+       "lng": 106.859122,
+       "sequence": 13
+      },
+      {
+       "id": "tj-koridor-12:sunter-karya",
+       "name": "Sunter Karya",
+       "lat": -6.137502,
+       "lng": 106.870816,
+       "sequence": 14
+      },
+      {
+       "id": "tj-koridor-12:sunter-boulevard-barat",
+       "name": "Sunter Boulevard Barat",
+       "lat": -6.149605,
+       "lng": 106.888903,
+       "sequence": 15
+      },
+      {
+       "id": "tj-koridor-12:sunter-kelapa-gading",
+       "name": "Sunter Kelapa Gading",
+       "lat": -6.142736,
+       "lng": 106.890571,
+       "sequence": 16
+      },
+      {
+       "id": "tj-koridor-12:plumpang",
+       "name": "Plumpang",
+       "lat": -6.128448,
+       "lng": 106.893415,
+       "sequence": 17
+      },
+      {
+       "id": "tj-koridor-12:walikota-jakarta-utara",
+       "name": "Walikota Jakarta Utara",
+       "lat": -6.118853,
+       "lng": 106.893087,
+       "sequence": 18
+      },
+      {
+       "id": "tj-koridor-12:koja",
+       "name": "Koja",
+       "lat": -6.114091,
+       "lng": 106.892963,
+       "sequence": 19
+      },
+      {
+       "id": "tj-koridor-12:mambo",
+       "name": "Mambo",
+       "lat": -6.110169,
+       "lng": 106.892466,
+       "sequence": 20
+      },
+      {
+       "id": "tj-koridor-12:tanjung-priok",
+       "name": "Tanjung Priok",
+       "lat": -6.109831,
+       "lng": 106.881305,
+       "sequence": 21
+      }
+     ]
+    },
+    {
+     "id": "tj-koridor-13",
+     "name": "Koridor 13",
+     "stations": [
+      {
+       "id": "tj-koridor-13:tegal-mampang",
+       "name": "Tegal Mampang",
+       "lat": -6.240211,
+       "lng": 106.830889,
+       "sequence": 0
+      },
+      {
+       "id": "tj-koridor-13:rawa-barat",
+       "name": "Rawa Barat",
+       "lat": -6.238942,
+       "lng": 106.816283,
+       "sequence": 1
+      },
+      {
+       "id": "tj-koridor-13:pasar-santa",
+       "name": "Pasar Santa",
+       "lat": -6.239229,
+       "lng": 106.807804,
+       "sequence": 2
+      },
+      {
+       "id": "tj-koridor-13:csw",
+       "name": "CSW",
+       "lat": -6.239936,
+       "lng": 106.798414,
+       "sequence": 3
+      },
+      {
+       "id": "tj-koridor-13:mayestik",
+       "name": "Mayestik",
+       "lat": -6.241938,
+       "lng": 106.790744,
+       "sequence": 4
+      },
+      {
+       "id": "tj-koridor-13:velbak",
+       "name": "Velbak",
+       "lat": -6.239446,
+       "lng": 106.785567,
+       "sequence": 5
+      },
+      {
+       "id": "tj-koridor-13:kebayoran-lama",
+       "name": "Kebayoran Lama",
+       "lat": -6.238379,
+       "lng": 106.777615,
+       "sequence": 6
+      },
+      {
+       "id": "tj-koridor-13:seskoal",
+       "name": "Seskoal",
+       "lat": -6.238084,
+       "lng": 106.771258,
+       "sequence": 7
+      },
+      {
+       "id": "tj-koridor-13:cipulir",
+       "name": "Cipulir",
+       "lat": -6.237861,
+       "lng": 106.765335,
+       "sequence": 8
+      },
+      {
+       "id": "tj-koridor-13:swadarma-paragoncorp",
+       "name": "Swadarma ParagonCorp",
+       "lat": -6.237562,
+       "lng": 106.760659,
+       "sequence": 9
+      },
+      {
+       "id": "tj-koridor-13:jorr",
+       "name": "JORR",
+       "lat": -6.236232,
+       "lng": 106.754832,
+       "sequence": 10
+      },
+      {
+       "id": "tj-koridor-13:petukangan-d-masiv",
+       "name": "Petukangan D'MASIV",
+       "lat": -6.236464,
+       "lng": 106.747471,
+       "sequence": 11
+      },
+      {
+       "id": "tj-koridor-13:puri-beta-2",
+       "name": "Puri Beta 2",
+       "lat": -6.230457,
+       "lng": 106.723737,
+       "sequence": 12
+      },
+      {
+       "id": "tj-koridor-13:ciledug",
+       "name": "Ciledug",
+       "lat": -6.223607,
+       "lng": 106.709009,
+       "sequence": 13
+      }
+     ]
+    },
+    {
+     "id": "tj-koridor-14",
+     "name": "Koridor 14",
+     "stations": [
+      {
+       "id": "tj-koridor-14:senen-toyota-rangga",
+       "name": "Senen Toyota Rangga",
+       "lat": -6.17823,
+       "lng": 106.842625,
+       "sequence": 0
+      },
+      {
+       "id": "tj-koridor-14:tanah-tinggi",
+       "name": "Tanah Tinggi",
+       "lat": -6.171199,
+       "lng": 106.85206,
+       "sequence": 1
+      },
+      {
+       "id": "tj-koridor-14:kemayoran",
+       "name": "Kemayoran",
+       "lat": -6.157945,
+       "lng": 106.851262,
+       "sequence": 2
+      },
+      {
+       "id": "tj-koridor-14:jiexpo-kemayoran",
+       "name": "JIEXPO Kemayoran",
+       "lat": -6.144799,
+       "lng": 106.848729,
+       "sequence": 3
+      },
+      {
+       "id": "tj-koridor-14:landasan-pacu",
+       "name": "Landasan Pacu",
+       "lat": -6.152102,
+       "lng": 106.854238,
+       "sequence": 4
+      },
+      {
+       "id": "tj-koridor-14:danau-agung",
+       "name": "Danau Agung",
+       "lat": -6.146794,
+       "lng": 106.857989,
+       "sequence": 5
+      },
+      {
+       "id": "tj-koridor-14:danau-sunter",
+       "name": "Danau Sunter",
+       "lat": -6.140821,
+       "lng": 106.856907,
+       "sequence": 6
+      },
+      {
+       "id": "tj-koridor-14:jembatan-item",
+       "name": "Jembatan Item",
+       "lat": -6.130929,
+       "lng": 106.855135,
+       "sequence": 7
+      },
+      {
+       "id": "tj-koridor-14:jakarta-international-stadium",
+       "name": "Jakarta International Stadium",
+       "lat": -6.126828,
+       "lng": 106.85557,
+       "sequence": 8
+      }
+     ]
+    },
+    {
+     "id": "tj-koridor-2",
+     "name": "Koridor 2",
+     "stations": [
+      {
+       "id": "tj-koridor-2:pulo-gadung",
+       "name": "Pulo Gadung",
+       "lat": -6.18326,
+       "lng": 106.909143,
+       "sequence": 0
+      },
+      {
+       "id": "tj-koridor-2:bermis",
+       "name": "Bermis",
+       "lat": -6.17823,
+       "lng": 106.898554,
+       "sequence": 1
+      },
+      {
+       "id": "tj-koridor-2:pulo-mas",
+       "name": "Pulo Mas",
+       "lat": -6.174586,
+       "lng": 106.892511,
+       "sequence": 2
+      },
+      {
+       "id": "tj-koridor-2:perintis-kemerdekaan",
+       "name": "Perintis Kemerdekaan",
+       "lat": -6.17177,
+       "lng": 106.888645,
+       "sequence": 3
+      },
+      {
+       "id": "tj-koridor-2:pedongkelan",
+       "name": "Pedongkelan",
+       "lat": -6.168031,
+       "lng": 106.882517,
+       "sequence": 4
+      },
+      {
+       "id": "tj-koridor-2:cempaka-mas",
+       "name": "Cempaka Mas",
+       "lat": -6.166628,
+       "lng": 106.875876,
+       "sequence": 5
+      },
+      {
+       "id": "tj-koridor-2:sumur-batu",
+       "name": "Sumur Batu",
+       "lat": -6.168671,
+       "lng": 106.870391,
+       "sequence": 6
+      },
+      {
+       "id": "tj-koridor-2:cempaka-baru",
+       "name": "Cempaka Baru",
+       "lat": -6.170435,
+       "lng": 106.866601,
+       "sequence": 7
+      },
+      {
+       "id": "tj-koridor-2:pasar-cempaka-putih",
+       "name": "Pasar Cempaka Putih",
+       "lat": -6.172328,
+       "lng": 106.862538,
+       "sequence": 8
+      },
+      {
+       "id": "tj-koridor-2:rawa-selatan",
+       "name": "Rawa Selatan",
+       "lat": -6.173924,
+       "lng": 106.858223,
+       "sequence": 9
+      },
+      {
+       "id": "tj-koridor-2:galur",
+       "name": "Galur",
+       "lat": -6.174452,
+       "lng": 106.854705,
+       "sequence": 10
+      },
+      {
+       "id": "tj-koridor-2:senen-toyota-rangga",
+       "name": "Senen Toyota Rangga",
+       "lat": -6.178307,
+       "lng": 106.842678,
+       "sequence": 11
+      },
+      {
+       "id": "tj-koridor-2:senen-raya",
+       "name": "Senen Raya",
+       "lat": -6.176245,
+       "lng": 106.840196,
+       "sequence": 12
+      },
+      {
+       "id": "tj-koridor-2:rspad",
+       "name": "RSPAD",
+       "lat": -6.175469,
+       "lng": 106.83676,
+       "sequence": 13
+      },
+      {
+       "id": "tj-koridor-2:pejambon",
+       "name": "Pejambon",
+       "lat": -6.173521,
+       "lng": 106.834776,
+       "sequence": 14
+      },
+      {
+       "id": "tj-koridor-2:gambir",
+       "name": "Gambir",
+       "lat": -6.174565,
+       "lng": 106.830442,
+       "sequence": 15
+      },
+      {
+       "id": "tj-koridor-2:istiqlal",
+       "name": "Istiqlal",
+       "lat": -6.172273,
+       "lng": 106.830937,
+       "sequence": 16
+      },
+      {
+       "id": "tj-koridor-2:juanda",
+       "name": "Juanda",
+       "lat": -6.168183,
+       "lng": 106.83045,
+       "sequence": 17
+      },
+      {
+       "id": "tj-koridor-2:pecenongan",
+       "name": "Pecenongan",
+       "lat": -6.167851,
+       "lng": 106.828171,
+       "sequence": 18
+      },
+      {
+       "id": "tj-koridor-2:monumen-nasional",
+       "name": "Monumen Nasional",
+       "lat": -6.176177,
+       "lng": 106.822986,
+       "sequence": 19
+      }
+     ]
+    },
+    {
+     "id": "tj-koridor-3",
+     "name": "Koridor 3",
+     "stations": [
+      {
+       "id": "tj-koridor-3:monumen-nasional",
+       "name": "Monumen Nasional",
+       "lat": -6.176178,
+       "lng": 106.822788,
+       "sequence": 0
+      },
+      {
+       "id": "tj-koridor-3:petojo",
+       "name": "Petojo",
+       "lat": -6.17002,
+       "lng": 106.816991,
+       "sequence": 1
+      },
+      {
+       "id": "tj-koridor-3:roxy",
+       "name": "Roxy",
+       "lat": -6.16633,
+       "lng": 106.796755,
+       "sequence": 2
+      },
+      {
+       "id": "tj-koridor-3:grogol",
+       "name": "Grogol",
+       "lat": -6.166876,
+       "lng": 106.789495,
+       "sequence": 3
+      },
+      {
+       "id": "tj-koridor-3:jelambar",
+       "name": "Jelambar",
+       "lat": -6.166571,
+       "lng": 106.78649,
+       "sequence": 4
+      },
+      {
+       "id": "tj-koridor-3:damai",
+       "name": "Damai",
+       "lat": -6.163371,
+       "lng": 106.775097,
+       "sequence": 5
+      },
+      {
+       "id": "tj-koridor-3:taman-kota",
+       "name": "Taman Kota",
+       "lat": -6.157178,
+       "lng": 106.757858,
+       "sequence": 6
+      },
+      {
+       "id": "tj-koridor-3:jembatan-gantung",
+       "name": "Jembatan Gantung",
+       "lat": -6.155511,
+       "lng": 106.749415,
+       "sequence": 7
+      },
+      {
+       "id": "tj-koridor-3:pulo-nangka",
+       "name": "Pulo Nangka",
+       "lat": -6.154639,
+       "lng": 106.738112,
+       "sequence": 8
+      },
+      {
+       "id": "tj-koridor-3:jembatan-baru",
+       "name": "Jembatan Baru",
+       "lat": -6.154833,
+       "lng": 106.730378,
+       "sequence": 9
+      },
+      {
+       "id": "tj-koridor-3:rawa-buaya",
+       "name": "Rawa Buaya",
+       "lat": -6.153938,
+       "lng": 106.726215,
+       "sequence": 10
+      },
+      {
+       "id": "tj-koridor-3:sumur-bor",
+       "name": "Sumur Bor",
+       "lat": -6.15306,
+       "lng": 106.719412,
+       "sequence": 11
+      },
+      {
+       "id": "tj-koridor-3:pesakih",
+       "name": "Pesakih",
+       "lat": -6.154843,
+       "lng": 106.715257,
+       "sequence": 12
+      },
+      {
+       "id": "tj-koridor-3:kalideres",
+       "name": "Kalideres",
+       "lat": -6.154495,
+       "lng": 106.705457,
+       "sequence": 13
+      }
+     ]
+    },
+    {
+     "id": "tj-koridor-4",
+     "name": "Koridor 4",
+     "stations": [
+      {
+       "id": "tj-koridor-4:pulo-gadung",
+       "name": "Pulo Gadung",
+       "lat": -6.183182,
+       "lng": 106.908693,
+       "sequence": 0
+      },
+      {
+       "id": "tj-koridor-4:pasar-pulogadung",
+       "name": "Pasar Pulogadung",
+       "lat": -6.187405,
+       "lng": 106.905959,
+       "sequence": 1
+      },
+      {
+       "id": "tj-koridor-4:pemuda-merdeka",
+       "name": "Pemuda Merdeka",
+       "lat": -6.19244,
+       "lng": 106.904879,
+       "sequence": 2
+      },
+      {
+       "id": "tj-koridor-4:layur",
+       "name": "Layur",
+       "lat": -6.193561,
+       "lng": 106.8991,
+       "sequence": 3
+      },
+      {
+       "id": "tj-koridor-4:pemuda-rawamangun",
+       "name": "Pemuda Rawamangun",
+       "lat": -6.193525,
+       "lng": 106.891706,
+       "sequence": 4
+      },
+      {
+       "id": "tj-koridor-4:velodrome",
+       "name": "Velodrome",
+       "lat": -6.1935,
+       "lng": 106.888366,
+       "sequence": 5
+      },
+      {
+       "id": "tj-koridor-4:kayu-jati",
+       "name": "Kayu Jati",
+       "lat": -6.193293,
+       "lng": 106.883686,
+       "sequence": 6
+      },
+      {
+       "id": "tj-koridor-4:rawamangun",
+       "name": "Rawamangun",
+       "lat": -6.192964,
+       "lng": 106.880388,
+       "sequence": 7
+      },
+      {
+       "id": "tj-koridor-4:simpang-pramuka",
+       "name": "Simpang Pramuka",
+       "lat": -6.19221,
+       "lng": 106.874011,
+       "sequence": 8
+      },
+      {
+       "id": "tj-koridor-4:pramuka-sari",
+       "name": "Pramuka Sari",
+       "lat": -6.192267,
+       "lng": 106.868568,
+       "sequence": 9
+      },
+      {
+       "id": "tj-koridor-4:utan-kayu",
+       "name": "Utan Kayu",
+       "lat": -6.192777,
+       "lng": 106.864598,
+       "sequence": 10
+      },
+      {
+       "id": "tj-koridor-4:pasar-genjing",
+       "name": "Pasar Genjing",
+       "lat": -6.194472,
+       "lng": 106.86095,
+       "sequence": 11
+      },
+      {
+       "id": "tj-koridor-4:flyover-pramuka",
+       "name": "Flyover Pramuka",
+       "lat": -6.199001,
+       "lng": 106.854572,
+       "sequence": 12
+      },
+      {
+       "id": "tj-koridor-4:manggarai",
+       "name": "Manggarai",
+       "lat": -6.208929,
+       "lng": 106.847395,
+       "sequence": 13
+      },
+      {
+       "id": "tj-koridor-4:pasar-rumput",
+       "name": "Pasar Rumput",
+       "lat": -6.207156,
+       "lng": 106.841131,
+       "sequence": 14
+      },
+      {
+       "id": "tj-koridor-4:halimun",
+       "name": "Halimun",
+       "lat": -6.205167,
+       "lng": 106.833386,
+       "sequence": 15
+      },
+      {
+       "id": "tj-koridor-4:galunggung",
+       "name": "Galunggung",
+       "lat": -6.204332,
+       "lng": 106.823423,
+       "sequence": 16
+      }
+     ]
+    },
+    {
+     "id": "tj-koridor-5",
+     "name": "Koridor 5",
+     "stations": [
+      {
+       "id": "tj-koridor-5:ancol",
+       "name": "Ancol",
+       "lat": -6.127473,
+       "lng": 106.83074,
+       "sequence": 0
+      },
+      {
+       "id": "tj-koridor-5:pademangan",
+       "name": "Pademangan",
+       "lat": -6.133709,
+       "lng": 106.831683,
+       "sequence": 1
+      },
+      {
+       "id": "tj-koridor-5:gunung-sahari",
+       "name": "Gunung Sahari",
+       "lat": -6.136785,
+       "lng": 106.832414,
+       "sequence": 2
+      },
+      {
+       "id": "tj-koridor-5:jembatan-merah",
+       "name": "Jembatan Merah",
+       "lat": -6.146731,
+       "lng": 106.834322,
+       "sequence": 3
+      },
+      {
+       "id": "tj-koridor-5:pasar-baru-timur",
+       "name": "Pasar Baru Timur",
+       "lat": -6.162324,
+       "lng": 106.838181,
+       "sequence": 4
+      },
+      {
+       "id": "tj-koridor-5:lapangan-banteng",
+       "name": "Lapangan Banteng",
+       "lat": -6.166008,
+       "lng": 106.839106,
+       "sequence": 5
+      },
+      {
+       "id": "tj-koridor-5:jaga-jakarta",
+       "name": "Jaga Jakarta",
+       "lat": -6.178105,
+       "lng": 106.842161,
+       "sequence": 6
+      },
+      {
+       "id": "tj-koridor-5:pal-putih",
+       "name": "Pal Putih",
+       "lat": -6.184568,
+       "lng": 106.844048,
+       "sequence": 7
+      },
+      {
+       "id": "tj-koridor-5:kramat-sentiong",
+       "name": "Kramat Sentiong",
+       "lat": -6.187931,
+       "lng": 106.845986,
+       "sequence": 8
+      },
+      {
+       "id": "tj-koridor-5:salemba",
+       "name": "Salemba",
+       "lat": -6.193341,
+       "lng": 106.848959,
+       "sequence": 9
+      },
+      {
+       "id": "tj-koridor-5:paseban",
+       "name": "Paseban",
+       "lat": -6.196728,
+       "lng": 106.851061,
+       "sequence": 10
+      },
+      {
+       "id": "tj-koridor-5:matraman",
+       "name": "Matraman",
+       "lat": -6.199954,
+       "lng": 106.854471,
+       "sequence": 11
+      },
+      {
+       "id": "tj-koridor-5:tegalan",
+       "name": "Tegalan",
+       "lat": -6.203094,
+       "lng": 106.857212,
+       "sequence": 12
+      },
+      {
+       "id": "tj-koridor-5:kesatrian",
+       "name": "Kesatrian",
+       "lat": -6.208537,
+       "lng": 106.859346,
+       "sequence": 13
+      },
+      {
+       "id": "tj-koridor-5:matraman-baru",
+       "name": "Matraman Baru",
+       "lat": -6.212944,
+       "lng": 106.861259,
+       "sequence": 14
+      },
+      {
+       "id": "tj-koridor-5:bali-mester",
+       "name": "Bali Mester",
+       "lat": -6.215713,
+       "lng": 106.866343,
+       "sequence": 15
+      },
+      {
+       "id": "tj-koridor-5:jatinegara",
+       "name": "Jatinegara",
+       "lat": -6.221428,
+       "lng": 106.868135,
+       "sequence": 16
+      },
+      {
+       "id": "tj-koridor-5:kampung-melayu",
+       "name": "Kampung Melayu",
+       "lat": -6.224513,
+       "lng": 106.867176,
+       "sequence": 17
+      }
+     ]
+    },
+    {
+     "id": "tj-koridor-6",
+     "name": "Koridor 6",
+     "stations": [
+      {
+       "id": "tj-koridor-6:ragunan",
+       "name": "Ragunan",
+       "lat": -6.305692,
+       "lng": 106.818836,
+       "sequence": 0
+      },
+      {
+       "id": "tj-koridor-6:simpang-ragunan-ar-raudhah",
+       "name": "Simpang Ragunan Ar-Raudhah",
+       "lat": -6.294612,
+       "lng": 106.822092,
+       "sequence": 1
+      },
+      {
+       "id": "tj-koridor-6:jati-barat",
+       "name": "Jati Barat",
+       "lat": -6.290983,
+       "lng": 106.823612,
+       "sequence": 2
+      },
+      {
+       "id": "tj-koridor-6:jatipadang",
+       "name": "Jatipadang",
+       "lat": -6.285416,
+       "lng": 106.826227,
+       "sequence": 3
+      },
+      {
+       "id": "tj-koridor-6:pejaten",
+       "name": "Pejaten",
+       "lat": -6.278392,
+       "lng": 106.829723,
+       "sequence": 4
+      },
+      {
+       "id": "tj-koridor-6:buncit-indah",
+       "name": "Buncit Indah",
+       "lat": -6.274322,
+       "lng": 106.830274,
+       "sequence": 5
+      },
+      {
+       "id": "tj-koridor-6:warung-jati",
+       "name": "Warung Jati",
+       "lat": -6.262368,
+       "lng": 106.829768,
+       "sequence": 6
+      },
+      {
+       "id": "tj-koridor-6:warung-buncit",
+       "name": "Warung Buncit",
+       "lat": -6.256982,
+       "lng": 106.828081,
+       "sequence": 7
+      },
+      {
+       "id": "tj-koridor-6:duren-tiga",
+       "name": "Duren Tiga",
+       "lat": -6.252385,
+       "lng": 106.826976,
+       "sequence": 8
+      },
+      {
+       "id": "tj-koridor-6:mampang-prapatan",
+       "name": "Mampang Prapatan",
+       "lat": -6.242685,
+       "lng": 106.825698,
+       "sequence": 9
+      },
+      {
+       "id": "tj-koridor-6:underpass-kuningan",
+       "name": "Underpass Kuningan",
+       "lat": -6.234894,
+       "lng": 106.828772,
+       "sequence": 10
+      },
+      {
+       "id": "tj-koridor-6:patra-kuningan",
+       "name": "Patra Kuningan",
+       "lat": -6.232671,
+       "lng": 106.832022,
+       "sequence": 11
+      },
+      {
+       "id": "tj-koridor-6:kuningan",
+       "name": "Kuningan",
+       "lat": -6.228657,
+       "lng": 106.833154,
+       "sequence": 12
+      },
+      {
+       "id": "tj-koridor-6:rasuna-said",
+       "name": "Rasuna Said",
+       "lat": -6.221748,
+       "lng": 106.832217,
+       "sequence": 13
+      },
+      {
+       "id": "tj-koridor-6:karet-kuningan",
+       "name": "Karet Kuningan",
+       "lat": -6.216809,
+       "lng": 106.830725,
+       "sequence": 14
+      },
+      {
+       "id": "tj-koridor-6:kuningan-madya",
+       "name": "Kuningan Madya",
+       "lat": -6.213174,
+       "lng": 106.830415,
+       "sequence": 15
+      },
+      {
+       "id": "tj-koridor-6:setiabudi-integritas",
+       "name": "Setiabudi Integritas",
+       "lat": -6.209319,
+       "lng": 106.830183,
+       "sequence": 16
+      },
+      {
+       "id": "tj-koridor-6:flyover-kuningan",
+       "name": "Flyover Kuningan",
+       "lat": -6.202849,
+       "lng": 106.827607,
+       "sequence": 17
+      },
+      {
+       "id": "tj-koridor-6:halimun",
+       "name": "Halimun",
+       "lat": -6.205167,
+       "lng": 106.833386,
+       "sequence": 18
+      },
+      {
+       "id": "tj-koridor-6:galunggung",
+       "name": "Galunggung",
+       "lat": -6.204455,
+       "lng": 106.823401,
+       "sequence": 19
+      }
+     ]
+    },
+    {
+     "id": "tj-koridor-7",
+     "name": "Koridor 7",
+     "stations": [
+      {
+       "id": "tj-koridor-7:kampung-rambutan",
+       "name": "Kampung Rambutan",
+       "lat": -6.309229,
+       "lng": 106.88161,
+       "sequence": 0
+      },
+      {
+       "id": "tj-koridor-7:tanah-merdeka",
+       "name": "Tanah Merdeka",
+       "lat": -6.308245,
+       "lng": 106.873926,
+       "sequence": 1
+      },
+      {
+       "id": "tj-koridor-7:flyover-raya-bogor",
+       "name": "Flyover Raya Bogor",
+       "lat": -6.306627,
+       "lng": 106.865619,
+       "sequence": 2
+      },
+      {
+       "id": "tj-koridor-7:trikora",
+       "name": "Trikora",
+       "lat": -6.301902,
+       "lng": 106.868015,
+       "sequence": 3
+      },
+      {
+       "id": "tj-koridor-7:pasar-induk",
+       "name": "Pasar Induk",
+       "lat": -6.294217,
+       "lng": 106.871989,
+       "sequence": 4
+      },
+      {
+       "id": "tj-koridor-7:kramat-jati",
+       "name": "Kramat Jati",
+       "lat": -6.268836,
+       "lng": 106.866588,
+       "sequence": 5
+      },
+      {
+       "id": "tj-koridor-7:ciliitan",
+       "name": "Ciliitan",
+       "lat": -6.262466,
+       "lng": 106.86632,
+       "sequence": 6
+      },
+      {
+       "id": "tj-koridor-7:cawang-cililitan",
+       "name": "Cawang Cililitan",
+       "lat": -6.257708,
+       "lng": 106.869967,
+       "sequence": 7
+      },
+      {
+       "id": "tj-koridor-7:cawang-sentral",
+       "name": "Cawang Sentral",
+       "lat": -6.250244,
+       "lng": 106.873589,
+       "sequence": 8
+      },
+      {
+       "id": "tj-koridor-7:cawang",
+       "name": "Cawang",
+       "lat": -6.245935,
+       "lng": 106.871197,
+       "sequence": 9
+      },
+      {
+       "id": "tj-koridor-7:cawang-baru",
+       "name": "Cawang Baru",
+       "lat": -6.243629,
+       "lng": 106.868749,
+       "sequence": 10
+      },
+      {
+       "id": "tj-koridor-7:gelanggang-remaja",
+       "name": "Gelanggang Remaja",
+       "lat": -6.235436,
+       "lng": 106.867907,
+       "sequence": 11
+      },
+      {
+       "id": "tj-koridor-7:bidara-cina",
+       "name": "Bidara Cina",
+       "lat": -6.229739,
+       "lng": 106.867173,
+       "sequence": 12
+      },
+      {
+       "id": "tj-koridor-7:kampung-melayu",
+       "name": "Kampung Melayu",
+       "lat": -6.224735,
+       "lng": 106.866745,
+       "sequence": 13
+      }
+     ]
+    },
+    {
+     "id": "tj-koridor-8",
+     "name": "Koridor 8",
+     "stations": [
+      {
+       "id": "tj-koridor-8:pasar-baru",
+       "name": "Pasar Baru",
+       "lat": -6.166118,
+       "lng": 106.834787,
+       "sequence": 0
+      },
+      {
+       "id": "tj-koridor-8:juanda",
+       "name": "Juanda",
+       "lat": -6.168154,
+       "lng": 106.830613,
+       "sequence": 1
+      },
+      {
+       "id": "tj-koridor-8:pecenongan",
+       "name": "Pecenongan",
+       "lat": -6.167851,
+       "lng": 106.828171,
+       "sequence": 2
+      },
+      {
+       "id": "tj-koridor-8:petojo",
+       "name": "Petojo",
+       "lat": -6.17002,
+       "lng": 106.816991,
+       "sequence": 3
+      },
+      {
+       "id": "tj-koridor-8:tarakan",
+       "name": "Tarakan",
+       "lat": -6.171191,
+       "lng": 106.810129,
+       "sequence": 4
+      },
+      {
+       "id": "tj-koridor-8:tomang-raya",
+       "name": "Tomang Raya",
+       "lat": -6.176882,
+       "lng": 106.80045,
+       "sequence": 5
+      },
+      {
+       "id": "tj-koridor-8:tanjung-duren",
+       "name": "Tanjung Duren",
+       "lat": -6.175523,
+       "lng": 106.79217,
+       "sequence": 6
+      },
+      {
+       "id": "tj-koridor-8:jelambar",
+       "name": "Jelambar",
+       "lat": -6.166571,
+       "lng": 106.78649,
+       "sequence": 7
+      },
+      {
+       "id": "tj-koridor-8:damai",
+       "name": "Damai",
+       "lat": -6.163371,
+       "lng": 106.775097,
+       "sequence": 8
+      },
+      {
+       "id": "tj-koridor-8:kedoya",
+       "name": "Kedoya",
+       "lat": -6.164453,
+       "lng": 106.763075,
+       "sequence": 9
+      },
+      {
+       "id": "tj-koridor-8:kedoya-panjang",
+       "name": "Kedoya Panjang",
+       "lat": -6.174492,
+       "lng": 106.765905,
+       "sequence": 10
+      },
+      {
+       "id": "tj-koridor-8:duri-kepa",
+       "name": "Duri Kepa",
+       "lat": -6.18526,
+       "lng": 106.768459,
+       "sequence": 11
+      },
+      {
+       "id": "tj-koridor-8:kebon-jeruk",
+       "name": "Kebon Jeruk",
+       "lat": -6.194289,
+       "lng": 106.768911,
+       "sequence": 12
+      },
+      {
+       "id": "tj-koridor-8:kelapa-dua-sasak",
+       "name": "Kelapa Dua Sasak",
+       "lat": -6.20555,
+       "lng": 106.76957,
+       "sequence": 13
+      },
+      {
+       "id": "tj-koridor-8:pos-pengumben",
+       "name": "Pos Pengumben",
+       "lat": -6.212914,
+       "lng": 106.772279,
+       "sequence": 14
+      },
+      {
+       "id": "tj-koridor-8:arteri",
+       "name": "Arteri",
+       "lat": -6.218364,
+       "lng": 106.77759,
+       "sequence": 15
+      },
+      {
+       "id": "tj-koridor-8:permata-hijau",
+       "name": "Permata Hijau",
+       "lat": -6.221389,
+       "lng": 106.783237,
+       "sequence": 16
+      },
+      {
+       "id": "tj-koridor-8:simprug",
+       "name": "Simprug",
+       "lat": -6.233924,
+       "lng": 106.786562,
+       "sequence": 17
+      },
+      {
+       "id": "tj-koridor-8:kebayoran",
+       "name": "Kebayoran",
+       "lat": -6.238413,
+       "lng": 106.783294,
+       "sequence": 18
+      },
+      {
+       "id": "tj-koridor-8:bungur",
+       "name": "Bungur",
+       "lat": -6.252662,
+       "lng": 106.78168,
+       "sequence": 19
+      },
+      {
+       "id": "tj-koridor-8:tanah-kusir",
+       "name": "Tanah Kusir",
+       "lat": -6.256967,
+       "lng": 106.781733,
+       "sequence": 20
+      },
+      {
+       "id": "tj-koridor-8:pondok-indah",
+       "name": "Pondok Indah",
+       "lat": -6.267213,
+       "lng": 106.783741,
+       "sequence": 21
+      },
+      {
+       "id": "tj-koridor-8:underpass-lebak-bulus",
+       "name": "Underpass Lebak Bulus",
+       "lat": -6.286794,
+       "lng": 106.780065,
+       "sequence": 22
+      },
+      {
+       "id": "tj-koridor-8:lebak-bulus",
+       "name": "Lebak Bulus",
+       "lat": -6.289383,
+       "lng": 106.774015,
+       "sequence": 23
+      }
+     ]
+    },
+    {
+     "id": "tj-koridor-9",
+     "name": "Koridor 9",
+     "stations": [
+      {
+       "id": "tj-koridor-9:pinang-ranti",
+       "name": "Pinang Ranti",
+       "lat": -6.291249,
+       "lng": 106.886351,
+       "sequence": 0
+      },
+      {
+       "id": "tj-koridor-9:makasar",
+       "name": "Makasar",
+       "lat": -6.290174,
+       "lng": 106.881152,
+       "sequence": 1
+      },
+      {
+       "id": "tj-koridor-9:cawang-sentral",
+       "name": "Cawang Sentral",
+       "lat": -6.250465,
+       "lng": 106.873479,
+       "sequence": 2
+      },
+      {
+       "id": "tj-koridor-9:cawang",
+       "name": "Cawang",
+       "lat": -6.245971,
+       "lng": 106.871318,
+       "sequence": 3
+      },
+      {
+       "id": "tj-koridor-9:ciliwung",
+       "name": "Ciliwung",
+       "lat": -6.243303,
+       "lng": 106.86358,
+       "sequence": 4
+      },
+      {
+       "id": "tj-koridor-9:cikoko",
+       "name": "Cikoko",
+       "lat": -6.243374,
+       "lng": 106.858079,
+       "sequence": 5
+      },
+      {
+       "id": "tj-koridor-9:tebet-eco-park",
+       "name": "Tebet Eco Park",
+       "lat": -6.243358,
+       "lng": 106.852101,
+       "sequence": 6
+      },
+      {
+       "id": "tj-koridor-9:pancoran-tugu",
+       "name": "Pancoran Tugu",
+       "lat": -6.243588,
+       "lng": 106.843812,
+       "sequence": 7
+      },
+      {
+       "id": "tj-koridor-9:pancoran",
+       "name": "Pancoran",
+       "lat": -6.241695,
+       "lng": 106.837278,
+       "sequence": 8
+      },
+      {
+       "id": "tj-koridor-9:tegal-parang",
+       "name": "Tegal Parang",
+       "lat": -6.238853,
+       "lng": 106.830194,
+       "sequence": 9
+      },
+      {
+       "id": "tj-koridor-9:simpang-kuningan",
+       "name": "Simpang Kuningan",
+       "lat": -6.237453,
+       "lng": 106.827808,
+       "sequence": 10
+      },
+      {
+       "id": "tj-koridor-9:denpasar",
+       "name": "Denpasar",
+       "lat": -6.233238,
+       "lng": 106.821772,
+       "sequence": 11
+      },
+      {
+       "id": "tj-koridor-9:widya-chandra-telkomsel",
+       "name": "Widya Chandra Telkomsel",
+       "lat": -6.22728,
+       "lng": 106.817532,
+       "sequence": 12
+      },
+      {
+       "id": "tj-koridor-9:semanggi",
+       "name": "Semanggi",
+       "lat": -6.220545,
+       "lng": 106.812908,
+       "sequence": 13
+      },
+      {
+       "id": "tj-koridor-9:gerbang-pemuda",
+       "name": "Gerbang Pemuda",
+       "lat": -6.213854,
+       "lng": 106.808355,
+       "sequence": 14
+      },
+      {
+       "id": "tj-koridor-9:petamburan",
+       "name": "Petamburan",
+       "lat": -6.202046,
+       "lng": 106.799724,
+       "sequence": 15
+      },
+      {
+       "id": "tj-koridor-9:kemanggisan",
+       "name": "Kemanggisan",
+       "lat": -6.189816,
+       "lng": 106.796926,
+       "sequence": 16
+      },
+      {
+       "id": "tj-koridor-9:kota-bambu",
+       "name": "Kota Bambu",
+       "lat": -6.18444,
+       "lng": 106.796757,
+       "sequence": 17
+      },
+      {
+       "id": "tj-koridor-9:tanjung-duren",
+       "name": "Tanjung Duren",
+       "lat": -6.175523,
+       "lng": 106.79217,
+       "sequence": 18
+      },
+      {
+       "id": "tj-koridor-9:grogol-reformasi",
+       "name": "Grogol Reformasi",
+       "lat": -6.167234,
+       "lng": 106.787762,
+       "sequence": 19
+      },
+      {
+       "id": "tj-koridor-9:kali-grogol",
+       "name": "Kali Grogol",
+       "lat": -6.16108,
+       "lng": 106.790372,
+       "sequence": 20
+      },
+      {
+       "id": "tj-koridor-9:jembatan-besi",
+       "name": "Jembatan Besi",
+       "lat": -6.152014,
+       "lng": 106.794898,
+       "sequence": 21
+      },
+      {
+       "id": "tj-koridor-9:jembatan-dua",
+       "name": "Jembatan Dua",
+       "lat": -6.143281,
+       "lng": 106.793452,
+       "sequence": 22
+      },
+      {
+       "id": "tj-koridor-9:jembatan-tiga",
+       "name": "Jembatan Tiga",
+       "lat": -6.133413,
+       "lng": 106.792648,
+       "sequence": 23
+      },
+      {
+       "id": "tj-koridor-9:penjaringan",
+       "name": "Penjaringan",
+       "lat": -6.126256,
+       "lng": 106.79197,
+       "sequence": 24
+      },
+      {
+       "id": "tj-koridor-9:pluit",
+       "name": "Pluit",
+       "lat": -6.115744,
+       "lng": 106.790127,
+       "sequence": 25
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
