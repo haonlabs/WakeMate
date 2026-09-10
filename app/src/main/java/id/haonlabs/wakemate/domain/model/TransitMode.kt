@@ -6,12 +6,18 @@ package id.haonlabs.wakemate.domain.model
  */
 enum class TransitMode(
     val label: String,
-    /** Sejauh apa user boleh menyimpang dari polyline line sebelum dianggap salah naik. */
+    /**
+     * Sejauh apa user boleh menyimpang dari polyline line sebelum dianggap salah naik. Ini jarak
+     * *tegak lurus* ke rute, jadi patokannya bukan kerapatan halte melainkan galat model ditambah
+     * galat GPS. Replay geometri rel asli mengukur simpangan garis-lurus terhadap jalur sebenarnya
+     * mencapai 783 m di Lin Bogor dan 250 m di Koridor 1; angka di bawah menyisakan ruang untuk
+     * galat GPS di atas itu.
+     */
     val offRouteToleranceMeters: Double,
     /** Radius yang dianggap "sudah sampai" tujuan. */
     val arrivalRadiusMeters: Double,
 ) {
     KRL("KRL Commuter Line", offRouteToleranceMeters = 1_500.0, arrivalRadiusMeters = 250.0),
     MRT("MRT Jakarta", offRouteToleranceMeters = 1_000.0, arrivalRadiusMeters = 200.0),
-    TRANSJAKARTA("Transjakarta", offRouteToleranceMeters = 400.0, arrivalRadiusMeters = 100.0),
+    TRANSJAKARTA("Transjakarta", offRouteToleranceMeters = 700.0, arrivalRadiusMeters = 100.0),
 }

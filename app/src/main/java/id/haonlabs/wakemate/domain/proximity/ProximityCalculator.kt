@@ -73,6 +73,8 @@ class ProximityCalculator(
     private var speedMps = 0.0
     /** +1 searah urutan stasiun, -1 berlawanan, 0 selama belum ada perpindahan yang meyakinkan. */
     private var travelSign = 0.0
+    /** Titik acuan arah; sengaja tidak digeser tiap fix, lihat [updateMotion]. */
+    private var directionAnchor = Double.NaN
 
     fun onLocation(point: GeoPoint, timestampMs: Long): ProximityState {
         val px = (point.lng - route[0].lng) * METERS_PER_DEGREE * cosLat
@@ -124,10 +126,23 @@ class ProximityCalculator(
         // Lompatan GPS (mis. keluar terowongan) akan mengarang kecepatan; abaikan saja.
         if (abs(observed) > MAX_PLAUSIBLE_SPEED_MPS) return
         speedMps = if (speedMps == 0.0) observed else SMOOTHING * observed + (1 - SMOOTHING) * speedMps
+
         // Arah dibaca dari perpindahan mentah, bukan dari kecepatan yang sudah dihaluskan: EMA
         // butuh beberapa update untuk membalik tanda, dan peringatan "kamu menjauh" yang telat
-        // satu-dua update persis kehilangan gunanya. Ambang jarak menyaring jitter GPS diam.
-        if (abs(moved) > MIN_DIRECTION_DELTA_METERS) travelSign = sign(moved)
+        // satu-dua update persis kehilangan gunanya.
+        //
+        // Yang dibandingkan adalah jarak dari titik acuan yang menetap, bukan dari fix sebelumnya.
+        // Transjakarta hanya menempuh ~47 m antar fix sementara galat GPS menggeser ~85 m, jadi
+        // selisih antar dua fix berurutan lebih banyak berisi noise daripada perjalanan — replay
+        // jalur asli menunjukkan 16% update salah dilaporkan "menjauh" dengan cara itu. Acuan baru
+        // dipasang hanya setelah benar-benar berpindah sejauh ambang, sehingga perjalanan nyata
+        // selalu mendominasi galat.
+        if (directionAnchor.isNaN()) directionAnchor = progress
+        val fromAnchor = newProgress - directionAnchor
+        if (abs(fromAnchor) > DIRECTION_BASELINE_METERS) {
+            travelSign = sign(fromAnchor)
+            directionAnchor = newProgress
+        }
     }
 
     private fun stateAt(at: Double, offRouteMeters: Double, deadReckoned: Boolean): ProximityState {
@@ -162,8 +177,11 @@ class ProximityCalculator(
         /** Meter per derajat lintang pada bola berjari-jari rata-rata bumi. */
         const val METERS_PER_DEGREE = 111_194.93
         const val MIN_MOVING_MPS = 1.0
-        /** Di atas jitter GPS saat diam, di bawah jarak antar halte Transjakarta terdekat. */
-        const val MIN_DIRECTION_DELTA_METERS = 50.0
+        /**
+         * Cukup jauh agar perjalanan nyata mengalahkan galat GPS, cukup dekat agar putar balik
+         * ketahuan dalam hitungan detik (~12 detik di KRL, ~40 detik di Transjakarta).
+         */
+        const val DIRECTION_BASELINE_METERS = 200.0
         const val MAX_PLAUSIBLE_SPEED_MPS = 45.0 // ~160 km/jam, di atas semua moda di sini
         const val SMOOTHING = 0.4
         const val STALE_AFTER_SECONDS = 20.0
