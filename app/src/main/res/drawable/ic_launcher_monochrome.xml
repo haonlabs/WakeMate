@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ikon bertema (Android 13+). Bulan dilubangi dari badan pin lewat fillType evenOdd,
+     karena VectorDrawable tidak punya operasi pengurangan bentuk. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+    <group
+        android:pivotX="256"
+        android:pivotY="250"
+        android:scaleX="0.95"
+        android:scaleY="0.95"
+        android:translateY="6">
+        <path
+            android:fillColor="#FFFFFF"
+            android:fillType="evenOdd"
+            android:pathData="M256,122 C198,122 152,168 152,226 C152,278 206,338 245.5,373.2 C251.5,378.5 260.5,378.5 266.5,373.2 C306,338 360,278 360,226 C360,168 314,122 256,122 Z M276,182 C241.5,182 215,208.5 215,243 C215,268 229.5,289.5 251,299 C244,290 239.5,278.5 239.5,266 C239.5,236 264,211.5 294,211.5 C301.5,211.5 308.5,213 315,215.8 C306,195.8 292.5,182 276,182 Z" />
+    </group>
+</vector>

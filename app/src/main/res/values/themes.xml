@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.WakeMate" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Gelap, dengan latar jendela berwarna sama seperti tema Compose supaya peluncuran aplikasi
+         tidak berkedip putih di gerbong yang gelap. -->
+    <style name="Theme.WakeMate" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/midnight</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
 </resources>

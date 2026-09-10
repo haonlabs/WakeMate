@@ -1,10 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ikon status bar: siluet putih, mengikuti bentuk pin di ikon aplikasi supaya notifikasi
+     dan peluncur terbaca sebagai satu identitas. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24"
+    android:viewportWidth="512"
+    android:viewportHeight="512"
     android:tint="#FFFFFF">
-    <path
-        android:fillColor="@android:color/white"
-        android:pathData="M12,2C8.13,2 5,5.13 5,9c0,1.74 0.5,3.37 1.41,4.84L12,22l5.59,-8.16C18.5,12.37 19,10.74 19,9c0,-3.87 -3.13,-7 -7,-7zM12,11.5c-1.38,0 -2.5,-1.12 -2.5,-2.5s1.12,-2.5 2.5,-2.5 2.5,1.12 2.5,2.5 -1.12,2.5 -2.5,2.5z" />
+    <group
+        android:pivotX="256"
+        android:pivotY="250"
+        android:scaleX="1.8"
+        android:scaleY="1.8"
+        android:translateY="6">
+        <path
+            android:fillColor="@android:color/white"
+            android:fillType="evenOdd"
+            android:pathData="M256,122 C198,122 152,168 152,226 C152,278 206,338 245.5,373.2 C251.5,378.5 260.5,378.5 266.5,373.2 C306,338 360,278 360,226 C360,168 314,122 256,122 Z M276,182 C241.5,182 215,208.5 215,243 C215,268 229.5,289.5 251,299 C244,290 239.5,278.5 239.5,266 C239.5,236 264,211.5 294,211.5 C301.5,211.5 308.5,213 315,215.8 C306,195.8 292.5,182 276,182 Z" />
+    </group>
 </vector>
