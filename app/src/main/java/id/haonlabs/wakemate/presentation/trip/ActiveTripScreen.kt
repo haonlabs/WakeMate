@@ -11,6 +11,14 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,7 +34,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.Surface
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -66,7 +76,21 @@ fun ActiveTripScreen(
     }
     val current = trip ?: return
 
-    Scaffold(topBar = { TopAppBar(title = { Text("Perjalanan aktif") }) }) { padding ->
+    Scaffold(
+        topBar = { TopAppBar(title = { Text("Perjalanan aktif") }) },
+        bottomBar = {
+            // Alarm bisa dimatikan dari notifikasi atau dari sini; keduanya berarti hal yang sama
+            // ("saya sudah bangun"), jadi user tidak perlu mencari yang mana yang benar. Ditempel
+            // di bawah supaya terjangkau tanpa menggulir oleh orang yang baru bangun.
+            AnimatedVisibility(
+                visible = current.hasAlerted,
+                enter = slideInVertically { it } + fadeIn(),
+                exit = slideOutVertically { it } + fadeOut(),
+            ) {
+                AlarmActionBar(onStop = { viewModel.onComplete() })
+            }
+        },
+    ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -101,9 +125,14 @@ fun ActiveTripScreen(
             item {
                 OutlinedButton(
                     onClick = { viewModel.onCancel() },
+                    shape = RoundedCornerShape(16.dp),
+                    contentPadding = PaddingValues(vertical = 14.dp),
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 ) {
-                    Text("Batalkan pantauan perjalanan")
+                    Text(
+                        if (current.hasAlerted) "Batalkan perjalanan tanpa menandai sampai"
+                        else "Batalkan pantauan perjalanan"
+                    )
                 }
             }
             item {
@@ -275,4 +304,65 @@ private fun WarningCard(warning: String) {
             Text(warning, style = MaterialTheme.typography.bodyMedium)
         }
     }
+}
+
+@Composable
+private fun AlarmActionBar(onStop: () -> Unit) {
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        tonalElevation = 3.dp,
+        shadowElevation = 12.dp,
+    ) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                PulsingDot()
+                Text(
+                    "Alarm sedang berbunyi",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.secondary,
+                )
+            }
+            Button(
+                onClick = onStop,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary,
+                ),
+                shape = RoundedCornerShape(18.dp),
+                contentPadding = PaddingValues(vertical = 18.dp),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    "Saya sudah bangun — matikan alarm",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            }
+        }
+    }
+}
+
+/** Denyut kecil supaya bar ini terbaca sebagai "sedang terjadi", bukan tombol diam. */
+@Composable
+private fun PulsingDot() {
+    val transition = rememberInfiniteTransition(label = "denyut")
+    val alpha by transition.animateFloat(
+        initialValue = 1f,
+        targetValue = 0.25f,
+        animationSpec = infiniteRepeatable(tween(700), RepeatMode.Reverse),
+        label = "alpha",
+    )
+    Box(
+        Modifier
+            .size(12.dp)
+            .background(MaterialTheme.colorScheme.secondary.copy(alpha = alpha), CircleShape)
+    )
 }
