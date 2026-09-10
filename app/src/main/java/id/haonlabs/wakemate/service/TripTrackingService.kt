@@ -204,6 +204,7 @@ class TripTrackingService : Service() {
      * selesai sebelum ini dipanggil — bukan di-launch berbarengan.
      */
     private fun stopTracking(): Int {
+        alertManager.stop()
         locationLog.stop()
         trackingJob?.cancel()
         trackingJob = null

@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import id.haonlabs.wakemate.domain.model.AlertThreshold
 import id.haonlabs.wakemate.domain.model.Station
 import id.haonlabs.wakemate.domain.repository.StationRepository
+import id.haonlabs.wakemate.domain.settings.AlarmSettings
 import id.haonlabs.wakemate.domain.usecase.StartTripUseCase
 import id.haonlabs.wakemate.presentation.TripSetup
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +22,7 @@ data class TripSetupUiState(
     val station: Station? = null,
     val lineName: String = "",
     val threshold: AlertThreshold = AlertThreshold.DEFAULT,
+    val speakerFallback: Boolean = true,
     val started: Boolean = false,
     val error: String? = null,
 )
@@ -29,6 +31,7 @@ data class TripSetupUiState(
 class TripSetupViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val stationRepository: StationRepository,
+    private val alarmSettings: AlarmSettings,
     private val startTrip: StartTripUseCase,
 ) : ViewModel() {
 
@@ -45,6 +48,15 @@ class TripSetupViewModel @Inject constructor(
                 .firstOrNull { it.id == route.lineId }?.name.orEmpty()
             _state.update { it.copy(station = station, lineName = lineName) }
         }
+        viewModelScope.launch {
+            alarmSettings.speakerFallback.collect { allowed ->
+                _state.update { it.copy(speakerFallback = allowed) }
+            }
+        }
+    }
+
+    fun onSpeakerFallbackChanged(allowed: Boolean) {
+        viewModelScope.launch { alarmSettings.setSpeakerFallback(allowed) }
     }
 
     fun onThresholdChanged(threshold: AlertThreshold) {

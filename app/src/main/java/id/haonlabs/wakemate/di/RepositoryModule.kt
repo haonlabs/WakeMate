@@ -10,7 +10,7 @@ import id.haonlabs.wakemate.domain.repository.StationRepository
 import id.haonlabs.wakemate.domain.repository.TripRepository
 import id.haonlabs.wakemate.domain.trip.TripTracker
 import id.haonlabs.wakemate.service.AlertManager
-import id.haonlabs.wakemate.service.NotificationAlertManager
+import id.haonlabs.wakemate.service.AlarmAlertManager
 import id.haonlabs.wakemate.service.ServiceTripTracker
 import javax.inject.Singleton
 
@@ -30,5 +30,5 @@ abstract class RepositoryModule {
     abstract fun tripTracker(impl: ServiceTripTracker): TripTracker
 
     @Binds
-    abstract fun alertManager(impl: NotificationAlertManager): AlertManager
+    abstract fun alertManager(impl: AlarmAlertManager): AlertManager
 }
