@@ -39,6 +39,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true // LocationLog hanya aktif di build debug.
     }
 }
 

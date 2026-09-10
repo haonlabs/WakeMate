@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import dagger.hilt.android.AndroidEntryPoint
+import id.haonlabs.wakemate.data.location.LocationLog
 import id.haonlabs.wakemate.data.location.LocationTracker
 import id.haonlabs.wakemate.data.location.TrackingProfile
 import id.haonlabs.wakemate.domain.model.AlertThreshold
@@ -42,6 +43,7 @@ import javax.inject.Inject
 class TripTrackingService : Service() {
 
     @Inject lateinit var locationTracker: LocationTracker
+    @Inject lateinit var locationLog: LocationLog
     @Inject lateinit var stationRepository: StationRepository
     @Inject lateinit var tripRepository: TripRepository
     @Inject lateinit var alertManager: AlertManager
@@ -110,6 +112,7 @@ class TripTrackingService : Service() {
         // sesi berikutnya mewarisi mode hemat dari sesi sebelumnya dan fix pertamanya tidak
         // pernah datang.
         locationTracker.setRequest(TrackingProfile.near())
+        locationLog.start(trip)
 
         val fixes = flow<Event> { locationTracker.locations.collect { emit(Event.Fix(it)) } }
         // Denyut terpisah supaya estimasi tanpa GPS (terowongan MRT) tetap jalan walau fix berhenti.
@@ -120,16 +123,27 @@ class TripTrackingService : Service() {
             }
         }
 
+        var lastFixAt = System.currentTimeMillis()
+
         merge(fixes, ticks)
             .catch { error ->
                 // Izin lokasi dicabut di tengah sesi: berhenti, jangan pura-pura masih tracking.
                 Log.e(TAG, "Tracking berhenti", error)
-                endSession(completed = false)
+                endSession(completed = false, reason = SessionEnd.NO_SIGNAL)
             }
             .collect { event ->
                 val now = System.currentTimeMillis()
+                // Diperiksa di jalur denyut juga, bukan hanya saat ada fix — justru sesi yang
+                // tidak pernah menerima fix lagi yang paling perlu dihentikan.
+                sessionExhausted(trip.session.startedAt, lastFixAt, now)?.let { reason ->
+                    endSession(completed = false, reason = reason)
+                    return@collect
+                }
                 val state = when (event) {
-                    is Event.Fix -> calculator.onLocation(event.point, now)
+                    is Event.Fix -> {
+                        lastFixAt = now
+                        calculator.onLocation(event.point, now)
+                    }
                     Event.Tick -> calculator.onNoFix(now)
                 } ?: return@collect
                 onProximity(state, threshold, now)
@@ -148,6 +162,7 @@ class TripTrackingService : Service() {
         if (!trip.hasAlerted) {
             if (state.hasReached(threshold)) {
                 alertManager.alert(trip)
+                locationLog.event("alert")
                 tripRepository.markAlerted(now)
             }
             return
@@ -168,11 +183,17 @@ class TripTrackingService : Service() {
     }
 
     /** Tutup sesi di Room lalu matikan service — urutannya penting, lihat [stopTracking]. */
-    private fun endSession(completed: Boolean): Int {
+    private fun endSession(completed: Boolean, reason: SessionEnd? = null): Int {
         trackingJob?.cancel()
         trackingJob = null
         scope.launch {
             if (completed) tripRepository.complete() else tripRepository.cancel()
+            // Berhenti tanpa memberi tahu adalah kegagalan terburuk untuk app pengingat: user
+            // mengira masih dijaga padahal tidak.
+            reason?.let {
+                locationLog.event("berhenti:${it.name}")
+                notifications.postSessionEnded(it)
+            }
             stopTracking()
         }
         return START_NOT_STICKY
@@ -183,6 +204,7 @@ class TripTrackingService : Service() {
      * selesai sebelum ini dipanggil — bukan di-launch berbarengan.
      */
     private fun stopTracking(): Int {
+        locationLog.stop()
         trackingJob?.cancel()
         trackingJob = null
         notifications.clearAlert()

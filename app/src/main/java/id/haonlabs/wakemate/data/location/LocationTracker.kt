@@ -49,8 +49,16 @@ object TrackingProfile {
 @Singleton
 class LocationTracker @Inject constructor(
     @param:ApplicationContext private val context: Context,
+    private val locationLog: LocationLog,
 ) {
     private val client = LocationServices.getFusedLocationProviderClient(context)
+    /**
+     * Berganti profil menutup satu request dan membuka yang baru, dan request baru langsung
+     * mengirim ulang fix terakhir yang sama. Disaring pakai waktu fix dari penyedia, bukan
+     * koordinat: dua fix beda yang kebetulan berkoordinat sama tetap harus lewat, kalau tidak
+     * kendaraan yang lama berhenti akan terlihat seperti kehilangan sinyal.
+     */
+    private var lastFixTime = Long.MIN_VALUE
     // Mulai dari mode akurat supaya fix pertama datang cepat; sesi turun ke mode hemat begitu
     // ketahuan masih jauh dari tujuan.
     private val request = MutableStateFlow(TrackingProfile.near())
@@ -74,7 +82,11 @@ class LocationTracker @Inject constructor(
             .build()
         val callback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
-                result.lastLocation?.let { trySend(GeoPoint(it.latitude, it.longitude)) }
+                val fix = result.lastLocation ?: return
+                if (fix.time == lastFixTime) return
+                lastFixTime = fix.time
+                locationLog.record(fix)
+                trySend(GeoPoint(fix.latitude, fix.longitude))
             }
         }
         try {

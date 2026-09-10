@@ -97,6 +97,23 @@ class TripNotifications @Inject constructor(
 
     fun clearAlert() = manager.cancel(ID_ALERT)
 
+    /** Sengaja di channel alert: user perlu tahu jaring pengamannya sudah tidak aktif. */
+    fun postSessionEnded(reason: id.haonlabs.wakemate.service.SessionEnd) {
+        if (!hasPermission()) return
+        manager.notify(
+            ID_SESSION_ENDED,
+            NotificationCompat.Builder(context, CHANNEL_ALERT)
+                .setSmallIcon(R.drawable.ic_stat_wakemate)
+                .setContentTitle("Pengingat WakeMate berhenti")
+                .setContentText(reason.message)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(reason.message))
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setAutoCancel(true)
+                .setContentIntent(openApp())
+                .build(),
+        )
+    }
+
     private fun progressText(trip: ActiveTrip): String {
         val proximity = trip.proximity ?: return "Menunggu sinyal GPS..."
         val prefix = when {
@@ -131,5 +148,6 @@ class TripNotifications @Inject constructor(
         const val CHANNEL_ALERT = "trip_alert"
         const val ID_PROGRESS = 1
         const val ID_ALERT = 2
+        const val ID_SESSION_ENDED = 3
     }
 }
