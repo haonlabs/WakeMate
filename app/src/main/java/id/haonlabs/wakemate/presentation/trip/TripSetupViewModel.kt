@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import id.haonlabs.wakemate.domain.model.AlertThreshold
 import id.haonlabs.wakemate.domain.model.Station
+import id.haonlabs.wakemate.domain.proximity.routeDistanceMeters
 import id.haonlabs.wakemate.domain.repository.StationRepository
 import id.haonlabs.wakemate.domain.settings.AlarmSettings
 import id.haonlabs.wakemate.domain.usecase.StartTripUseCase
@@ -25,6 +26,8 @@ data class TripSetupUiState(
     val speakerFallback: Boolean = true,
     val started: Boolean = false,
     val error: String? = null,
+    /** Jumlah stasiun -> jarak sebenarnya dari titik itu ke tujuan, sepanjang rute. */
+    val leadDistanceMeters: Map<Int, Double> = emptyMap(),
 )
 
 @HiltViewModel
@@ -46,7 +49,21 @@ class TripSetupViewModel @Inject constructor(
             val station = stations.firstOrNull { it.id == route.stationId }
             val lineName = stationRepository.lines(station?.mode ?: return@launch)
                 .firstOrNull { it.id == route.lineId }?.name.orEmpty()
-            _state.update { it.copy(station = station, lineName = lineName) }
+            // Ambang "2 stasiun" berarti hal yang sangat berbeda antar line: di Lin Bogor ruas
+            // terakhirnya belasan kilometer. Jaraknya ditunjukkan supaya user tidak dibangunkan
+            // jauh lebih awal dari yang dikiranya.
+            val destinationIndex = stations.indexOfFirst { it.id == route.stationId }
+            val leads = STATION_OPTIONS.mapNotNull { count ->
+                val wakeIndex = destinationIndex - count
+                val reverseIndex = destinationIndex + count
+                val index = if (wakeIndex in stations.indices) wakeIndex
+                else if (reverseIndex in stations.indices) reverseIndex
+                else return@mapNotNull null
+                count to routeDistanceMeters(stations, index, destinationIndex)
+            }.toMap()
+            _state.update {
+                it.copy(station = station, lineName = lineName, leadDistanceMeters = leads)
+            }
         }
         viewModelScope.launch {
             alarmSettings.speakerFallback.collect { allowed ->
@@ -74,5 +91,9 @@ class TripSetupViewModel @Inject constructor(
 
     fun onErrorShown() {
         _state.update { it.copy(error = null) }
+    }
+
+    companion object {
+        val STATION_OPTIONS = listOf(1, 2, 3)
     }
 }

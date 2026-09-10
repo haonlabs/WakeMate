@@ -1,5 +1,11 @@
 package id.haonlabs.wakemate.presentation
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -14,6 +20,9 @@ import id.haonlabs.wakemate.presentation.home.HomeScreen
 import id.haonlabs.wakemate.presentation.trip.ActiveTripScreen
 import id.haonlabs.wakemate.presentation.trip.TripSetupScreen
 import kotlinx.serialization.Serializable
+
+private val SLIDE = tween<androidx.compose.ui.unit.IntOffset>(durationMillis = 280, easing = FastOutSlowInEasing)
+private val FADE = tween<Float>(durationMillis = 220, easing = FastOutSlowInEasing)
 
 @Serializable
 object Home
@@ -41,7 +50,16 @@ fun WakeMateNavHost(
         }
     }
 
-    NavHost(navController = navController, startDestination = Home) {
+    // Geser mendatar seperlunya: layar-layar ini satu alur maju-mundur, dan perpindahan yang
+    // muncul begitu saja terasa seperti aplikasi yang tersendat.
+    NavHost(
+        navController = navController,
+        startDestination = Home,
+        enterTransition = { slideInHorizontally(SLIDE) { it / 5 } + fadeIn(FADE) },
+        exitTransition = { slideOutHorizontally(SLIDE) { -it / 8 } + fadeOut(FADE) },
+        popEnterTransition = { slideInHorizontally(SLIDE) { -it / 8 } + fadeIn(FADE) },
+        popExitTransition = { slideOutHorizontally(SLIDE) { it / 5 } + fadeOut(FADE) },
+    ) {
         composable<Home> {
             HomeScreen(
                 onStationSelected = { station ->

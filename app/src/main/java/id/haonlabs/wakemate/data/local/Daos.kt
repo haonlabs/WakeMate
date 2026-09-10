@@ -16,7 +16,6 @@ interface StationDao {
         JOIN line ON line.id = station.lineId
         WHERE station.mode = :mode AND station.name LIKE '%' || :query || '%'
         ORDER BY station.name, line.name
-        LIMIT 60
         """
     )
     fun search(mode: TransitMode, query: String): Flow<List<StationWithLineRow>>

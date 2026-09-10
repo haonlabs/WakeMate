@@ -1,5 +1,16 @@
 package id.haonlabs.wakemate.presentation.trip
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -62,9 +73,15 @@ fun ActiveTripScreen(
         ) {
             item { HeadlineCard(current) }
 
-            current.proximity?.let { proximity ->
-                warningFor(proximity, current)?.let { warning ->
-                    item { WarningCard(warning) }
+            item {
+                // Peringatan muncul dan hilang mengikuti kondisi GPS, jadi jangan menyentak.
+                AnimatedVisibility(
+                    visible = current.proximity?.let { warningFor(it, current) } != null,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically(),
+                ) {
+                    val warning = current.proximity?.let { warningFor(it, current) }.orEmpty()
+                    WarningCard(warning)
                 }
             }
 
@@ -76,7 +93,9 @@ fun ActiveTripScreen(
                         modifier = Modifier.padding(top = 8.dp),
                     )
                 }
-                items(stops, key = { it.station.id }) { StopRow(it) }
+                items(stops, key = { it.station.id }) {
+                    StopRow(it, Modifier.animateItem(placementSpec = tween(250)))
+                }
             }
 
             item {
@@ -132,11 +151,22 @@ private fun HeadlineCard(trip: ActiveTrip) {
             when (val proximity = trip.proximity) {
                 null -> Text("Menunggu sinyal GPS pertama...")
                 else -> {
-                    Text(
-                        if (proximity.stationsRemaining <= 0) "Sampai" else "${proximity.stationsRemaining}",
-                        style = MaterialTheme.typography.displayLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
+                    // Angka ini yang paling sering dilirik orang setengah tidur; pergantiannya
+                    // digeser ke atas supaya terbaca sebagai hitungan mundur, bukan kedipan.
+                    AnimatedContent(
+                        targetState = proximity.stationsRemaining,
+                        transitionSpec = {
+                            (slideInVertically { it / 2 } + fadeIn()) togetherWith
+                                (slideOutVertically { -it / 2 } + fadeOut())
+                        },
+                        label = "sisa",
+                    ) { remaining ->
+                        Text(
+                            if (remaining <= 0) "Sampai" else "$remaining",
+                            style = MaterialTheme.typography.displayLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
                     if (proximity.stationsRemaining > 0) {
                         Text("stasiun lagi", style = MaterialTheme.typography.titleMedium)
                     }
@@ -155,7 +185,7 @@ private fun HeadlineCard(trip: ActiveTrip) {
 }
 
 @Composable
-private fun StopRow(stop: RouteStop) {
+private fun StopRow(stop: RouteStop, modifier: Modifier = Modifier) {
     val accent = when (stop.status) {
         StopStatus.CURRENT -> MaterialTheme.colorScheme.primary
         StopStatus.WAKE_POINT -> MaterialTheme.colorScheme.secondary
@@ -164,14 +194,18 @@ private fun StopRow(stop: RouteStop) {
     }
     val faded = stop.status == StopStatus.PASSED
 
+    val dotSize by animateDpAsState(
+        if (stop.status == StopStatus.CURRENT) 14.dp else 10.dp,
+        label = "titik",
+    )
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Box(
             Modifier
-                .size(if (stop.status == StopStatus.CURRENT) 14.dp else 10.dp)
+                .size(dotSize)
                 .background(if (faded) MaterialTheme.colorScheme.outlineVariant else accent, CircleShape)
         )
         Column(Modifier.weight(1f).padding(vertical = 6.dp)) {

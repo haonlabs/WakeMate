@@ -2,9 +2,7 @@ package id.haonlabs.wakemate.domain.proximity
 
 import id.haonlabs.wakemate.domain.model.Station
 import id.haonlabs.wakemate.domain.model.TransitMode
-import kotlin.math.PI
 import kotlin.math.abs
-import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sign
 
@@ -49,21 +47,14 @@ class ProximityCalculator(
         require(it >= 0) { "Destination $destinationStationId is not on this route" }
     }
 
-    // Proyeksi bidang datar lokal. Di Jabodetabek galatnya jauh di bawah noise GPS, dan jauh
-    // lebih murah daripada haversine di setiap segmen untuk tiap update lokasi.
-    private val cosLat = cos(route[0].lat * PI / 180.0)
-    private val xs = DoubleArray(route.size) { (route[it].lng - route[0].lng) * METERS_PER_DEGREE * cosLat }
-    private val ys = DoubleArray(route.size) { (route[it].lat - route[0].lat) * METERS_PER_DEGREE }
-
     // ponytail: rute = garis lurus antar stasiun, bukan geometri rel sebenarnya. Jarak jadi sedikit
     // lebih pendek dari kenyataan di tikungan; cukup untuk ambang alert, ganti dengan polyline OSM
     // kalau nanti butuh ETA menit-akurat.
-    private val segmentLength = DoubleArray(route.size - 1) {
-        hypot(xs[it + 1] - xs[it], ys[it + 1] - ys[it])
-    }
-    private val cumulative = DoubleArray(route.size).also { cum ->
-        for (i in 1 until route.size) cum[i] = cum[i - 1] + segmentLength[i - 1]
-    }
+    private val flat = FlatRoute(route)
+    private val xs = flat.xs
+    private val ys = flat.ys
+    private val segmentLength = flat.segmentLength
+    private val cumulative = flat.cumulative
     private val destProgress = cumulative[destIndex]
 
     /** Meter sepanjang rute dari stasiun pertama, dari fix GPS terakhir. */
@@ -77,8 +68,8 @@ class ProximityCalculator(
     private var directionAnchor = Double.NaN
 
     fun onLocation(point: GeoPoint, timestampMs: Long): ProximityState {
-        val px = (point.lng - route[0].lng) * METERS_PER_DEGREE * cosLat
-        val py = (point.lat - route[0].lat) * METERS_PER_DEGREE
+        val px = flat.toX(point.lng)
+        val py = flat.toY(point.lat)
 
         var offRoute = Double.MAX_VALUE
         var projected = 0.0
@@ -174,8 +165,6 @@ class ProximityCalculator(
     }
 
     private companion object {
-        /** Meter per derajat lintang pada bola berjari-jari rata-rata bumi. */
-        const val METERS_PER_DEGREE = 111_194.93
         const val MIN_MOVING_MPS = 1.0
         /**
          * Cukup jauh agar perjalanan nyata mengalahkan galat GPS, cukup dekat agar putar balik

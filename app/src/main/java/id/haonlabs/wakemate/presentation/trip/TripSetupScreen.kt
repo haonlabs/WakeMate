@@ -3,6 +3,26 @@ package id.haonlabs.wakemate.presentation.trip
 import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import id.haonlabs.wakemate.R
+import id.haonlabs.wakemate.presentation.iconRes
+import java.util.Locale
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,7 +33,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -72,52 +91,134 @@ fun TripSetupScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Atur pengingat") },
-                navigationIcon = { IconButton(onClick = onBack) { Text("←") } },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            painterResource(R.drawable.ic_arrow_back),
+                            contentDescription = "Kembali",
+                        )
+                    }
+                },
             )
         },
     ) { padding ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(16.dp)) {
-                    Text("Tujuan", style = MaterialTheme.typography.labelMedium)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
+            ) {
+                Row(
+                    Modifier.padding(18.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(14.dp),
+                ) {
+                    Box(
+                        Modifier
+                            .size(46.dp)
+                            .background(
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.14f),
+                                CircleShape,
+                            ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        state.station?.let {
+                            Icon(
+                                painterResource(it.mode.iconRes()),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(24.dp),
+                            )
+                        }
+                    }
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            "TUJUAN",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                        Text(
+                            state.station?.name ?: "Memuat...",
+                            style = MaterialTheme.typography.titleLarge,
+                        )
+                        Text(
+                            state.lineName,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
+            ) {
+                Column(
+                    Modifier.padding(18.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.ic_alarm),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.size(22.dp),
+                        )
+                        Text("Bangunkan saya saat", style = MaterialTheme.typography.titleMedium)
+                    }
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        TripSetupViewModel.STATION_OPTIONS.forEach { count ->
+                            ThresholdOption(
+                                selected = state.threshold == AlertThreshold.StationCount(count),
+                                title = if (count == 1) "1 stasiun" else "$count stasiun",
+                                // Angka jarak ini nyata, dihitung dari rute line yang dipilih.
+                                subtitle = state.leadDistanceMeters[count]
+                                    ?.let { String.format(Locale.US, "%.1f km", it / 1000) }
+                                    ?: "-",
+                                recommended = count == 2,
+                                onClick = {
+                                    viewModel.onThresholdChanged(AlertThreshold.StationCount(count))
+                                },
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+                    }
+
                     Text(
-                        state.station?.name ?: "Memuat...",
-                        style = MaterialTheme.typography.headlineSmall,
+                        "Jarak antar stasiun tidak seragam, jadi hitungan stasiun lebih bisa " +
+                            "diandalkan daripada kilometer. Angka di bawah tiap pilihan adalah " +
+                            "jarak sebenarnya ke tujuan di line ini.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                    Text(state.lineName, style = MaterialTheme.typography.bodyMedium)
                 }
             }
 
-            Text("Bangunkan saya", style = MaterialTheme.typography.titleMedium)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf(1, 2, 3).forEach { count ->
-                    FilterChip(
-                        selected = state.threshold == AlertThreshold.StationCount(count),
-                        onClick = { viewModel.onThresholdChanged(AlertThreshold.StationCount(count)) },
-                        label = { Text("$count stasiun lagi") },
-                    )
-                }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf(1_000.0, 2_000.0).forEach { meters ->
-                    FilterChip(
-                        selected = state.threshold == AlertThreshold.Distance(meters),
-                        onClick = { viewModel.onThresholdChanged(AlertThreshold.Distance(meters)) },
-                        label = { Text("${(meters / 1000).toInt()} km lagi") },
-                    )
-                }
-            }
-            Text(
-                "Jarak antar stasiun tidak seragam, jadi hitungan stasiun biasanya lebih bisa " +
-                    "diandalkan daripada jarak kilometer.",
-                style = MaterialTheme.typography.bodySmall,
-            )
-
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
+            ) {
+                Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -149,9 +250,35 @@ fun TripSetupScreen(
             Button(
                 onClick = { startWithPermissions(context, foregroundLauncher::launch) { viewModel.onStart() } },
                 enabled = state.station != null,
+                shape = RoundedCornerShape(18.dp),
+                contentPadding = PaddingValues(vertical = 16.dp),
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Mulai Perjalanan")
+                Text("Mulai perjalanan & pasang alarm", style = MaterialTheme.typography.titleMedium)
+                Spacer(Modifier.width(10.dp))
+                Icon(
+                    painterResource(R.drawable.ic_arrow_forward),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(bottom = 24.dp),
+            ) {
+                Icon(
+                    painterResource(R.drawable.ic_battery_saver),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(18.dp),
+                )
+                Text(
+                    "Hemat baterai: pelacakan dipertajam hanya saat mendekati tujuan.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
 
             state.error?.let { message ->
@@ -202,8 +329,14 @@ fun TripSetupScreen(
 
 @Composable
 private fun BatteryOptimizationCard(context: Context) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        ),
+    ) {
+        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("Optimasi baterai aktif", style = MaterialTheme.typography.titleSmall)
             Text(
                 "Sebagian HP mematikan aplikasi latar belakang secara agresif dan bisa membuat " +
@@ -226,5 +359,51 @@ private inline fun startWithPermissions(
         !TripPermissions.hasForegroundLocation(context) || !TripPermissions.hasNotifications(context) ->
             requestForeground(TripPermissions.foreground)
         else -> start()
+    }
+}
+
+@Composable
+private fun ThresholdOption(
+    selected: Boolean,
+    title: String,
+    subtitle: String,
+    recommended: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val border by animateColorAsState(
+        if (selected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.outlineVariant,
+        label = "tepi",
+    )
+    val container by animateColorAsState(
+        if (selected) MaterialTheme.colorScheme.secondary.copy(alpha = 0.16f) else Color.Transparent,
+        label = "isi",
+    )
+    Surface(
+        onClick = onClick,
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        color = container,
+        border = BorderStroke(if (selected) 2.dp else 1.dp, border),
+    ) {
+        Column(
+            Modifier.padding(vertical = 12.dp, horizontal = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+            if (recommended) {
+                Text(
+                    "DISARANKAN",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.secondary,
+                )
+            }
+            Text(title, style = MaterialTheme.typography.titleSmall)
+            Text(
+                subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
