@@ -12,9 +12,9 @@ fun TransitMode.iconRes(): Int = when (this) {
     TransitMode.TRANSJAKARTA -> R.drawable.ic_mode_tj
 }
 
-/** Label pendek untuk chip; label penuh terlalu panjang berjajar tiga. */
-fun TransitMode.shortLabel(): String = when (this) {
-    TransitMode.KRL -> "KRL"
-    TransitMode.MRT -> "MRT"
+/** Label chip: cukup spesifik untuk dikenali komuter, tanpa kata "Line" yang tidak menambah apa pun. */
+fun TransitMode.chipLabel(): String = when (this) {
+    TransitMode.KRL -> "KRL Commuter"
+    TransitMode.MRT -> "MRT Jakarta"
     TransitMode.TRANSJAKARTA -> "Transjakarta"
 }

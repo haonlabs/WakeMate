@@ -38,7 +38,9 @@ class HomeViewModel @Inject constructor(
     val results: StateFlow<List<StationWithLine>> =
         combine(_isReady, _mode, _query) { ready, mode, query -> Triple(ready, mode, query) }
             .flatMapLatest { (ready, mode, query) ->
-                if (ready) searchStations(mode, query) else flowOf(emptyList())
+                // Query kosong tidak ditampilkan, jadi jangan pula dijalankan: percuma membaca
+                // 400+ baris tiap kali layar dibuka.
+                if (ready && query.isNotBlank()) searchStations(mode, query) else flowOf(emptyList())
             }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 

@@ -5,10 +5,13 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -36,6 +40,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -48,10 +53,9 @@ import id.haonlabs.wakemate.R
 import id.haonlabs.wakemate.domain.model.Station
 import id.haonlabs.wakemate.domain.model.StationWithLine
 import id.haonlabs.wakemate.domain.model.TransitMode
+import id.haonlabs.wakemate.presentation.chipLabel
 import id.haonlabs.wakemate.presentation.iconRes
-import id.haonlabs.wakemate.presentation.shortLabel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onStationSelected: (Station) -> Unit,
@@ -63,91 +67,134 @@ fun HomeScreen(
     val results by viewModel.results.collectAsStateWithLifecycle()
     val isReady by viewModel.isReady.collectAsStateWithLifecycle()
 
+    val searching = query.isNotBlank()
+
     // Tanpa Surface pembungkus, LocalContentColor jatuh ke hitam dan teks tanpa warna eksplisit
     // hilang di atas latar gelap.
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(
-            start = 20.dp, end = 20.dp, top = 56.dp, bottom = 32.dp,
-        ),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        item { Header(onOpenDiagnostics) }
-        item { Spacer(Modifier.height(4.dp)) }
-        item { ModeSelector(mode, viewModel::onModeSelected) }
-        item {
-            SearchField(query, viewModel::onQueryChanged, enabled = isReady)
-        }
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 52.dp, bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            item { BrandBar(onOpenDiagnostics) }
+            item { HeroCard() }
+            item { ModeSelector(mode, viewModel::onModeSelected) }
+            item { SearchField(query, viewModel::onQueryChanged, enabled = isReady) }
 
-        if (!isReady) {
-            item { SeedingState() }
-            return@LazyColumn
-        }
+            when {
+                !isReady -> item { SeedingState() }
 
-        item {
-            ResultsLabel(
-                query = query,
-                count = results.size,
-            )
-        }
+                // Daftar lengkap 400+ stasiun bukan sesuatu yang dibaca orang; yang berguna
+                // muncul begitu mereka mengetik.
+                !searching -> item { SearchPrompt(mode) }
 
-        if (results.isEmpty()) {
-            item { EmptyState(query) }
-        } else {
-            items(results, key = { it.station.id }) { result ->
-                StationCard(
-                    result = result,
-                    modifier = Modifier.animateItem(
-                        fadeInSpec = tween(200),
-                        placementSpec = tween(220),
-                    ),
-                    onClick = { onStationSelected(result.station) },
-                )
+                else -> {
+                    item { ResultsLabel(results.size) }
+                    if (results.isEmpty()) {
+                        item { EmptyState(query) }
+                    } else {
+                        items(results, key = { it.station.id }) { result ->
+                            StationCard(
+                                result = result,
+                                modifier = Modifier.animateItem(
+                                    fadeInSpec = tween(200),
+                                    placementSpec = tween(220),
+                                ),
+                                onClick = { onStationSelected(result.station) },
+                            )
+                        }
+                    }
+                }
             }
         }
-    }
     }
 }
 
 @Composable
-private fun Header(onOpenDiagnostics: () -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+private fun BrandBar(onOpenDiagnostics: () -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        // Vector muka ikon sudah diskalakan ke zona aman peluncur, jadi di badge kecil ia tampak
+        // mengambang. Digambar lebih besar lalu dipotong kotaknya.
+        Box(
+            Modifier
+                .size(44.dp)
+                .clip(RoundedCornerShape(14.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+            contentAlignment = Alignment.Center,
+        ) {
+            Image(
+                painterResource(R.drawable.ic_launcher_foreground),
+                contentDescription = null,
+                modifier = Modifier.size(70.dp),
+            )
+        }
+        Spacer(Modifier.size(12.dp))
+        Column(Modifier.weight(1f)) {
             Text(
                 "WAKEMATE",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.weight(1f),
             )
-            // Alat ukur internal; tidak dimunculkan di rilis.
-            if (BuildConfig.DEBUG) {
-                TextButton(onClick = onOpenDiagnostics) { Text("Audio") }
-            }
+            Text("Transit Alarm", style = MaterialTheme.typography.titleLarge)
         }
-        Text("Mau turun di stasiun mana?", style = MaterialTheme.typography.headlineMedium)
-        Text(
-            "Pilih tujuan, lalu tidur tenang. WakeMate yang menjaga rutenya.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        // Alat ukur internal; tidak dimunculkan di rilis.
+        if (BuildConfig.DEBUG) {
+            TextButton(onClick = onOpenDiagnostics) { Text("Audio") }
+        }
+    }
+}
+
+@Composable
+private fun HeroCard() {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        color = MaterialTheme.colorScheme.surfaceContainer,
+    ) {
+        Column(
+            Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            Text("Mau turun di stasiun mana?", style = MaterialTheme.typography.headlineSmall)
+            Text(
+                "WakeMate menjaga rutenya dan membangunkanmu tepat waktu.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 
 @Composable
 private fun ModeSelector(selected: TransitMode, onSelect: (TransitMode) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(
-            "MODA TRANSPORTASI",
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                "MODA TRANSPORTASI",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            // Cakupan datanya memang hanya Jabodetabek; disebut supaya tidak jadi kejutan.
+            Text(
+                "Jabodetabek",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+        // Label penuh tidak muat berjajar tiga di layar sempit, jadi barisnya bisa digeser.
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             TransitMode.entries.forEach { option ->
                 FilterChip(
                     selected = option == selected,
                     onClick = { onSelect(option) },
-                    label = { Text(option.shortLabel()) },
+                    label = { Text(option.chipLabel()) },
                     leadingIcon = {
                         Icon(
                             painterResource(option.iconRes()),
@@ -185,7 +232,7 @@ private fun SearchField(query: String, onQueryChanged: (String) -> Unit, enabled
             }
         },
         singleLine = true,
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(22.dp),
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
             unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -198,13 +245,13 @@ private fun SearchField(query: String, onQueryChanged: (String) -> Unit, enabled
 }
 
 @Composable
-private fun ResultsLabel(query: String, count: Int) {
+private fun ResultsLabel(count: Int) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+        modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-            if (query.isBlank()) "SEMUA STASIUN" else "HASIL PENCARIAN",
+            "HASIL PENCARIAN",
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -274,23 +321,42 @@ private fun StationCard(
 
 @Composable
 private fun SeedingState() {
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 64.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
+    CenteredState {
         CircularProgressIndicator()
+        Spacer(Modifier.height(8.dp))
         Text("Menyiapkan data stasiun...", style = MaterialTheme.typography.bodyMedium)
     }
 }
 
 @Composable
+private fun SearchPrompt(mode: TransitMode) {
+    CenteredState {
+        Box(
+            Modifier
+                .size(64.dp)
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.10f), CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                painterResource(R.drawable.ic_search),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(28.dp),
+            )
+        }
+        Text("Cari tujuanmu", style = MaterialTheme.typography.titleMedium)
+        Text(
+            "Ketik nama stasiun atau halte ${mode.chipLabel()} yang jadi tujuanmu.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+    }
+}
+
+@Composable
 private fun EmptyState(query: String) {
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 48.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
+    CenteredState {
         Text(
             "Tidak ada yang cocok dengan \"$query\"",
             style = MaterialTheme.typography.titleSmall,
@@ -302,5 +368,16 @@ private fun EmptyState(query: String) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
+    }
+}
+
+@Composable
+private fun CenteredState(content: @Composable () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(top = 48.dp, bottom = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        content()
     }
 }
