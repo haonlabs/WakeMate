@@ -17,6 +17,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,12 +26,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import id.haonlabs.wakemate.BuildConfig
 import id.haonlabs.wakemate.domain.model.TransitMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onStationSelected: (id.haonlabs.wakemate.domain.model.Station) -> Unit,
+    onOpenDiagnostics: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val mode by viewModel.mode.collectAsStateWithLifecycle()
@@ -38,7 +41,19 @@ fun HomeScreen(
     val results by viewModel.results.collectAsStateWithLifecycle()
     val isReady by viewModel.isReady.collectAsStateWithLifecycle()
 
-    Scaffold(topBar = { TopAppBar(title = { Text("WakeMate") }) }) { padding ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("WakeMate") },
+                actions = {
+                    // Alat ukur internal; tidak dimunculkan di rilis.
+                    if (BuildConfig.DEBUG) {
+                        TextButton(onClick = onOpenDiagnostics) { Text("Audio") }
+                    }
+                },
+            )
+        },
+    ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),

@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import id.haonlabs.wakemate.presentation.diagnostics.AudioRoutingScreen
 import id.haonlabs.wakemate.presentation.home.HomeScreen
 import id.haonlabs.wakemate.presentation.trip.ActiveTripScreen
 import id.haonlabs.wakemate.presentation.trip.TripSetupScreen
@@ -22,6 +23,9 @@ data class TripSetup(val stationId: String, val lineId: String)
 
 @Serializable
 object ActiveTrip
+
+@Serializable
+object AudioDiagnostics
 
 @Composable
 fun WakeMateNavHost(
@@ -43,6 +47,7 @@ fun WakeMateNavHost(
                 onStationSelected = { station ->
                     navController.navigate(TripSetup(station.id, station.lineId))
                 },
+                onOpenDiagnostics = { navController.navigate(AudioDiagnostics) },
             )
         }
         composable<TripSetup> {
@@ -50,6 +55,9 @@ fun WakeMateNavHost(
                 onStarted = { navController.navigate(ActiveTrip) { popUpTo(Home) } },
                 onBack = { navController.popBackStack() },
             )
+        }
+        composable<AudioDiagnostics> {
+            AudioRoutingScreen(onBack = { navController.popBackStack() })
         }
         composable<ActiveTrip> {
             ActiveTripScreen(
