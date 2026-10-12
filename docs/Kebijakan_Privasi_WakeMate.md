@@ -3,8 +3,8 @@
 **Berlaku sejak:** 10 September 2026
 **Terakhir diperbarui:** 12 Oktober 2026
 **Aplikasi:** WakeMate (`id.haonlabs.wakemate`)
-**Pengembang:** [ISI NAMA PENGEMBANG / HAON LABS]
-**Kontak:** [ISI ALAMAT EMAIL KONTAK]
+**Pengembang:** Haon Malvinger
+**Kontak:** developedbyadifens@gmail.com
 
 ---
 
@@ -197,4 +197,4 @@ Pemrosesan lokasimu tetap sepenuhnya di dalam perangkat.
 
 ## 11. Kontak
 
-Pertanyaan mengenai kebijakan ini dapat dikirim ke: **[ISI ALAMAT EMAIL KONTAK]**
+Pertanyaan mengenai kebijakan ini dapat dikirim ke: **developedbyadifens@gmail.com**
