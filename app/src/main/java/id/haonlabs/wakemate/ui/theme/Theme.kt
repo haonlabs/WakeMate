@@ -3,26 +3,29 @@ package id.haonlabs.wakemate.ui.theme
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 
 /**
- * Gelap saja, dan warna dinamis sengaja tidak dipakai.
+ * Gelap dan terang mengikuti setelan sistem; warna dinamis sengaja tidak dipakai.
  *
- * Sistem desainnya hanya mendefinisikan varian gelap — membuat varian terang berarti mengarang
- * warna yang tidak ada di sana. Warna dinamis Android 12+ akan menimpa identitas teal/amber ini
- * dengan wallpaper user, dan identitas itu justru yang membuat notifikasi WakeMate dikenali
- * sekilas oleh orang yang baru bangun.
+ * Warna dinamis Android 12+ akan menimpa identitas teal/amber dengan wallpaper user, dan identitas
+ * itu justru yang membuat alarm WakeMate dikenali sekilas oleh orang yang baru bangun.
+ *
+ * secondaryContainer = latar lembut untuk hal soal alarm (sorotan halte tujuan, status "alarm
+ * aktif"); di tema gelap ia amber transparan supaya tetap menyatu dengan permukaan di bawahnya.
  */
-private val WakeMateColors = darkColorScheme(
+private val DarkColors = darkColorScheme(
     primary = Teal,
     onPrimary = OnTeal,
     primaryContainer = TealContainer,
     onPrimaryContainer = OnTeal,
     secondary = Amber,
     onSecondary = OnAmber,
-    secondaryContainer = AmberContainer,
-    onSecondaryContainer = OnAmber,
-    tertiary = TealSoft,
+    secondaryContainer = Amber.copy(alpha = 0.18f),
+    onSecondaryContainer = Amber,
+    tertiary = Teal,
     onTertiary = OnTeal,
     background = Midnight,
     onBackground = Moonlight,
@@ -40,19 +43,54 @@ private val WakeMateColors = darkColorScheme(
     surfaceContainerHighest = MidnightHighest,
     outline = Outline,
     outlineVariant = MidnightHighest,
+    scrim = Color(0xFF010914),
     error = ErrorLight,
     onError = OnError,
     errorContainer = ErrorContainerDark,
     onErrorContainer = OnErrorContainerLight,
 )
 
+private val LightColors = lightColorScheme(
+    primary = TealDeep,
+    onPrimary = Color.White,
+    primaryContainer = TealMist,
+    onPrimaryContainer = OnTeal,
+    secondary = AmberDeep,
+    onSecondary = Color.White,
+    secondaryContainer = AmberMist,
+    onSecondaryContainer = AmberDeep,
+    tertiary = TealDeep,
+    onTertiary = Color.White,
+    background = Daylight,
+    onBackground = Ink,
+    surface = Daylight,
+    onSurface = Ink,
+    surfaceVariant = DaylightHighest,
+    onSurfaceVariant = InkSoft,
+    surfaceTint = TealDeep,
+    surfaceBright = Color.White,
+    surfaceDim = DaylightHighest,
+    surfaceContainerLowest = Color.White,
+    surfaceContainerLow = DaylightLow,
+    surfaceContainer = Color.White,
+    surfaceContainerHigh = DaylightHigh,
+    surfaceContainerHighest = DaylightHighest,
+    outline = InkMuted,
+    outlineVariant = Hairline,
+    scrim = Ink,
+    error = ErrorDeep,
+    onError = Color.White,
+    errorContainer = ErrorMist,
+    onErrorContainer = OnErrorMist,
+)
+
 @Composable
 fun WakeMateTheme(
-    @Suppress("UNUSED_PARAMETER") darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
     MaterialTheme(
-        colorScheme = WakeMateColors,
+        colorScheme = if (darkTheme) DarkColors else LightColors,
         typography = Typography,
         content = content,
     )

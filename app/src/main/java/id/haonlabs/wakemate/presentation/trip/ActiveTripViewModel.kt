@@ -7,7 +7,6 @@ import id.haonlabs.wakemate.domain.model.Station
 import id.haonlabs.wakemate.domain.repository.StationRepository
 import id.haonlabs.wakemate.domain.trip.ActiveTrip
 import id.haonlabs.wakemate.domain.usecase.CancelTripUseCase
-import id.haonlabs.wakemate.domain.usecase.CompleteTripUseCase
 import id.haonlabs.wakemate.domain.usecase.ObserveTripProgressUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -22,7 +21,6 @@ class ActiveTripViewModel @Inject constructor(
     observeTripProgress: ObserveTripProgressUseCase,
     private val stationRepository: StationRepository,
     private val cancelTrip: CancelTripUseCase,
-    private val completeTrip: CompleteTripUseCase,
 ) : ViewModel() {
 
     val trip: StateFlow<ActiveTrip?> = observeTripProgress()
@@ -46,6 +44,4 @@ class ActiveTripViewModel @Inject constructor(
     }
 
     fun onCancel() = viewModelScope.launch { cancelTrip() }
-
-    fun onComplete() = viewModelScope.launch { completeTrip() }
 }

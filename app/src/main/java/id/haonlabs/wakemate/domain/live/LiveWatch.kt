@@ -24,6 +24,8 @@ sealed interface LiveWatch {
         override val halteName: String,
         override val lead: LiveLead,
         override val startedAt: Long,
+        /** Jarak (halte) ke tujuan saat alarm dipasang, untuk bar progres. Null pada data lama. */
+        val initialStops: Int? = null,
     ) : LiveWatch
 
     /**

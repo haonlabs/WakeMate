@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import id.haonlabs.wakemate.domain.model.StationWithLine
 import id.haonlabs.wakemate.domain.model.TransitMode
 import id.haonlabs.wakemate.domain.repository.StationRepository
+import id.haonlabs.wakemate.domain.repository.TripRepository
 import id.haonlabs.wakemate.domain.usecase.SearchStationsUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +24,12 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val repository: StationRepository,
     searchStations: SearchStationsUseCase,
+    tripRepository: TripRepository,
 ) : ViewModel() {
+
+    /** Komuter pergi ke tempat yang sama setiap hari: tujuan terakhir cukup satu ketukan. */
+    val recent: StateFlow<List<StationWithLine>> = tripRepository.recentDestinations(limit = 3)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val _mode = MutableStateFlow(TransitMode.KRL)
     val mode: StateFlow<TransitMode> = _mode.asStateFlow()

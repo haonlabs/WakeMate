@@ -1,69 +1,49 @@
 package id.haonlabs.wakemate.presentation.trip
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.Surface
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import id.haonlabs.wakemate.R
 import id.haonlabs.wakemate.domain.proximity.ProximityState
 import id.haonlabs.wakemate.domain.proximity.TravelDirection
 import id.haonlabs.wakemate.domain.trip.ActiveTrip
+import id.haonlabs.wakemate.presentation.components.CircleIconButton
+import id.haonlabs.wakemate.presentation.components.CountdownCard
+import id.haonlabs.wakemate.presentation.components.InfoRow
+import id.haonlabs.wakemate.presentation.components.SectionLabel
+import id.haonlabs.wakemate.presentation.components.StatusPill
+import id.haonlabs.wakemate.presentation.components.TimelineRow
+import id.haonlabs.wakemate.presentation.components.TimelineStatus
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * GPS3: pola yang sama dengan perjalanan live (LT6) supaya dua jenis alarm terasa satu aplikasi.
+ * Saat alarm berbunyi, layar penuh di tingkat aplikasi (RingingScreen) yang mengambil alih.
+ */
 @Composable
 fun ActiveTripScreen(
+    onBack: () -> Unit,
     onFinished: () -> Unit,
     viewModel: ActiveTripViewModel = hiltViewModel(),
 ) {
@@ -75,294 +55,110 @@ fun ActiveTripScreen(
         if (trip == null) onFinished()
     }
     val current = trip ?: return
+    val proximity = current.proximity
 
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("Perjalanan aktif") }) },
-        bottomBar = {
-            // Alarm bisa dimatikan dari notifikasi atau dari sini; keduanya berarti hal yang sama
-            // ("saya sudah bangun"), jadi user tidak perlu mencari yang mana yang benar. Ditempel
-            // di bawah supaya terjangkau tanpa menggulir oleh orang yang baru bangun.
-            AnimatedVisibility(
-                visible = current.hasAlerted,
-                enter = slideInVertically { it } + fadeIn(),
-                exit = slideOutVertically { it } + fadeOut(),
-            ) {
-                AlarmActionBar(onStop = { viewModel.onComplete() })
-            }
-        },
-    ) { padding ->
+    Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp),
+            modifier = Modifier.fillMaxSize().statusBarsPadding(),
+            contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            item { HeadlineCard(current) }
-
-            item {
-                // Peringatan muncul dan hilang mengikuti kondisi GPS, jadi jangan menyentak.
-                AnimatedVisibility(
-                    visible = current.proximity?.let { warningFor(it, current) } != null,
-                    enter = fadeIn() + expandVertically(),
-                    exit = fadeOut() + shrinkVertically(),
-                ) {
-                    val warning = current.proximity?.let { warningFor(it, current) }.orEmpty()
-                    WarningCard(warning)
+            item(key = "atas") {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    CircleIconButton(R.drawable.ic_arrow_back, "Kembali", onBack)
+                    StatusPill("ALARM AKTIF")
                 }
             }
+            item(key = "hitungan") {
+                val currentIndex = stops.indexOfFirst { it.status == StopStatus.CURRENT }
+                val remaining = proximity?.stationsRemaining
+                CountdownCard(
+                    eyebrow = "MENUJU",
+                    title = current.destination.name,
+                    count = when {
+                        remaining == null -> "–"
+                        remaining <= 0 -> "Sampai"
+                        else -> remaining.toString()
+                    },
+                    unit = when {
+                        proximity == null -> "menunggu sinyal GPS"
+                        proximity.stationsRemaining <= 0 -> current.lineName
+                        else -> String.format(Locale.US, "stasiun lagi · %.1f km", proximity.distanceToDestinationMeters / 1000).replace('.', ',')
+                    },
+                    segments = (stops.size - 1).coerceAtLeast(0),
+                    done = currentIndex.coerceAtLeast(0),
+                    wakeAt = stops.indexOfFirst { it.status == StopStatus.WAKE_POINT }.takeIf { it >= 0 },
+                    legend = stops.firstOrNull { it.status == StopStatus.WAKE_POINT }?.let { "Bunyi di ${it.station.name}" },
+                )
+            }
+            item(key = "sinyal") { SignalRow(proximity, current) }
 
             if (stops.isNotEmpty()) {
-                item {
-                    Text(
-                        "Rute & posisi",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(top = 8.dp),
+                item(key = "judul-stasiun") { SectionLabel("STASIUN BERIKUTNYA", trailing = current.lineName) }
+                itemsIndexed(stops, key = { _, it -> it.station.id }) { index, stop ->
+                    TimelineRow(
+                        name = stop.station.name,
+                        status = when (stop.status) {
+                            StopStatus.PASSED -> TimelineStatus.PASSED
+                            StopStatus.DESTINATION -> TimelineStatus.DESTINATION
+                            else -> TimelineStatus.DEFAULT
+                        },
+                        lineColor = MaterialTheme.colorScheme.primary,
+                        detail = when (stop.status) {
+                            StopStatus.CURRENT -> "Posisimu"
+                            StopStatus.WAKE_POINT -> "Alarm bunyi"
+                            StopStatus.PASSED -> "Lewat"
+                            else -> null
+                        },
+                        isFirst = index == 0,
+                        isLast = index == stops.lastIndex,
+                        modifier = Modifier.animateItem(placementSpec = tween(250)),
                     )
-                }
-                items(stops, key = { it.station.id }) {
-                    StopRow(it, Modifier.animateItem(placementSpec = tween(250)))
                 }
             }
 
-            item {
+            item(key = "batal") {
                 OutlinedButton(
                     onClick = { viewModel.onCancel() },
-                    shape = RoundedCornerShape(16.dp),
-                    contentPadding = PaddingValues(vertical = 14.dp),
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                    shape = RoundedCornerShape(18.dp),
+                    contentPadding = PaddingValues(vertical = 16.dp),
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                 ) {
                     Text(
-                        if (current.hasAlerted) "Batalkan perjalanan tanpa menandai sampai"
-                        else "Batalkan pantauan perjalanan"
+                        if (current.hasAlerted) "Batalkan tanpa menandai sampai" else "Batalkan pantauan",
+                        style = MaterialTheme.typography.titleSmall,
                     )
                 }
             }
-            item {
+            item(key = "catatan") {
                 Text(
                     "HP boleh dikunci dan ditaruh di saku. WakeMate tetap memantau di latar belakang.",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.outline,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
         }
     }
 }
 
+/** Status sinyal selalu terlihat — termasuk peringatan salah jalur dan estimasi di terowongan. */
 @Composable
-private fun HeadlineCard(trip: ActiveTrip) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-        ),
-    ) {
-        Column(
-            Modifier.fillMaxWidth().padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            Text(
-                "MENUJU",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.primary,
-            )
-            Text(
-                trip.destination.name,
-                style = MaterialTheme.typography.headlineSmall,
-                textAlign = TextAlign.Center,
-            )
-            Text(
-                trip.lineName,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Spacer(Modifier.height(12.dp))
-            when (val proximity = trip.proximity) {
-                null -> Text("Menunggu sinyal GPS pertama...")
-                else -> {
-                    // Angka ini yang paling sering dilirik orang setengah tidur; pergantiannya
-                    // digeser ke atas supaya terbaca sebagai hitungan mundur, bukan kedipan.
-                    AnimatedContent(
-                        targetState = proximity.stationsRemaining,
-                        transitionSpec = {
-                            (slideInVertically { it / 2 } + fadeIn()) togetherWith
-                                (slideOutVertically { -it / 2 } + fadeOut())
-                        },
-                        label = "sisa",
-                    ) { remaining ->
-                        Text(
-                            if (remaining <= 0) "Sampai" else "$remaining",
-                            style = MaterialTheme.typography.displayLarge,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
-                    }
-                    if (proximity.stationsRemaining > 0) {
-                        Text("stasiun lagi", style = MaterialTheme.typography.titleMedium)
-                    }
-                    Text(
-                        String.format(
-                            Locale.US, "%.1f km sepanjang rute",
-                            proximity.distanceToDestinationMeters / 1000,
-                        ),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-        }
+private fun SignalRow(proximity: ProximityState?, trip: ActiveTrip) {
+    val scheme = MaterialTheme.colorScheme
+    val (title, subtitle, warn) = when {
+        proximity == null -> Triple("Menunggu sinyal GPS pertama...", "Pastikan lokasi ponsel menyala.", false)
+        proximity.isOffRoute -> Triple("Posisi jauh dari ${trip.lineName}", "Pastikan kamu naik line yang benar.", true)
+        proximity.isDeadReckoned -> Triple("Sinyal GPS hilang", "Angka di atas estimasi dari kecepatan terakhir.", true)
+        proximity.direction == TravelDirection.AWAY_FROM_DESTINATION -> Triple("Bergerak menjauh dari tujuan", "Cek arah keberangkatan.", true)
+        else -> Triple("Sinyal GPS baik", "Arah perjalanan benar.", false)
     }
-}
-
-@Composable
-private fun StopRow(stop: RouteStop, modifier: Modifier = Modifier) {
-    val accent = when (stop.status) {
-        StopStatus.CURRENT -> MaterialTheme.colorScheme.primary
-        StopStatus.WAKE_POINT -> MaterialTheme.colorScheme.secondary
-        StopStatus.DESTINATION -> MaterialTheme.colorScheme.primary
-        else -> MaterialTheme.colorScheme.outline
-    }
-    val faded = stop.status == StopStatus.PASSED
-
-    val dotSize by animateDpAsState(
-        if (stop.status == StopStatus.CURRENT) 14.dp else 10.dp,
-        label = "titik",
-    )
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Box(
-            Modifier
-                .size(dotSize)
-                .background(if (faded) MaterialTheme.colorScheme.outlineVariant else accent, CircleShape)
-        )
-        Column(Modifier.weight(1f).padding(vertical = 6.dp)) {
-            Text(
-                stop.station.name,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = if (stop.status == StopStatus.PASSED) FontWeight.Normal else FontWeight.SemiBold,
-                color = if (faded) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onSurface,
-                textDecoration = if (faded) TextDecoration.LineThrough else null,
-            )
-            stop.status.caption()?.let {
-                Text(it, style = MaterialTheme.typography.bodySmall, color = accent)
-            }
-        }
-        stop.status.badge()?.let { StatusBadge(it, accent) }
-    }
-}
-
-@Composable
-private fun StatusBadge(label: String, accent: Color) {
-    Text(
-        label,
-        style = MaterialTheme.typography.labelSmall,
-        color = accent,
-        modifier = Modifier
-            .background(accent.copy(alpha = 0.14f), MaterialTheme.shapes.small)
-            .padding(horizontal = 8.dp, vertical = 4.dp),
-    )
-}
-
-private fun StopStatus.caption(): String? = when (this) {
-    StopStatus.CURRENT -> "Posisimu sekarang"
-    StopStatus.WAKE_POINT -> "Alarm mulai berbunyi di sini"
-    StopStatus.DESTINATION -> "Tujuan akhir"
-    else -> null
-}
-
-private fun StopStatus.badge(): String? = when (this) {
-    StopStatus.PASSED -> "Lewat"
-    StopStatus.CURRENT -> "Saat ini"
-    StopStatus.WAKE_POINT -> "Titik bangun"
-    StopStatus.DESTINATION -> "Tujuan"
-    StopStatus.UPCOMING -> null
-}
-
-private fun warningFor(proximity: ProximityState, trip: ActiveTrip): String? = when {
-    proximity.isOffRoute ->
-        "Posisimu jauh dari ${trip.lineName}. Pastikan kamu naik line yang benar."
-    proximity.isDeadReckoned ->
-        "Sinyal GPS hilang. Angka di atas estimasi dari kecepatan terakhir."
-    proximity.direction == TravelDirection.AWAY_FROM_DESTINATION ->
-        "Kamu bergerak menjauh dari tujuan. Cek arah keberangkatan."
-    else -> null
-}
-
-@Composable
-private fun WarningCard(warning: String) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer,
-            contentColor = MaterialTheme.colorScheme.onErrorContainer,
-        ),
-    ) {
-        Row(Modifier.padding(16.dp)) {
-            Spacer(Modifier.width(0.dp))
-            Text(warning, style = MaterialTheme.typography.bodyMedium)
-        }
-    }
-}
-
-@Composable
-private fun AlarmActionBar(onStop: () -> Unit) {
-    Surface(
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        tonalElevation = 3.dp,
-        shadowElevation = 12.dp,
-    ) {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .navigationBarsPadding()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                PulsingDot()
-                Text(
-                    "Alarm sedang berbunyi",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.secondary,
-                )
-            }
-            Button(
-                onClick = onStop,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary,
-                ),
-                shape = RoundedCornerShape(18.dp),
-                contentPadding = PaddingValues(vertical = 18.dp),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(
-                    "Saya sudah bangun — matikan alarm",
-                    style = MaterialTheme.typography.titleMedium,
-                )
-            }
-        }
-    }
-}
-
-/** Denyut kecil supaya bar ini terbaca sebagai "sedang terjadi", bukan tombol diam. */
-@Composable
-private fun PulsingDot() {
-    val transition = rememberInfiniteTransition(label = "denyut")
-    val alpha by transition.animateFloat(
-        initialValue = 1f,
-        targetValue = 0.25f,
-        animationSpec = infiniteRepeatable(tween(700), RepeatMode.Reverse),
-        label = "alpha",
-    )
-    Box(
-        Modifier
-            .size(12.dp)
-            .background(MaterialTheme.colorScheme.secondary.copy(alpha = alpha), CircleShape)
+    InfoRow(
+        R.drawable.ic_my_location,
+        title = title,
+        subtitle = subtitle,
+        iconTint = if (warn) scheme.error else scheme.primary,
+        container = if (warn) scheme.errorContainer else scheme.surfaceContainer,
     )
 }

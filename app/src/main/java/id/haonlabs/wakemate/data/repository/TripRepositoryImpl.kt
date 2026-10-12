@@ -7,14 +7,17 @@ import id.haonlabs.wakemate.data.local.TripSessionEntity
 import id.haonlabs.wakemate.domain.model.AlertThreshold
 import id.haonlabs.wakemate.domain.model.AlertThresholdType
 import id.haonlabs.wakemate.domain.model.Station
+import id.haonlabs.wakemate.domain.model.StationWithLine
 import id.haonlabs.wakemate.domain.model.TripSession
 import id.haonlabs.wakemate.domain.model.TripStatus
 import id.haonlabs.wakemate.domain.proximity.ProximityState
 import id.haonlabs.wakemate.domain.repository.TripRepository
 import id.haonlabs.wakemate.domain.trip.ActiveTrip
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -91,6 +94,19 @@ class TripRepositoryImpl @Inject constructor(
             tripSessionDao.update(it.copy(status = status, endedAt = System.currentTimeMillis()))
         }
     }
+
+    override fun recentDestinations(limit: Int): Flow<List<StationWithLine>> =
+        tripSessionDao.history().map { sessions ->
+            sessions.distinctBy { it.destinationStationId }.take(limit).mapNotNull { session ->
+                // Data seed bisa berubah; tujuan yang sudah tidak ada dilewati saja.
+                stationDao.findById(session.destinationStationId)?.let { s ->
+                    StationWithLine(
+                        Station(s.id, s.name, s.mode, s.lat, s.lng, s.lineId, s.sequenceInLine),
+                        lineName(s.lineId),
+                    )
+                }
+            }
+        }
 
     private suspend fun lineName(lineId: String): String =
         lineDao.findById(lineId)?.name ?: lineId

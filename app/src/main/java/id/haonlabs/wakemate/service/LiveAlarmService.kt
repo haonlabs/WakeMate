@@ -13,6 +13,7 @@ import id.haonlabs.wakemate.data.live.LiveWatchRepository
 import id.haonlabs.wakemate.data.live.TjLiveFeed
 import id.haonlabs.wakemate.domain.live.Approach
 import id.haonlabs.wakemate.domain.live.LIVE_LOST_MS
+import id.haonlabs.wakemate.domain.live.LiveLead
 import id.haonlabs.wakemate.domain.live.LiveWatch
 import id.haonlabs.wakemate.domain.live.WatchVerdict
 import id.haonlabs.wakemate.domain.live.evaluate
@@ -234,6 +235,19 @@ class LiveAlarms @Inject constructor(
             context,
             LiveAlarmService.intent(context, LiveAlarmService.ACTION_START),
         )
+    }
+
+    /**
+     * "Ingatkan lagi di halte berikutnya": watch yang sama dipasang ulang dengan ambang satu halte
+     * lebih dekat. Service melihatnya sebagai watch baru, jadi bunyi berhenti dan pemantauan lanjut.
+     */
+    suspend fun snoozeOneStop(): Boolean {
+        val state = watches.state.value ?: return false
+        val watch = state.watch as? LiveWatch.Onboard ?: return false
+        val stopsAway = state.approach?.stopsAway ?: return false
+        if (stopsAway <= 1) return false
+        start(watch.copy(lead = LiveLead.Stops(stopsAway - 1)))
+        return true
     }
 
     fun stop() {

@@ -3,14 +3,15 @@ package id.haonlabs.wakemate.ui.theme
 import androidx.compose.ui.graphics.Color
 
 /**
- * Palet dari sistem desain Stitch (design/stitch/). Hanya varian gelap yang didefinisikan di sana,
- * dan itu memang sesuai pemakaiannya: gerbong subuh dan perjalanan pulang malam.
+ * Palet dari file Figma "WakeMate — Redesign UI/UX" (koleksi variabel Tema Gelap dan Tema
+ * Terang). Teal untuk seleksi dan informasi live, amber khusus untuk hal soal alarm — di kedua tema.
+ * Nilai terang sudah digelapkan seperlunya supaya semua pasangan teks lolos WCAG AA.
  */
+
+// ---- Tema Gelap (identitas asli dari Stitch)
 val Teal = Color(0xFF4FDBC8)
 val TealContainer = Color(0xFF14B8A6)
-val TealSoft = Color(0xFF6BD8CB)
 val Amber = Color(0xFFFFB95F)
-val AmberContainer = Color(0xFFEE9800)
 
 val Midnight = Color(0xFF051426)
 val MidnightLowest = Color(0xFF010F20)
@@ -31,3 +32,23 @@ val ErrorLight = Color(0xFFFFB4AB)
 val ErrorContainerDark = Color(0xFF93000A)
 val OnErrorContainerLight = Color(0xFFFFDAD6)
 val OnError = Color(0xFF690005)
+
+// ---- Tema Terang
+val TealDeep = Color(0xFF007868)
+val TealMist = Color(0xFFBFF2EA)
+val AmberDeep = Color(0xFF995700)
+val AmberMist = Color(0xFFFFE6C2)
+
+val Daylight = Color(0xFFF4F7FB)
+val DaylightLow = Color(0xFFEEF2F7)
+val DaylightHigh = Color(0xFFE6ECF3)
+val DaylightHighest = Color(0xFFD9E1EB)
+
+val Ink = Color(0xFF0B1B2E)
+val InkSoft = Color(0xFF44576A)
+val InkMuted = Color(0xFF5F6E7E)
+val Hairline = Color(0xFFD3DCE6)
+
+val ErrorDeep = Color(0xFFBA1A1A)
+val ErrorMist = Color(0xFFFFDAD6)
+val OnErrorMist = Color(0xFF410002)
