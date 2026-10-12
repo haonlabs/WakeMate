@@ -4,6 +4,7 @@ package id.haonlabs.wakemate.service
 enum class SessionEnd(val message: String) {
     NO_SIGNAL("Sinyal GPS hilang terlalu lama. Pengingat dimatikan — nyalakan ulang kalau masih di perjalanan."),
     TOO_LONG("Sesi berjalan lebih lama dari perjalanan mana pun yang wajar, jadi dihentikan agar tidak menguras baterai."),
+    LIVE_LOST("Data live bus tidak masuk lebih dari 5 menit (internet putus atau feed Transjakarta bermasalah). Pengingat dimatikan."),
 }
 
 /** Batas atas perjalanan Jabodetabek mana pun; PRD §3 menyebut 30-90 menit. */

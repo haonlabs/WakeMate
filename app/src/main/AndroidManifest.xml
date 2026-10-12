@@ -10,6 +10,9 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <!-- Feed live bus Transjakarta (MQTT) dan tile peta. Alarm GPS tetap jalan tanpa internet. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
     <uses-feature android:name="android.hardware.location.gps" android:required="false" />
 
@@ -40,6 +43,12 @@
             android:name=".service.TripTrackingService"
             android:exported="false"
             android:foregroundServiceType="location" />
+
+        <!-- Alarm dari feed live bus: tidak membaca lokasi HP, hanya menerima data jaringan. -->
+        <service
+            android:name=".service.LiveAlarmService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
     </application>
 
 </manifest>

@@ -159,3 +159,23 @@ Flow permintaan izin (Android 10+):
 ---
 
 *Langkah berikutnya: mulai dari poin 1–3 di §10 (skeleton project + data seeding + ProximityCalculator) sebagai fondasi yang bisa langsung diuji tanpa perlu UI selesai dulu.*
+
+---
+
+## 11. Tracker Live Transjakarta (v1.1)
+
+Tab **Live TJ** menampilkan posisi bus live per rute, ETA per halte, dan dua alarm yang digerakkan data live (bukan GPS HP). Alarm GPS §2 tetap ada di tab **Alarm GPS** tanpa perubahan perilaku.
+
+| Komponen | Peran |
+|---|---|
+| `data/live/TjStaticSource` | Rute, halte, trip, shape dari `assets/tj_static.json` (dibuat `tools/generate_tj_static.py` dari GTFS resmi `gtfs.transjakarta.co.id`). Id trip & halte induk sama dengan id di feed live. |
+| `data/live/TjLiveFeed` | Klien MQTT (Paho) ke `wss://mqtt.tj.co.id:8084/mqtt`. Subscribe **per rute** (`/mobile_armada/+/{rute}/#`), satu koneksi dipakai bersama, diputus 10 dtk setelah tak ada pendengar. Bus yang diam >3 menit dibuang. |
+| `domain/live/LiveWatch` + `evaluate()` | Keputusan alarm murni (teruji di `LiveWatchTest`). `Onboard`: bangunkan sebelum bus yang dinaiki sampai halte tujuan (halte/menit). `Arrival`: ingatkan saat bus searah hampir tiba di halte tempat menunggu. |
+| `service/LiveAlarmService` | Foreground service tipe `dataSync`. Watch disimpan di DataStore agar bisa dipulihkan. Berhenti sendiri jika data live hilang >5 menit (`SessionEnd.LIVE_LOST`) atau sesi >4 jam. |
+| `presentation/live/*` | Daftar rute, layar rute (peta MapLibre + style OpenFreeMap dark, arah, bus aktif terurut jarak, halte+ETA). |
+
+Catatan penting:
+- Feed MQTT **tidak terdokumentasi dan bukan API resmi**. Bisa berubah/ditutup kapan saja; UI tetap menampilkan rute & halte tanpa data live.
+- Halte BRT dipakai dua arah dengan id yang sama → arah bus ditentukan dari `trip_id` (`TjNetwork.tripIdsToward`), bukan dari halte.
+- Halte pertama di `stops` payload sering tanpa `eta` (bus sedang/baru di halte itu).
+- Aplikasi kini memakai izin `INTERNET` dan `FOREGROUND_SERVICE_DATA_SYNC`.

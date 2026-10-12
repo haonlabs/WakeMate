@@ -161,7 +161,7 @@ class TripTrackingService : Service() {
 
         if (!trip.hasAlerted) {
             if (state.hasReached(threshold)) {
-                alertManager.alert(trip)
+                alertManager.alert(notifications.tripAlert(trip))
                 locationLog.event("alert")
                 tripRepository.markAlerted(now)
             }

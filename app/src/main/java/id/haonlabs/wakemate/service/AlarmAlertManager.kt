@@ -2,7 +2,6 @@ package id.haonlabs.wakemate.service
 
 import android.util.Log
 import id.haonlabs.wakemate.domain.settings.AlarmSettings
-import id.haonlabs.wakemate.domain.trip.ActiveTrip
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -60,9 +59,13 @@ class AlarmAlertManager @Inject constructor(
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var escalation: Job? = null
+    private var alertId: Int? = null
 
-    override fun alert(trip: ActiveTrip) {
-        notifications.postAlert(trip)
+    // ponytail: satu alarm untuk seluruh app; dua sesi yang berbunyi bersamaan (GPS + live) saling
+    // mematikan saat salah satunya dihentikan. Pisahkan per sesi kalau itu ternyata terjadi.
+    override fun alert(alert: WakeAlert) {
+        notifications.postAlert(alert)
+        alertId = alert.notificationId
         escalation?.cancel()
         escalation = scope.launch {
             // Getar lebih dulu dan tanpa syarat: ini satu-satunya kanal yang tidak bergantung pada
@@ -92,7 +95,8 @@ class AlarmAlertManager @Inject constructor(
         escalation = null
         player.stopSound()
         player.stopVibration()
-        notifications.clearAlert()
+        alertId?.let(notifications::clearAlert)
+        alertId = null
     }
 
     /** Rute baru terlaporkan sesaat setelah pemutaran mulai, jadi diperiksa setelah jeda pendek. */

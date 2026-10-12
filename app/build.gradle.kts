@@ -68,6 +68,8 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.paho.mqtt) // Feed live armada Transjakarta (MQTT over WSS).
+    implementation(libs.maplibre.android)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

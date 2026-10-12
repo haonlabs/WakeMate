@@ -55,7 +55,7 @@ class TripNotifications @Inject constructor(
             .setSilent(true)
             .setCategory(NotificationCompat.CATEGORY_NAVIGATION)
             .setContentIntent(openApp())
-            .addAction(0, "Batalkan", serviceAction(TripTrackingService.ACTION_CANCEL))
+            .addAction(0, "Batalkan", serviceAction(TripTrackingService::class.java, TripTrackingService.ACTION_CANCEL))
             .build()
 
     /** Dipakai sesaat sebelum sesi selesai dimuat dari Room; judulnya menyusul. */
@@ -73,32 +73,67 @@ class TripNotifications @Inject constructor(
         if (hasPermission()) manager.notify(ID_PROGRESS, progress(trip))
     }
 
-    fun postAlert(trip: ActiveTrip) {
-        if (!hasPermission()) return
+    /** Isi alarm sesi GPS; eskalasinya diurus [AlertManager]. */
+    fun tripAlert(trip: ActiveTrip): WakeAlert {
         val remaining = trip.proximity?.stationsRemaining
+        return WakeAlert(
+            notificationId = ID_ALERT,
+            title = "Hampir sampai ${trip.destination.name} — bersiap turun",
+            text = when {
+                remaining == null || remaining <= 0 -> "Kamu sudah sampai tujuan."
+                remaining == 1 -> "Tujuan adalah pemberhentian berikutnya."
+                else -> "$remaining pemberhentian lagi."
+            },
+            doneLabel = "Selesai",
+            doneAction = serviceAction(TripTrackingService::class.java, TripTrackingService.ACTION_COMPLETE),
+        )
+    }
+
+    fun postAlert(alert: WakeAlert) {
+        if (!hasPermission()) return
         val notification = NotificationCompat.Builder(context, CHANNEL_ALERT)
             .setSmallIcon(R.drawable.ic_stat_wakemate)
-            .setContentTitle("Hampir sampai ${trip.destination.name} — bersiap turun")
-            .setContentText(
-                when {
-                    remaining == null || remaining <= 0 -> "Kamu sudah sampai tujuan."
-                    remaining == 1 -> "Tujuan adalah pemberhentian berikutnya."
-                    else -> "$remaining pemberhentian lagi."
-                }
-            )
+            .setContentTitle(alert.title)
+            .setContentText(alert.text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(alert.text))
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setAutoCancel(true)
             .setContentIntent(openApp())
-            .addAction(0, "Selesai", serviceAction(TripTrackingService.ACTION_COMPLETE))
+            .addAction(0, alert.doneLabel, alert.doneAction)
             .build()
-        manager.notify(ID_ALERT, notification)
+        manager.notify(alert.notificationId, notification)
     }
 
-    fun clearAlert() = manager.cancel(ID_ALERT)
+    /** Notifikasi foreground untuk alarm live; dipisah dari sesi GPS karena keduanya bisa jalan bersamaan. */
+    fun liveProgress(title: String, text: String): Notification =
+        NotificationCompat.Builder(context, CHANNEL_PROGRESS)
+            .setSmallIcon(R.drawable.ic_stat_wakemate)
+            .setContentTitle(title)
+            .setContentText(text)
+            .setOngoing(true)
+            .setSilent(true)
+            .setCategory(NotificationCompat.CATEGORY_NAVIGATION)
+            .setContentIntent(openApp())
+            .addAction(0, "Batalkan", serviceAction(LiveAlarmService::class.java, LiveAlarmService.ACTION_STOP))
+            .build()
+
+    fun updateLive(title: String, text: String) {
+        if (hasPermission()) manager.notify(ID_LIVE_PROGRESS, liveProgress(title, text))
+    }
+
+    fun liveAlert(title: String, text: String) = WakeAlert(
+        notificationId = ID_LIVE_ALERT,
+        title = title,
+        text = text,
+        doneLabel = "Matikan",
+        doneAction = serviceAction(LiveAlarmService::class.java, LiveAlarmService.ACTION_STOP),
+    )
+
+    fun clearAlert(id: Int = ID_ALERT) = manager.cancel(id)
 
     /** Sengaja di channel alert: user perlu tahu jaring pengamannya sudah tidak aktif. */
-    fun postSessionEnded(reason: id.haonlabs.wakemate.service.SessionEnd) {
+    fun postSessionEnded(reason: SessionEnd) {
         if (!hasPermission()) return
         manager.notify(
             ID_SESSION_ENDED,
@@ -135,9 +170,9 @@ class TripNotifications @Inject constructor(
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
     )
 
-    private fun serviceAction(action: String) = PendingIntent.getService(
+    private fun serviceAction(service: Class<*>, action: String) = PendingIntent.getService(
         context, action.hashCode(),
-        Intent(context, TripTrackingService::class.java).setAction(action),
+        Intent(context, service).setAction(action),
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
     )
 
@@ -149,5 +184,7 @@ class TripNotifications @Inject constructor(
         const val ID_PROGRESS = 1
         const val ID_ALERT = 2
         const val ID_SESSION_ENDED = 3
+        const val ID_LIVE_PROGRESS = 4
+        const val ID_LIVE_ALERT = 5
     }
 }
