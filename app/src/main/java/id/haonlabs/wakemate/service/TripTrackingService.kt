@@ -57,7 +57,7 @@ class TripTrackingService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // Wajib dipanggil dalam hitungan detik sejak startForegroundService, jadi jangan menunggu
         // Room dulu: judul aslinya menyusul begitu sesi selesai dimuat.
-        enterForeground(tripRepository.activeTrip.value)
+        if (!enterForeground(tripRepository.activeTrip.value)) return pauseUntilAppOpens()
 
         when (intent?.action) {
             ACTION_STOP -> return stopTracking()
@@ -81,17 +81,42 @@ class TripTrackingService : Service() {
         return START_STICKY
     }
 
-    private fun enterForeground(trip: ActiveTrip?) {
+    /**
+     * false kalau sistem menolak: tanpa izin lokasi latar belakang, service lokasi hanya boleh
+     * masuk foreground selagi aplikasi terbuka — penolakan terjadi saat sistem menyalakan ulang
+     * service setelah proses dibunuh.
+     */
+    private fun enterForeground(trip: ActiveTrip?): Boolean {
         val notification = trip?.let { notifications.progress(it) } ?: notifications.starting()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            startForeground(
-                TripNotifications.ID_PROGRESS,
-                notification,
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION,
-            )
-        } else {
-            startForeground(TripNotifications.ID_PROGRESS, notification)
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(
+                    TripNotifications.ID_PROGRESS,
+                    notification,
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION,
+                )
+            } else {
+                startForeground(TripNotifications.ID_PROGRESS, notification)
+            }
+            true
+        } catch (e: SecurityException) {
+            Log.w(TAG, "Service lokasi ditolak masuk foreground", e)
+            false
+        } catch (e: IllegalStateException) { // ForegroundServiceStartNotAllowedException
+            Log.w(TAG, "Service lokasi ditolak masuk foreground", e)
+            false
         }
+    }
+
+    /**
+     * Jangan tutup sesi di Room: begitu user membuka aplikasi, RestoreActiveTripUseCase
+     * menyalakan service dari foreground dan pemantauan berlanjut. Diam-diam berhenti adalah
+     * kegagalan terburuk, jadi user diberi tahu.
+     */
+    private fun pauseUntilAppOpens(): Int {
+        notifications.postSessionEnded(SessionEnd.RESUME_IN_APP)
+        stopSelf()
+        return START_NOT_STICKY
     }
 
     private suspend fun track(trip: ActiveTrip) {

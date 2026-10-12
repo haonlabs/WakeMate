@@ -102,8 +102,7 @@ Beberapa hal yang perlu kamu ketahui:
 | Izin | Alasan |
 |---|---|
 | `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION` | Menghitung posisimu terhadap stasiun tujuan (Alarm GPS) dan mengurutkan bus terdekat (Live TJ) |
-| `ACCESS_BACKGROUND_LOCATION` | Melanjutkan pemantauan Alarm GPS saat layar terkunci dan ponsel di dalam saku |
-| `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_LOCATION` | Menjaga sesi Alarm GPS tetap hidup sepanjang perjalanan |
+| `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_LOCATION` | Menjaga sesi Alarm GPS tetap hidup sepanjang perjalanan, termasuk saat layar terkunci. WakeMate **tidak** meminta izin lokasi latar belakang: lokasi hanya dibaca selama sesi yang kamu mulai sendiri, dengan notifikasi yang selalu terlihat |
 | `FOREGROUND_SERVICE_DATA_SYNC` | Menjaga alarm Live TJ tetap menerima posisi bus saat layar mati |
 | `INTERNET` | Menerima posisi bus live dan mengunduh peta (lihat bagian 2) |
 | `ACCESS_NETWORK_STATE`, `ACCESS_WIFI_STATE` | Dipakai pustaka peta MapLibre untuk mengetahui apakah perangkat sedang tersambung ke internet |

@@ -10,8 +10,10 @@ import android.provider.Settings
 import androidx.core.content.ContextCompat
 
 /**
- * Izin dipecah bertahap sesuai Android 10+ (Technical Design §8): foreground dulu supaya user
- * paham konteksnya, baru background — meminta keduanya sekaligus justru ditolak sistem.
+ * Izin lokasi latar belakang sengaja tidak diminta: pemantauan saat layar mati berjalan lewat
+ * foreground service bertipe location yang dimulai selagi aplikasi terbuka, dan service seperti
+ * itu tetap boleh membaca lokasi tanpa ACCESS_BACKGROUND_LOCATION. Izin latar belakang membuat
+ * versi 1.0 ditolak Play (Prominent Disclosure) padahal tidak dibutuhkan.
  */
 object TripPermissions {
 
@@ -30,10 +32,6 @@ object TripPermissions {
     fun hasNotifications(context: Context) =
         Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
             context.isGranted(Manifest.permission.POST_NOTIFICATIONS)
-
-    fun hasBackgroundLocation(context: Context) =
-        Build.VERSION.SDK_INT < Build.VERSION_CODES.Q ||
-            context.isGranted(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
 
     /**
      * PRD §7.1: HP dengan battery saver agresif (Xiaomi/Oppo/Vivo) bisa membunuh service di tengah

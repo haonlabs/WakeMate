@@ -129,7 +129,7 @@ ServiceModule      → Dependency khusus untuk TripTrackingService (EntryPoint,
 
 Flow permintaan izin (Android 10+):
 1. Saat pertama kali user tap "Mulai Perjalanan" → minta `ACCESS_FINE_LOCATION` (foreground)
-2. Jelaskan lewat rationale dialog kenapa perlu **background location** juga (`ACCESS_BACKGROUND_LOCATION`) — karena app perlu tetap tracking walau layar mati
+2. **Tidak** meminta `ACCESS_BACKGROUND_LOCATION`. Tracking saat layar mati berjalan lewat foreground service bertipe `location` yang dimulai selagi app terbuka — service seperti itu tetap mendapat lokasi tanpa izin latar belakang (diuji di emulator: alarm bunyi dengan layar mati; service yang di-restart sistem setelah proses dibunuh tetap menerima lokasi). Izin latar belakang membuat versi 1.0 ditolak Play (Prominent Disclosure). Bila sistem menolak service masuk foreground saat restart dari latar belakang, service berhenti tanpa menutup sesi dan memberi tahu user untuk membuka app (`SessionEnd.RESUME_IN_APP`)
 3. Untuk Android 13+ → minta `POST_NOTIFICATIONS` juga di flow yang sama
 4. Jika user tolak background location → beri tahu keterbatasan (app hanya bisa tracking saat layar menyala) alih-alih diam-diam gagal
 

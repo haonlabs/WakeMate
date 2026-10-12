@@ -4,6 +4,11 @@ package id.haonlabs.wakemate.service
 enum class SessionEnd(val message: String) {
     NO_SIGNAL("Sinyal GPS hilang terlalu lama. Pengingat dimatikan — nyalakan ulang kalau masih di perjalanan."),
     TOO_LONG("Sesi berjalan lebih lama dari perjalanan mana pun yang wajar, jadi dihentikan agar tidak menguras baterai."),
+    /**
+     * Android 14+ menolak service lokasi yang dinyalakan ulang dari latar belakang tanpa izin
+     * lokasi latar belakang. Sesinya tetap tersimpan dan dilanjutkan begitu aplikasi dibuka.
+     */
+    RESUME_IN_APP("Android menghentikan pemantauan di latar belakang. Buka WakeMate untuk melanjutkan pengingat perjalananmu."),
     LIVE_LOST("Data live bus tidak masuk lebih dari 5 menit (internet putus atau feed Transjakarta bermasalah). Pengingat dimatikan."),
 }
 

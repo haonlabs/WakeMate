@@ -60,22 +60,13 @@ fun TripSetupScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    var showBackgroundRationale by remember { mutableStateOf(false) }
     var showForegroundDenied by remember { mutableStateOf(false) }
-
-    val backgroundLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { viewModel.onStart() } // Ditolak pun sesi tetap jalan, hanya terbatas saat layar menyala.
 
     val foregroundLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) {
-        if (TripPermissions.hasForegroundLocation(context)) {
-            if (TripPermissions.hasBackgroundLocation(context)) viewModel.onStart()
-            else showBackgroundRationale = true
-        } else {
-            showForegroundDenied = true
-        }
+        if (TripPermissions.hasForegroundLocation(context)) viewModel.onStart()
+        else showForegroundDenied = true
     }
 
     LaunchedEffect(state.started) {
@@ -171,31 +162,6 @@ fun TripSetupScreen(
             confirmButton = { TextButton(onClick = viewModel::onErrorShown) { Text("OK") } },
             title = { Text("Tidak bisa memulai") },
             text = { Text(message) },
-        )
-    }
-
-    if (showBackgroundRationale) {
-        AlertDialog(
-            onDismissRequest = { showBackgroundRationale = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    showBackgroundRationale = false
-                    backgroundLauncher.launch(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-                }) { Text("Izinkan") }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    showBackgroundRationale = false
-                    viewModel.onStart()
-                }) { Text("Nanti saja") }
-            },
-            title = { Text("Izin lokasi latar belakang") },
-            text = {
-                Text(
-                    "WakeMate perlu membaca lokasi walau layar mati — itu justru saat kamu tidur. " +
-                        "Tanpa izin ini, pengingat hanya bekerja selama layar menyala."
-                )
-            },
         )
     }
 
