@@ -23,13 +23,16 @@ import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
+import org.eclipse.paho.client.mqttv3.MqttException
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import org.eclipse.paho.client.mqttv3.MqttTopic
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 import javax.inject.Inject
 import javax.inject.Singleton
 
-enum class FeedStatus { IDLE, CONNECTING, LIVE, OFFLINE }
+enum class FeedStatus { IDLE, CONNECTING, LIVE, OFFLINE, UNAVAILABLE }
+
+private enum class ConnectResult { OK, RETRY, REJECTED }
 
 /**
  * Posisi bus live dari broker MQTT milik Transjakarta (dipakai juga oleh aplikasi resminya).
@@ -117,15 +120,26 @@ class TjLiveFeed @Inject constructor() {
             // percobaan pertama diulang sendiri.
             while (isActive && synchronized(lock) { listeners.isNotEmpty() }) {
                 _status.value = FeedStatus.CONNECTING
-                if (connectOnce()) return@launch
-                _status.value = FeedStatus.OFFLINE
-                delay(backoff)
-                backoff = (backoff * 2).coerceAtMost(30_000L)
+                when (connectOnce()) {
+                    ConnectResult.OK -> return@launch
+                    // Broker menolak koneksi (mis. koneksi anonim tidak diizinkan lagi).
+                    // Mengulang hanya membuang baterai dan data tanpa mungkin berhasil, jadi
+                    // percobaan berikutnya menunggu sampai ada pendengar baru yang masuk.
+                    ConnectResult.REJECTED -> {
+                        _status.value = FeedStatus.UNAVAILABLE
+                        return@launch
+                    }
+                    ConnectResult.RETRY -> {
+                        _status.value = FeedStatus.OFFLINE
+                        delay(backoff)
+                        backoff = (backoff * 2).coerceAtMost(30_000L)
+                    }
+                }
             }
         }
     }
 
-    private fun connectOnce(): Boolean {
+    private fun connectOnce(): ConnectResult {
         val candidate = MqttAsyncClient(BROKER, MqttAsyncClient.generateClientId(), MemoryPersistence())
         candidate.setCallback(Callback(candidate))
         val options = MqttConnectOptions().apply {
@@ -137,12 +151,15 @@ class TjLiveFeed @Inject constructor() {
         }
         synchronized(lock) { client = candidate }
         return runCatching { candidate.connect(options).waitForCompletion(20_000) }
-            .onFailure {
-                Log.w(TAG, "Gagal terhubung ke feed live", it)
-                synchronized(lock) { if (client === candidate) client = null }
-                runCatching { candidate.close(true) }
-            }
-            .isSuccess
+            .fold(
+                onSuccess = { ConnectResult.OK },
+                onFailure = {
+                    Log.w(TAG, "Gagal terhubung ke feed live", it)
+                    synchronized(lock) { if (client === candidate) client = null }
+                    runCatching { candidate.close(true) }
+                    if (isAuthRejection(it)) ConnectResult.REJECTED else ConnectResult.RETRY
+                },
+            )
     }
 
     private fun disconnect() {
@@ -197,4 +214,21 @@ class TjLiveFeed @Inject constructor() {
 
         fun topicFilter(routeId: String) = "/mobile_armada/+/$routeId/#"
     }
+}
+
+private val AUTH_REJECTION_CODES = setOf(
+    MqttException.REASON_CODE_FAILED_AUTHENTICATION.toInt(),
+    MqttException.REASON_CODE_NOT_AUTHORIZED.toInt(),
+)
+
+/**
+ * [true] kalau broker menolak koneksi karena otorisasi, bukan karena jaringan jelek.
+ *
+ * Penolakan seperti ini tidak akan hilang dengan dicoba ulang, jadi harus dibedakan dari
+ * kegagalan jaringan biasa yang layak dicoba lagi. Paho kadang membungkus penyebab sebenarnya
+ * di dalam [Throwable.cause], jadi rantainya ikut diperiksa.
+ */
+fun isAuthRejection(t: Throwable): Boolean {
+    val mqtt = t as? MqttException ?: return false
+    return mqtt.reasonCode in AUTH_REJECTION_CODES || mqtt.cause?.let(::isAuthRejection) == true
 }

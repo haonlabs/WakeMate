@@ -265,6 +265,7 @@ private fun TopOverlay(state: RouteLiveUi, onBack: () -> Unit, onFavorite: () ->
                     val (text, color) = when (state.feed) {
                         FeedStatus.LIVE -> "Live · ${state.buses.size} bus" to MaterialTheme.colorScheme.primary
                         FeedStatus.OFFLINE -> "Data live tidak tersedia" to MaterialTheme.colorScheme.error
+                        FeedStatus.UNAVAILABLE -> "Live Transjakarta sedang tidak tersedia" to MaterialTheme.colorScheme.error
                         else -> "Menghubungkan..." to MaterialTheme.colorScheme.onSurfaceVariant
                     }
                     Text(text, style = MaterialTheme.typography.labelSmall, color = color)
