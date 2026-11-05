@@ -55,4 +55,46 @@ class ScheduleEtaTest {
         val tidakSejajar = trip.copy(halteIds = listOf("HA", "HB", "HC", "HD"))
         assertEquals(emptyList<Int>(), scheduleEtas(listOf(tidakSejajar), "HB", senin(7, 5)))
     }
+
+    // ---- Jadwal tetap (KRL): arrivals mutlak, tanpa freqs.
+
+    /** Stasiun HA 05:00, HB 05:10 (Sen-Jum) dan KA malam yang tiba di HB 24:30 (layanan Minggu). */
+    private val krlPagi = TjTrip(
+        id = "krl:1", routeId = "krl:B", headsign = "Bogor", name = "KA 1",
+        halteIds = listOf("HA", "HB"), shape = "",
+        arrivals = listOf(18000, 18600), days = 0b0011111,
+    )
+    private val krlLarut = TjTrip(
+        id = "krl:2", routeId = "krl:B", headsign = "Bogor", name = "KA 2",
+        halteIds = listOf("HA", "HB"), shape = "",
+        arrivals = listOf(86400, 88200), days = 0b1000000, // berangkat Minggu 24:00, tiba HB Senin 00:30
+    )
+
+    @Test
+    fun `jadwal tetap memberi selisih menit ke jam tiba mutlak`() {
+        assertEquals(listOf(20), scheduleEtas(listOf(krlPagi), "HB", senin(4, 50)))
+    }
+
+    @Test
+    fun `jadwal tetap yang sudah lewat tidak ditampilkan`() {
+        assertEquals(emptyList<Int>(), scheduleEtas(listOf(krlPagi), "HB", senin(5, 11)))
+    }
+
+    @Test
+    fun `jadwal tetap tidak ada di hari tanpa layanan - Sabtu`() {
+        val sabtu = ZonedDateTime.of(2026, 11, 7, 4, 50, 0, 0, zone)
+        assertEquals(emptyList<Int>(), scheduleEtas(listOf(krlPagi), "HB", sabtu))
+    }
+
+    @Test
+    fun `KA lewat tengah malam dihitung dari hari layanan kemarin`() {
+        // Senin 00:20: KA layanan Minggu tiba di HB 00:30 -> 10 menit lagi.
+        assertEquals(listOf(10), scheduleEtas(listOf(krlLarut), "HB", senin(0, 20)))
+    }
+
+    @Test
+    fun `jadwal tetap dan frekuensi digabung lalu diurutkan`() {
+        // Senin 04:50: KRL 05:10 (20 mnt), lalu bus berfrekuensi tiba di HB 06:10 (80) dan 06:40 (110).
+        assertEquals(listOf(20, 80, 110), scheduleEtas(listOf(trip, krlPagi), "HB", senin(4, 50)))
+    }
 }

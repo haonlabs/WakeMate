@@ -43,6 +43,8 @@ class TjNetwork(
     val routes: List<TjRoute>,
     val halte: Map<String, Halte>,
     trips: List<TjTrip>,
+    /** Hari terakhir jadwal tetap (KRL) berlaku; setelahnya ETA-nya tidak boleh ditampilkan. */
+    val fixedScheduleValidUntil: java.time.LocalDate? = null,
 ) {
     val routeById: Map<String, TjRoute> = routes.associateBy { it.id }
     val tripById: Map<String, TjTrip> = trips.associateBy { it.id }

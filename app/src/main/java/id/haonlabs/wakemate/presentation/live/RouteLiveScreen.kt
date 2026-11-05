@@ -206,7 +206,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.routeItems(
             InfoRow(
                 R.drawable.ic_alarm,
                 title = "Perkiraan tiba belum tersedia",
-                subtitle = "Rute dan $unit tetap bisa dilihat di peta dan daftar ini.",
+                subtitle = state.scheduleNote ?: "Rute dan $unit tetap bisa dilihat di peta dan daftar ini.",
                 iconTint = MaterialTheme.colorScheme.outline,
             )
         }
@@ -222,6 +222,18 @@ private fun androidx.compose.foundation.lazy.LazyListScope.routeItems(
             isLast = i == state.halte.lastIndex,
         )
     }
+    state.route?.let { route ->
+        item(key = "sumber") {
+            Text(sourceNote(route.kind), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
+
+/** Atribusi wajib: Open-KRL (CC-BY 4.0) untuk jadwal KRL, OpenStreetMap (ODbL) untuk jalur dan stasiun rel. */
+private fun sourceNote(kind: String): String = when {
+    kind == "KRL" -> "Jadwal: Open-KRL (CC-BY 4.0), disusun dari papan jadwal kci.id; tidak resmi dan bisa berubah tanpa pemberitahuan. Stasiun dan peta © kontributor OpenStreetMap."
+    kind == "MRT" || kind.startsWith("LRT") -> "Jalur dan stasiun © kontributor OpenStreetMap. Jadwal belum tersedia di aplikasi ini."
+    else -> "Rute, halte, dan jadwal: GTFS Transjakarta. Perkiraan menurut jadwal, bukan posisi bus."
 }
 
 @Composable

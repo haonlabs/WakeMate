@@ -28,8 +28,11 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import javax.inject.Inject
 
 /** [scheduleEta] = menit dari sekarang menurut jadwal; null kalau rute ini tidak punya data jadwal. */
@@ -43,6 +46,8 @@ data class RouteLiveUi(
     val directions: List<TjTrip> = emptyList(),
     val directionIndex: Int = 0,
     val halte: List<HalteRow> = emptyList(),
+    /** Alasan ETA jadwal tidak tampil (KRL: jadwal kadaluarsa / hari Sabtu), null kalau tidak ada masalah. */
+    val scheduleNote: String? = null,
     val favorite: Boolean = false,
     val userLocation: Location? = null,
 ) {
@@ -84,15 +89,19 @@ class RouteLiveViewModel @Inject constructor(
                 .takeIf { it >= 0 }
         } ?: 0
         val direction = directions.getOrNull(directionIndex)
+        val route = net?.routeById?.get(routeId)
+        val note = scheduleNote(route, net, now)
         val towardTrips = direction?.let { d -> net?.tripIdsToward(d)?.mapNotNull { net.tripById[it] } }.orEmpty()
+        val expired = note != null && note.startsWith(EXPIRED_PREFIX)
         val rows = if (net == null || direction == null) emptyList() else direction.halteIds.mapNotNull { id ->
-            net.halte[id]?.let { HalteRow(it, scheduleEtas(towardTrips, id, now).firstOrNull()) }
+            net.halte[id]?.let { HalteRow(it, if (expired) null else scheduleEtas(towardTrips, id, now).firstOrNull()) }
         }
         return RouteLiveUi(
-            route = net?.routeById?.get(routeId),
+            route = route,
             directions = directions,
             directionIndex = directionIndex,
             halte = rows,
+            scheduleNote = note,
             favorite = favorite,
             userLocation = location,
         )
@@ -118,6 +127,25 @@ class RouteLiveViewModel @Inject constructor(
             .addOnSuccessListener { loc -> if (loc != null) userLocation.value = loc }
     }
 }
+
+/**
+ * KRL memakai jadwal tetap yang punya masa berlaku dan tidak mencakup hari Sabtu (sumber datanya
+ * hanya merekam hari kerja dan Minggu). Lebih baik bilang tidak tahu daripada menampilkan jam
+ * yang salah.
+ */
+private fun scheduleNote(route: TjRoute?, net: TjNetwork?, now: ZonedDateTime): String? {
+    if (route?.kind != "KRL") return null
+    val until = net?.fixedScheduleValidUntil
+    return when {
+        until != null && now.toLocalDate().isAfter(until) ->
+            "$EXPIRED_PREFIX ${until.format(DATE_ID)}. Perbarui aplikasi untuk jadwal terbaru."
+        now.dayOfWeek == DayOfWeek.SATURDAY -> "Jadwal KRL hari Sabtu belum tersedia."
+        else -> null
+    }
+}
+
+private const val EXPIRED_PREFIX = "Jadwal KRL di aplikasi ini hanya berlaku sampai"
+private val DATE_ID = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("id-ID"))
 
 /** Semua waktu jadwal mengikuti zona operator (WIB), bukan zona device. */
 private val JAKARTA = ZoneId.of("Asia/Jakarta")

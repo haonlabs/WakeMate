@@ -16,12 +16,16 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.double
 import kotlinx.serialization.json.jsonPrimitive
+import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Rute, halte, dan trip dari assets/tj_static.json (lihat tools/generate_tj_static.py). Dibaca
- * sekali lalu disimpan di memori: datanya hanya-baca dan cuma ~1 MB, jadi tidak perlu Room.
+ * Rute, halte, dan trip dari dua aset dengan skema sama, digabung jadi satu jaringan:
+ * tj_static.json (Transjakarta, tools/generate_tj_static.py) dan rail_static.json (KRL, MRT, LRT,
+ * tools/generate_rail_static.py). Dibaca sekali lalu disimpan di memori: datanya hanya-baca dan
+ * ~1,5 MB, jadi tidak perlu Room. Id rute/halte rel berawalan "krl:", "mrt:", "lrtj:", "lrtjbd:",
+ * jadi tidak bertabrakan dengan id GTFS Transjakarta.
  */
 @Singleton
 class TjStaticSource @Inject constructor(
@@ -35,16 +39,17 @@ class TjStaticSource @Inject constructor(
     }
 
     private suspend fun load(): TjNetwork = withContext(Dispatchers.IO) {
-        val text = context.assets.open(ASSET).bufferedReader().use { it.readText() }
-        val file = json.decodeFromString<StaticFile>(text)
+        val files = ASSETS.map { name ->
+            json.decodeFromString<StaticFile>(context.assets.open(name).bufferedReader().use { it.readText() })
+        }
         TjNetwork(
-            routes = file.routes
+            routes = files.flatMap { it.routes }
                 .map { TjRoute(it.id, it.short, it.long, it.kind, it.color, it.text) }
                 .sortedWith(routeOrder),
-            halte = file.halte.mapValues { (id, row) ->
-                Halte(id, row[0].jsonPrimitive.content, row[1].jsonPrimitive.double, row[2].jsonPrimitive.double)
+            halte = files.flatMap { it.halte.entries }.associate { (id, row) ->
+                id to Halte(id, row[0].jsonPrimitive.content, row[1].jsonPrimitive.double, row[2].jsonPrimitive.double)
             },
-            trips = file.trips.map { TjTrip(
+            trips = files.flatMap { it.trips }.map { TjTrip(
                 id = it.id,
                 routeId = it.route,
                 headsign = it.head,
@@ -55,6 +60,7 @@ class TjStaticSource @Inject constructor(
                 days = it.days,
                 freqs = it.freq.map { f -> Frequency(f[0], f[1], f[2]) },
             ) },
+            fixedScheduleValidUntil = files.firstNotNullOfOrNull { it.meta?.validUntil }?.let(LocalDate::parse),
         )
     }
 
@@ -64,7 +70,12 @@ class TjStaticSource @Inject constructor(
         /** id -> [nama, lat, lng]; dibuat ringkas karena jumlahnya ribuan. */
         val halte: Map<String, JsonArray>,
         val trips: List<TripRow>,
+        /** Hanya ada di rail_static.json. */
+        val meta: Meta? = null,
     )
+
+    @Serializable
+    private data class Meta(val validUntil: String? = null)
 
     @Serializable
     private data class RouteRow(
@@ -91,11 +102,11 @@ class TjStaticSource @Inject constructor(
     )
 
     private companion object {
-        const val ASSET = "tj_static.json"
+        val ASSETS = listOf("tj_static.json", "rail_static.json")
         val json = Json { ignoreUnknownKeys = true }
 
-        /** Koridor BRT paling sering dicari, jadi di atas; dalam satu jenis urut angka alami (2 < 10). */
-        val KIND_ORDER = listOf("BRT", "Angkutan Umum Integrasi", "Mikrotrans", "Transjabodetabek")
+        /** Rel (hanya belasan rute) di atas supaya mudah ditemukan, lalu koridor BRT; dalam satu jenis urut angka alami (2 < 10). */
+        val KIND_ORDER = listOf("KRL", "MRT", "LRT Jakarta", "LRT Jabodebek", "BRT", "Angkutan Umum Integrasi", "Mikrotrans", "Transjabodetabek")
 
         val routeOrder = compareBy<TjRoute>(
             { KIND_ORDER.indexOf(it.kind).let { i -> if (i < 0) KIND_ORDER.size else i } },
