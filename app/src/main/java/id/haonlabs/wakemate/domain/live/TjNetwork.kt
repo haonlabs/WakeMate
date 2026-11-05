@@ -12,6 +12,9 @@ data class TjRoute(
     val textColor: String,
 )
 
+/** KRL, MRT, dan LRT disebut "stasiun"; selebihnya (bus Transjakarta) "halte". */
+fun TjRoute.isRail(): Boolean = kind == "KRL" || kind == "MRT" || kind.startsWith("LRT")
+
 data class Halte(val id: String, val name: String, val lat: Double, val lng: Double)
 
 data class TjTrip(

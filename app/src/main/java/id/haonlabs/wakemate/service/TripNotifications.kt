@@ -105,31 +105,6 @@ class TripNotifications @Inject constructor(
         manager.notify(alert.notificationId, notification)
     }
 
-    /** Notifikasi foreground untuk alarm live; dipisah dari sesi GPS karena keduanya bisa jalan bersamaan. */
-    fun liveProgress(title: String, text: String): Notification =
-        NotificationCompat.Builder(context, CHANNEL_PROGRESS)
-            .setSmallIcon(R.drawable.ic_stat_wakemate)
-            .setContentTitle(title)
-            .setContentText(text)
-            .setOngoing(true)
-            .setSilent(true)
-            .setCategory(NotificationCompat.CATEGORY_NAVIGATION)
-            .setContentIntent(openApp())
-            .addAction(0, "Batalkan", serviceAction(LiveAlarmService::class.java, LiveAlarmService.ACTION_STOP))
-            .build()
-
-    fun updateLive(title: String, text: String) {
-        if (hasPermission()) manager.notify(ID_LIVE_PROGRESS, liveProgress(title, text))
-    }
-
-    fun liveAlert(title: String, text: String) = WakeAlert(
-        notificationId = ID_LIVE_ALERT,
-        title = title,
-        text = text,
-        doneLabel = "Matikan",
-        doneAction = serviceAction(LiveAlarmService::class.java, LiveAlarmService.ACTION_STOP),
-    )
-
     fun clearAlert(id: Int = ID_ALERT) = manager.cancel(id)
 
     /** Sengaja di channel alert: user perlu tahu jaring pengamannya sudah tidak aktif. */
@@ -184,7 +159,5 @@ class TripNotifications @Inject constructor(
         const val ID_PROGRESS = 1
         const val ID_ALERT = 2
         const val ID_SESSION_ENDED = 3
-        const val ID_LIVE_PROGRESS = 4
-        const val ID_LIVE_ALERT = 5
     }
 }

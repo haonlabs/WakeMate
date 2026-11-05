@@ -61,7 +61,7 @@ class AlarmAlertManager @Inject constructor(
     private var escalation: Job? = null
     private var alertId: Int? = null
 
-    // ponytail: satu alarm untuk seluruh app; dua sesi yang berbunyi bersamaan (GPS + live) saling
+    // ponytail: satu alarm untuk seluruh app. Kalau kelak ada dua sesi yang berbunyi bersamaan, mereka saling
     // mematikan saat salah satunya dihentikan. Pisahkan per sesi kalau itu ternyata terjadi.
     override fun alert(alert: WakeAlert) {
         notifications.postAlert(alert)

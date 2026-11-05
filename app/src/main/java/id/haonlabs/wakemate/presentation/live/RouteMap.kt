@@ -1,6 +1,5 @@
 package id.haonlabs.wakemate.presentation.live
 
-import android.graphics.RectF
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -8,7 +7,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -20,7 +18,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import id.haonlabs.wakemate.domain.live.Halte
-import id.haonlabs.wakemate.domain.live.LiveBus
 import org.maplibre.android.MapLibre
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
@@ -28,7 +25,6 @@ import org.maplibre.android.geometry.LatLngBounds
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
-import org.maplibre.android.style.expressions.Expression
 import org.maplibre.android.style.layers.CircleLayer
 import org.maplibre.android.style.layers.LineLayer
 import org.maplibre.android.style.layers.Property
@@ -48,21 +44,13 @@ data class CameraTarget(val lat: Double, val lng: Double, val zoom: Double = 15.
 
 private const val ROUTE = "route"
 private const val HALTE = "halte"
-private const val BUSES = "buses"
 
-/**
- * Peta satu rute: garis rute arah terpilih, halte, dan bus live. Bus di arah lain digambar redup
- * supaya tetap terlihat tanpa mengaburkan arah yang sedang dilihat.
- */
+/** Peta satu rute: garis rute arah terpilih dan halte/stasiunnya. Data statis, tanpa posisi kendaraan. */
 @Composable
-fun LiveMap(
+fun RouteMap(
     shape: String,
     halte: List<Halte>,
-    buses: List<LiveBus>,
-    activeTripIds: Set<String>,
-    selectedBusNo: String?,
     routeColor: Int,
-    onBusClick: (String?) -> Unit,
     modifier: Modifier = Modifier,
     /** Ruang di bawah yang tertutup bottom sheet; rute dipaskan di atasnya. */
     bottomPadding: Dp = 0.dp,
@@ -81,7 +69,6 @@ fun LiveMap(
     }
     var map by remember { mutableStateOf<MapLibreMap?>(null) }
     var style by remember { mutableStateOf<Style?>(null) }
-    val currentOnBusClick by rememberUpdatedState(onBusClick)
 
     DisposableEffect(lifecycle, mapView) {
         val observer = LifecycleEventObserver { _, event ->
@@ -114,16 +101,6 @@ fun LiveMap(
                 map = m
                 style = loaded
             }
-            if (map != null) return@getMapAsync // pendengar klik cukup dipasang sekali
-            m.addOnMapClickListener { point ->
-                val screen = m.projection.toScreenLocation(point)
-                val hit = m.queryRenderedFeatures(
-                    RectF(screen.x - 28, screen.y - 28, screen.x + 28, screen.y + 28),
-                    BUSES,
-                ).firstOrNull()
-                currentOnBusClick(hit?.getStringProperty("no"))
-                true
-            }
         }
     }
 
@@ -138,7 +115,6 @@ fun LiveMap(
         )
         s.getLayer(ROUTE)?.setProperties(PropertyFactory.lineColor(routeColor))
         s.getLayer(HALTE)?.setProperties(PropertyFactory.circleStrokeColor(routeColor))
-        s.getLayer(BUSES)?.setProperties(PropertyFactory.circleColor(routeColor))
 
         val points = line?.coordinates().orEmpty().map { LatLng(it.latitude(), it.longitude()) }
             .ifEmpty { halte.map { LatLng(it.lat, it.lng) } }
@@ -156,28 +132,12 @@ fun LiveMap(
         map?.easeCamera(CameraUpdateFactory.newLatLngZoom(LatLng(t.lat, t.lng), t.zoom), 500)
     }
 
-    LaunchedEffect(style, buses, selectedBusNo, activeTripIds) {
-        val s = style ?: return@LaunchedEffect
-        s.getSourceAs<GeoJsonSource>(BUSES)?.setGeoJson(
-            FeatureCollection.fromFeatures(
-                buses.map { bus ->
-                    Feature.fromGeometry(Point.fromLngLat(bus.lng, bus.lat)).apply {
-                        addStringProperty("no", bus.busNo)
-                        addBooleanProperty("sel", bus.busNo == selectedBusNo)
-                        addBooleanProperty("dim", activeTripIds.isNotEmpty() && bus.tripId !in activeTripIds)
-                    }
-                }
-            )
-        )
-    }
-
     AndroidView(factory = { mapView }, modifier = modifier)
 }
 
 private fun addLayers(style: Style) {
     style.addSource(GeoJsonSource(ROUTE))
     style.addSource(GeoJsonSource(HALTE))
-    style.addSource(GeoJsonSource(BUSES))
     style.addLayer(
         LineLayer(ROUTE, ROUTE).withProperties(
             PropertyFactory.lineWidth(4f),
@@ -191,22 +151,6 @@ private fun addLayers(style: Style) {
             PropertyFactory.circleRadius(3.5f),
             PropertyFactory.circleColor("#FFFFFF"),
             PropertyFactory.circleStrokeWidth(1.5f),
-        )
-    )
-    style.addLayer(
-        CircleLayer(BUSES, BUSES).withProperties(
-            PropertyFactory.circleRadius(
-                Expression.switchCase(Expression.get("sel"), Expression.literal(10f), Expression.literal(7f))
-            ),
-            PropertyFactory.circleOpacity(
-                Expression.switchCase(Expression.get("dim"), Expression.literal(0.35f), Expression.literal(1f))
-            ),
-            PropertyFactory.circleStrokeColor(
-                Expression.switchCase(Expression.get("sel"), Expression.color(0xFFFFB95F.toInt()), Expression.color(0xFFFFFFFF.toInt()))
-            ),
-            PropertyFactory.circleStrokeWidth(
-                Expression.switchCase(Expression.get("sel"), Expression.literal(3f), Expression.literal(2f))
-            ),
         )
     )
 }

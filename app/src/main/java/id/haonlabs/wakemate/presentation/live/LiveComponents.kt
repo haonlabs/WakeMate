@@ -11,11 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import id.haonlabs.wakemate.domain.live.Approach
-import id.haonlabs.wakemate.domain.live.LiveLead
 import id.haonlabs.wakemate.domain.live.TjRoute
 import id.haonlabs.wakemate.presentation.components.posterBorder
-import java.util.Locale
 
 /** Warna GTFS "RRGGBB"; rute tanpa warna valid jatuh ke warna utama tema. */
 fun parseRouteColor(hex: String, fallback: Color): Color =
@@ -39,26 +36,4 @@ fun RouteBadge(route: TjRoute, modifier: Modifier = Modifier) {
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
         )
     }
-}
-
-/** "±4 mnt", atau "Tiba" saat bus sudah di halte itu. */
-fun Approach.etaLabel(): String = when {
-    stopsAway <= 1 && (etaMin ?: 0) <= 0 -> "Tiba"
-    etaMin != null -> "±$etaMin mnt"
-    stopsAway <= 1 -> "berikutnya"
-    else -> "$stopsAway halte"
-}
-
-/** Label pendek untuk chip ambang: "2 halte", "5 menit". */
-fun LiveLead.chipLabel(): String = when (this) {
-    is LiveLead.Stops -> "$count halte"
-    is LiveLead.Minutes -> "$minutes menit"
-}
-
-fun formatDistance(meters: Float): String =
-    if (meters < 1_000) "${meters.toInt()} m" else String.format(Locale.US, "%.1f km", meters / 1_000).replace('.', ',')
-
-fun updatedAgo(updatedAt: Long): String {
-    val seconds = ((System.currentTimeMillis() - updatedAt) / 1_000).coerceAtLeast(0)
-    return if (seconds < 60) "diperbarui $seconds dtk lalu" else "diperbarui ${seconds / 60} mnt lalu"
 }

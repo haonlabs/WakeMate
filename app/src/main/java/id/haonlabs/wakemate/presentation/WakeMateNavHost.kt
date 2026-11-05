@@ -39,15 +39,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import id.haonlabs.wakemate.R
-import id.haonlabs.wakemate.data.live.LiveWatchState
-import id.haonlabs.wakemate.domain.live.LiveWatch
-import id.haonlabs.wakemate.domain.live.summary
 import id.haonlabs.wakemate.domain.trip.ActiveTrip as GpsTrip
 import id.haonlabs.wakemate.presentation.components.AlarmBar
 import id.haonlabs.wakemate.presentation.diagnostics.AudioRoutingScreen
 import id.haonlabs.wakemate.presentation.home.HomeScreen
 import id.haonlabs.wakemate.presentation.live.LiveRoutesScreen
-import id.haonlabs.wakemate.presentation.live.LiveTripScreen
 import id.haonlabs.wakemate.presentation.live.RouteLiveScreen
 import id.haonlabs.wakemate.presentation.trip.ActiveTripScreen
 import id.haonlabs.wakemate.presentation.trip.TripSetupScreen
@@ -62,12 +58,8 @@ private val FADE = tween<Float>(durationMillis = 220, easing = FastOutSlowInEasi
 @Serializable
 object LiveRoutes
 
-/** [boardBus] diisi dari "Ubah halte": sheet langsung terbuka di pemilihan halte untuk bus itu. */
 @Serializable
-data class RouteLive(val routeId: String, val boardBus: String? = null)
-
-@Serializable
-object LiveTrip
+data class RouteLive(val routeId: String)
 
 /** Alur alarm GPS (KRL/MRT/TJ). */
 @Serializable
@@ -89,7 +81,6 @@ fun WakeMateNavHost(
 ) {
     val hasActiveTrip by viewModel.hasActiveTrip.collectAsStateWithLifecycle()
     val gpsTrip by viewModel.gpsTrip.collectAsStateWithLifecycle()
-    val liveWatch by viewModel.liveWatch.collectAsStateWithLifecycle()
 
     // Sesi yang selamat dari app dibunuh sistem harus langsung terlihat lagi, bukan hilang diam-diam.
     LaunchedEffect(hasActiveTrip) {
@@ -109,16 +100,13 @@ fun WakeMateNavHost(
                     Column {
                         // Status jaring pengaman tidak boleh hilang hanya karena user pindah tab.
                         AnimatedVisibility(
-                            visible = liveWatch != null || gpsTrip != null,
+                            visible = gpsTrip != null,
                             enter = slideInVertically { it } + fadeIn(),
                             exit = slideOutVertically { it } + fadeOut(),
                         ) {
                             TabAlarmBar(
-                                liveWatch = liveWatch,
                                 gpsTrip = gpsTrip,
-                                onOpenLive = { navController.navigate(LiveTrip) },
                                 onOpenGps = { navController.navigate(ActiveTrip) },
-                                onStopLive = viewModel::onLiveAwake,
                                 onStopGps = { viewModel.onGpsAwake() },
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                             )
@@ -141,7 +129,7 @@ fun WakeMateNavHost(
                                 selected = destination?.hasRoute<LiveRoutes>() == true,
                                 onClick = { navController.switchTab(LiveRoutes) },
                                 icon = { Icon(painterResource(R.drawable.ic_mode_tj), contentDescription = null) },
-                                label = { Text("Live TJ", style = MaterialTheme.typography.labelLarge) },
+                                label = { Text("Peta Rute", style = MaterialTheme.typography.labelLarge) },
                                 colors = colors,
                             )
                             NavigationBarItem(
@@ -171,18 +159,7 @@ fun WakeMateNavHost(
                     LiveRoutesScreen(onRouteSelected = { navController.navigate(RouteLive(it)) })
                 }
                 composable<RouteLive> {
-                    RouteLiveScreen(
-                        onBack = { navController.popBackStack() },
-                        onOpenLiveTrip = { navController.navigate(LiveTrip) { launchSingleTop = true } },
-                    )
-                }
-                composable<LiveTrip> {
-                    LiveTripScreen(
-                        onBack = { navController.popBackStack() },
-                        onChangeStop = { routeId, busNo ->
-                            navController.navigate(RouteLive(routeId, boardBus = busNo)) { popUpTo(LiveTrip) { inclusive = true } }
-                        },
-                    )
+                    RouteLiveScreen(onBack = { navController.popBackStack() })
                 }
                 composable<Home> {
                     HomeScreen(
@@ -213,72 +190,41 @@ fun WakeMateNavHost(
         }
 
         // LT7: alarm yang sedang berbunyi menutupi apa pun — satu-satunya hal yang penting adalah bangun.
-        val ringingLive = liveWatch?.takeIf { it.alertedAt != null && it.watch is LiveWatch.Onboard }
         val ringingGps = gpsTrip?.takeIf { it.hasAlerted }
-        when {
-            ringingLive != null -> {
-                val approach = ringingLive.approach
-                val watch = ringingLive.watch as LiveWatch.Onboard
-                RingingScreen(
-                    destination = watch.halteName,
-                    detail = approach?.summary() ?: "Bus sudah melewati halte tujuan",
-                    meta = "Bus ${watch.busNo} · Rute ${watch.routeId}",
-                    onAwake = viewModel::onLiveAwake,
-                    onSnooze = if ((approach?.stopsAway ?: 0) > 1) ({ viewModel.onLiveSnooze() }) else null,
-                )
-            }
-            ringingGps != null -> {
-                val remaining = ringingGps.proximity?.stationsRemaining
-                RingingScreen(
-                    destination = ringingGps.destination.name,
-                    detail = when {
-                        remaining == null || remaining <= 0 -> "Kamu sudah sampai"
-                        remaining == 1 -> "Stasiun berikutnya"
-                        else -> "$remaining stasiun lagi"
-                    },
-                    meta = ringingGps.lineName,
-                    onAwake = { viewModel.onGpsAwake() },
-                    onSnooze = null,
-                )
-            }
+        if (ringingGps != null) {
+            val remaining = ringingGps.proximity?.stationsRemaining
+            RingingScreen(
+                destination = ringingGps.destination.name,
+                detail = when {
+                    remaining == null || remaining <= 0 -> "Kamu sudah sampai"
+                    remaining == 1 -> "Stasiun berikutnya"
+                    else -> "$remaining stasiun lagi"
+                },
+                meta = ringingGps.lineName,
+                onAwake = { viewModel.onGpsAwake() },
+                onSnooze = null,
+            )
         }
     }
 }
 
 @Composable
 private fun TabAlarmBar(
-    liveWatch: LiveWatchState?,
     gpsTrip: GpsTrip?,
-    onOpenLive: () -> Unit,
     onOpenGps: () -> Unit,
-    onStopLive: () -> Unit,
     onStopGps: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (liveWatch != null) {
-        val w = liveWatch.watch
-        AlarmBar(
-            title = when (w) {
-                is LiveWatch.Onboard -> "Bangunkan sebelum ${w.halteName}"
-                is LiveWatch.Arrival -> "Bus ${w.routeId} tiba di ${w.halteName}"
-            },
-            subtitle = liveWatch.approach?.let { "${it.bus.busNo} · ${it.summary()}" } ?: "Menunggu data live...",
-            ringing = liveWatch.alertedAt != null,
-            onClick = onOpenLive,
-            onStop = onStopLive,
-            modifier = modifier,
-        )
-    } else if (gpsTrip != null) {
-        val remaining = gpsTrip.proximity?.stationsRemaining
-        AlarmBar(
-            title = "Menuju ${gpsTrip.destination.name}",
-            subtitle = remaining?.let { if (it <= 0) "Sudah sampai" else "$it stasiun lagi · ${gpsTrip.lineName}" } ?: "Menunggu sinyal GPS...",
-            ringing = gpsTrip.hasAlerted,
-            onClick = onOpenGps,
-            onStop = onStopGps,
-            modifier = modifier,
-        )
-    }
+    if (gpsTrip == null) return
+    val remaining = gpsTrip.proximity?.stationsRemaining
+    AlarmBar(
+        title = "Menuju ${gpsTrip.destination.name}",
+        subtitle = remaining?.let { if (it <= 0) "Sudah sampai" else "$it stasiun lagi · ${gpsTrip.lineName}" } ?: "Menunggu sinyal GPS...",
+        ringing = gpsTrip.hasAlerted,
+        onClick = onOpenGps,
+        onStop = onStopGps,
+        modifier = modifier,
+    )
 }
 
 private fun NavHostController.switchTab(tab: Any) = navigate(tab) {

@@ -3,8 +3,8 @@ package id.haonlabs.wakemate.service
 import android.app.PendingIntent
 
 /**
- * Isi alarm, dipisah dari asal sesinya: alarm GPS (KRL/MRT/TJ) dan alarm dari feed live bus TJ
- * memakai eskalasi yang sama, hanya teks dan tombol "selesai"-nya yang berbeda.
+ * Isi alarm, dipisah dari asal sesinya (alarm GPS KRL/MRT/LRT/TJ): eskalasinya satu, hanya teks
+ * dan tombol "selesai"-nya yang berbeda.
  */
 data class WakeAlert(
     val notificationId: Int,

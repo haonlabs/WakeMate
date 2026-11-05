@@ -9,7 +9,6 @@ enum class SessionEnd(val message: String) {
      * lokasi latar belakang. Sesinya tetap tersimpan dan dilanjutkan begitu aplikasi dibuka.
      */
     RESUME_IN_APP("Android menghentikan pemantauan di latar belakang. Buka WakeMate untuk melanjutkan pengingat perjalananmu."),
-    LIVE_LOST("Data live bus tidak masuk lebih dari 5 menit (internet putus atau feed Transjakarta bermasalah). Pengingat dimatikan."),
 }
 
 /** Batas atas perjalanan Jabodetabek mana pun; PRD §3 menyebut 30-90 menit. */

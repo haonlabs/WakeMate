@@ -38,11 +38,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import id.haonlabs.wakemate.R
 import id.haonlabs.wakemate.data.live.LiveRoutePrefs
-import id.haonlabs.wakemate.data.live.LiveWatchRepository
-import id.haonlabs.wakemate.data.live.TjLiveFeed
 import id.haonlabs.wakemate.data.live.TjStaticSource
 import id.haonlabs.wakemate.domain.live.TjRoute
-import id.haonlabs.wakemate.presentation.components.LivePill
 import id.haonlabs.wakemate.presentation.components.PillChip
 import id.haonlabs.wakemate.presentation.components.PosterSearchField
 import id.haonlabs.wakemate.presentation.components.SectionLabel
@@ -55,7 +52,6 @@ import id.haonlabs.wakemate.ui.theme.SignalYellow
 import id.haonlabs.wakemate.ui.theme.Wake
 import id.haonlabs.wakemate.ui.theme.enterIn
 import id.haonlabs.wakemate.ui.theme.popIn
-import id.haonlabs.wakemate.service.LiveAlarms
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -72,15 +68,19 @@ import javax.inject.Inject
 
 /** Kelompok route_desc GTFS untuk filter. "Lainnya" = Rusun, Royaltrans, Bus Wisata. */
 enum class RouteKind(val label: String) {
-    SEMUA("Semua"), BRT("BRT"), INTEGRASI("Integrasi"), MIKROTRANS("Mikrotrans"), JABODETABEK("Jabodetabek"), LAINNYA("Lainnya");
+    SEMUA("Semua"), KRL("KRL"), MRT("MRT"), LRT("LRT"), BRT("BRT"), INTEGRASI("Integrasi"), MIKROTRANS("Mikrotrans"),
+    JABODETABEK("Jabodetabek"), LAINNYA("Lainnya");
 
     fun matches(route: TjRoute): Boolean = when (this) {
         SEMUA -> true
+        KRL -> route.kind == "KRL"
+        MRT -> route.kind == "MRT"
+        LRT -> route.kind.startsWith("LRT")
         BRT -> route.kind == "BRT"
         INTEGRASI -> route.kind == "Angkutan Umum Integrasi"
         MIKROTRANS -> route.kind == "Mikrotrans"
         JABODETABEK -> route.kind == "Transjabodetabek"
-        LAINNYA -> route.kind !in setOf("BRT", "Angkutan Umum Integrasi", "Mikrotrans", "Transjabodetabek")
+        LAINNYA -> route.kind !in setOf("KRL", "MRT", "BRT", "Angkutan Umum Integrasi", "Mikrotrans", "Transjabodetabek") && !route.kind.startsWith("LRT")
     }
 }
 
@@ -92,38 +92,21 @@ data class LiveRoutesUi(
     /** Favorit di atas, lalu sisanya; sudah tersaring query dan jenis. */
     val routes: List<TjRoute> = emptyList(),
     val favorites: Set<String> = emptySet(),
-    /** Jumlah bus live, hanya untuk rute favorit dan yang terakhir dibuka. */
-    val liveCounts: Map<String, Int> = emptyMap(),
 )
 
 @HiltViewModel
 class LiveRoutesViewModel @Inject constructor(
     staticSource: TjStaticSource,
-    feed: TjLiveFeed,
-    watches: LiveWatchRepository,
     private val prefs: LiveRoutePrefs,
-    private val liveAlarms: LiveAlarms,
 ) : ViewModel() {
 
     private val all = MutableStateFlow<List<TjRoute>?>(null)
     private val query = MutableStateFlow("")
     private val kind = MutableStateFlow(RouteKind.SEMUA)
 
-    /**
-     * ponytail: jumlah live hanya untuk ≤6 rute pilihan user. Menghitung semua 240 rute berarti
-     * subscribe seluruh armada (>100 pesan/detik) — beban yang sengaja dihindari di TjLiveFeed.
-     */
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val liveCounts = combine(prefs.favorites, prefs.recent) { favs, recent -> (recent + favs).distinct().take(6) }
-        .distinctUntilChanged()
-        .flatMapLatest { ids ->
-            if (ids.isEmpty()) flowOf(emptyMap())
-            else combine(ids.map { id -> feed.route(id).map { id to it.size } }) { pairs -> pairs.toMap() }
-        }
-
     val state: StateFlow<LiveRoutesUi> = combine(
-        all, combine(query, kind, ::Pair), prefs.favorites, prefs.recent, liveCounts,
-    ) { routes, (q, k), favs, recentIds, counts ->
+        all, combine(query, kind, ::Pair), prefs.favorites, prefs.recent,
+    ) { routes, (q, k), favs, recentIds ->
         if (routes == null) return@combine LiveRoutesUi(loading = true)
         val byId = routes.associateBy { it.id }
         val needle = q.trim()
@@ -137,16 +120,12 @@ class LiveRoutesViewModel @Inject constructor(
             recent = recentIds.mapNotNull(byId::get),
             routes = filtered.sortedByDescending { it.id in favs },
             favorites = favs,
-            liveCounts = counts,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LiveRoutesUi())
 
     init {
         viewModelScope.launch {
             all.value = staticSource.network().routes
-            // Sesi yang selamat dari proses dibunuh harus terlihat lagi dan benar-benar dipantau,
-            // bukan cuma tampil di layar.
-            if (watches.restore() != null) liveAlarms.resume()
         }
     }
 
@@ -170,8 +149,8 @@ fun LiveRoutesScreen(
         ) {
             item(key = "judul") {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.enterIn(0)) {
-                    StatusPill("WAKEMATE LIVE", color = SignalYellow, modifier = Modifier.padding(end = 8.dp))
-                    Text("Bus\nTransjakarta", style = MaterialTheme.typography.displaySmall)
+                    StatusPill("PETA RUTE", color = SignalYellow, modifier = Modifier.padding(end = 8.dp))
+                    Text("Rute\nTransportasi", style = MaterialTheme.typography.displaySmall)
                 }
             }
             item(key = "cari") { PosterSearchField(state.query, viewModel::onQueryChanged, "Cari rute: 1, 9D, JAK.31, Blok M…", Modifier.enterIn(1)) }
@@ -192,7 +171,7 @@ fun LiveRoutesScreen(
                         item(key = "terakhir") {
                             LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                 itemsIndexed(state.recent, key = { _, r -> r.id }) { index, route ->
-                                    RecentCard(route, state.liveCounts[route.id], onClick = { onRouteSelected(route.id) }, modifier = Modifier.popIn(300L + index * 110L, from = 0.6f))
+                                    RecentCard(route, onClick = { onRouteSelected(route.id) }, modifier = Modifier.popIn(300L + index * 110L, from = 0.6f))
                                 }
                             }
                         }
@@ -213,7 +192,6 @@ fun LiveRoutesScreen(
                     itemsIndexed(state.routes, key = { _, r -> r.id }) { index, route ->
                         RouteCard(
                             route = route,
-                            live = state.liveCounts[route.id],
                             favorite = route.id in state.favorites,
                             onClick = { onRouteSelected(route.id) },
                             onFavorite = { viewModel.toggleFavorite(route.id) },
@@ -228,9 +206,9 @@ fun LiveRoutesScreen(
     }
 }
 
-/** Kartu "terakhir dibuka": blok penuh warna resmi rute (GTFS), nomor besar, jumlah bus live. */
+/** Kartu "terakhir dibuka": blok penuh warna resmi rute (GTFS), nomor besar, jenis rute. */
 @Composable
-private fun RecentCard(route: TjRoute, live: Int?, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun RecentCard(route: TjRoute, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val shape = RoundedCornerShape(28.dp)
     val fill = parseRouteColor(route.color, MaterialTheme.colorScheme.primaryContainer)
     val onFill = parseRouteColor(route.textColor, Wake.colors.onColor)
@@ -245,7 +223,7 @@ private fun RecentCard(route: TjRoute, live: Int?, onClick: () -> Unit, modifier
         Column(Modifier.padding(16.dp).heightIn(min = 112.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(route.shortName, style = MaterialTheme.typography.displaySmall, maxLines = 1)
             Text(route.longName, style = MaterialTheme.typography.titleSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            live?.let { LivePill("$it bus", container = Wake.colors.onColor, content = Wake.colors.live) }
+            Text(route.kind, style = MaterialTheme.typography.labelMedium)
         }
     }
 }
@@ -253,7 +231,6 @@ private fun RecentCard(route: TjRoute, live: Int?, onClick: () -> Unit, modifier
 @Composable
 private fun RouteCard(
     route: TjRoute,
-    live: Int?,
     favorite: Boolean,
     onClick: () -> Unit,
     onFavorite: () -> Unit,
@@ -277,8 +254,7 @@ private fun RouteCard(
             RouteBadge(route)
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(route.longName, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                if (live != null) LivePill("$live bus")
-                else Text(route.kind, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(route.kind, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             IconButton(onClick = onFavorite) {
                 Icon(
