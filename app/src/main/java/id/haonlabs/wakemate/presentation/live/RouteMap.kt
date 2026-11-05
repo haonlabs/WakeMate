@@ -1,11 +1,13 @@
 package id.haonlabs.wakemate.presentation.live
 
+import android.graphics.RectF
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -18,6 +20,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import id.haonlabs.wakemate.domain.live.Halte
+import id.haonlabs.wakemate.domain.live.SimTrain
 import org.maplibre.android.MapLibre
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
@@ -44,14 +47,20 @@ data class CameraTarget(val lat: Double, val lng: Double, val zoom: Double = 15.
 
 private const val ROUTE = "route"
 private const val HALTE = "halte"
+private const val TRAINS = "trains"
 
-/** Peta satu rute: garis rute arah terpilih dan halte/stasiunnya. Data statis, tanpa posisi kendaraan. */
+/**
+ * Peta satu rute: garis rute arah terpilih dan halte/stasiunnya. Data statis. [trains] adalah
+ * kereta **simulasi** dari jadwal (bukan posisi nyata); layar yang memakainya wajib melabelinya.
+ */
 @Composable
 fun RouteMap(
     shape: String,
     halte: List<Halte>,
     routeColor: Int,
+    onHalteClick: (String) -> Unit,
     modifier: Modifier = Modifier,
+    trains: List<SimTrain> = emptyList(),
     /** Ruang di bawah yang tertutup bottom sheet; rute dipaskan di atasnya. */
     bottomPadding: Dp = 0.dp,
     target: CameraTarget? = null,
@@ -69,6 +78,7 @@ fun RouteMap(
     }
     var map by remember { mutableStateOf<MapLibreMap?>(null) }
     var style by remember { mutableStateOf<Style?>(null) }
+    val currentOnHalteClick by rememberUpdatedState(onHalteClick)
 
     DisposableEffect(lifecycle, mapView) {
         val observer = LifecycleEventObserver { _, event ->
@@ -96,10 +106,21 @@ fun RouteMap(
             m.uiSettings.isTiltGesturesEnabled = false
             m.uiSettings.setAllGesturesEnabled(interactive)
             style = null
+            val firstTime = map == null
             m.setStyle(Style.Builder().fromUri(if (dark) STYLE_DARK else STYLE_LIGHT)) { loaded ->
                 addLayers(loaded)
                 map = m
                 style = loaded
+            }
+            if (!firstTime) return@getMapAsync // pendengar klik cukup dipasang sekali
+            m.addOnMapClickListener { point ->
+                val screen = m.projection.toScreenLocation(point)
+                val hit = m.queryRenderedFeatures(
+                    RectF(screen.x - 28, screen.y - 28, screen.x + 28, screen.y + 28),
+                    HALTE,
+                ).firstOrNull()
+                hit?.getStringProperty("id")?.let(currentOnHalteClick)
+                hit != null
             }
         }
     }
@@ -111,8 +132,11 @@ fun RouteMap(
             FeatureCollection.fromFeatures(listOfNotNull(line?.let(Feature::fromGeometry)))
         )
         s.getSourceAs<GeoJsonSource>(HALTE)?.setGeoJson(
-            FeatureCollection.fromFeatures(halte.map { Feature.fromGeometry(Point.fromLngLat(it.lng, it.lat)) })
+            FeatureCollection.fromFeatures(halte.map {
+                Feature.fromGeometry(Point.fromLngLat(it.lng, it.lat)).apply { addStringProperty("id", it.id) }
+            })
         )
+        s.getLayer(TRAINS)?.setProperties(PropertyFactory.circleColor(routeColor))
         s.getLayer(ROUTE)?.setProperties(PropertyFactory.lineColor(routeColor))
         s.getLayer(HALTE)?.setProperties(PropertyFactory.circleStrokeColor(routeColor))
 
@@ -132,12 +156,20 @@ fun RouteMap(
         map?.easeCamera(CameraUpdateFactory.newLatLngZoom(LatLng(t.lat, t.lng), t.zoom), 500)
     }
 
+    LaunchedEffect(style, trains) {
+        val s = style ?: return@LaunchedEffect
+        s.getSourceAs<GeoJsonSource>(TRAINS)?.setGeoJson(
+            FeatureCollection.fromFeatures(trains.map { Feature.fromGeometry(Point.fromLngLat(it.lng, it.lat)) })
+        )
+    }
+
     AndroidView(factory = { mapView }, modifier = modifier)
 }
 
 private fun addLayers(style: Style) {
     style.addSource(GeoJsonSource(ROUTE))
     style.addSource(GeoJsonSource(HALTE))
+    style.addSource(GeoJsonSource(TRAINS))
     style.addLayer(
         LineLayer(ROUTE, ROUTE).withProperties(
             PropertyFactory.lineWidth(4f),
@@ -151,6 +183,13 @@ private fun addLayers(style: Style) {
             PropertyFactory.circleRadius(3.5f),
             PropertyFactory.circleColor("#FFFFFF"),
             PropertyFactory.circleStrokeWidth(1.5f),
+        )
+    )
+    style.addLayer(
+        CircleLayer(TRAINS, TRAINS).withProperties(
+            PropertyFactory.circleRadius(8f),
+            PropertyFactory.circleStrokeColor("#FFFFFF"),
+            PropertyFactory.circleStrokeWidth(3f),
         )
     )
 }

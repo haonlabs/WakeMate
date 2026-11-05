@@ -159,7 +159,10 @@ fun WakeMateNavHost(
                     LiveRoutesScreen(onRouteSelected = { navController.navigate(RouteLive(it)) })
                 }
                 composable<RouteLive> {
-                    RouteLiveScreen(onBack = { navController.popBackStack() })
+                    RouteLiveScreen(
+                        onBack = { navController.popBackStack() },
+                        onWakeAt = { stationId, lineId -> navController.navigate(TripSetup(stationId, lineId)) },
+                    )
                 }
                 composable<Home> {
                     HomeScreen(
