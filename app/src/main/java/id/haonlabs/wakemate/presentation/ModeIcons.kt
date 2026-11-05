@@ -13,7 +13,7 @@ import id.haonlabs.wakemate.ui.theme.SignalYellow
 fun TransitMode.iconRes(): Int = when (this) {
     TransitMode.KRL -> R.drawable.ic_mode_krl
     TransitMode.MRT -> R.drawable.ic_mode_mrt
-    TransitMode.LRT -> R.drawable.ic_mode_mrt
+    TransitMode.LRT -> R.drawable.ic_mode_lrt
     TransitMode.TRANSJAKARTA -> R.drawable.ic_mode_tj
 }
 

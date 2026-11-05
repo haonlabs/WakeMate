@@ -1,0 +1,11 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- LRT: kereta ringan tampak depan dengan pantograf, di atas lintasan layang bertiang. -->
+    <path
+        android:fillColor="@android:color/white"
+        android:fillType="evenOdd"
+        android:pathData="M8,2h8v1.4h-3.25V5h-1.5V3.4H8zM6,5h12a2,2 0 0 1 2,2v8a2,2 0 0 1 -2,2H6a2,2 0 0 1 -2,-2V7a2,2 0 0 1 2,-2zM6,7.5v4h12v-4zM6.25,14a1.25,1.25 0 1 0 2.5,0a1.25,1.25 0 1 0 -2.5,0zM15.25,14a1.25,1.25 0 1 0 2.5,0a1.25,1.25 0 1 0 -2.5,0zM2,18.5h20v1.8H2zM10.5,20.3h3V22h-3z" />
+</vector>
