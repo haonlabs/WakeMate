@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import id.haonlabs.wakemate.domain.live.Approach
 import id.haonlabs.wakemate.domain.live.LiveLead
 import id.haonlabs.wakemate.domain.live.TjRoute
+import id.haonlabs.wakemate.presentation.components.posterBorder
 import java.util.Locale
 
 /** Warna GTFS "RRGGBB"; rute tanpa warna valid jatuh ke warna utama tema. */
@@ -24,14 +25,15 @@ fun parseRouteColor(hex: String, fallback: Color): Color =
 @Composable
 fun RouteBadge(route: TjRoute, modifier: Modifier = Modifier) {
     Surface(
-        modifier = modifier.widthIn(min = 48.dp),
-        shape = RoundedCornerShape(10.dp),
-        color = parseRouteColor(route.color, MaterialTheme.colorScheme.primary),
+        modifier = modifier.widthIn(min = 52.dp),
+        shape = RoundedCornerShape(14.dp),
+        color = parseRouteColor(route.color, MaterialTheme.colorScheme.primaryContainer),
         contentColor = parseRouteColor(route.textColor, Color.Black),
+        border = posterBorder(),
     ) {
         Text(
             route.shortName,
-            style = MaterialTheme.typography.titleSmall,
+            style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center,
             maxLines = 1,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),

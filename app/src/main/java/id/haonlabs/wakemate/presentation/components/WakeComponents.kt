@@ -2,18 +2,23 @@ package id.haonlabs.wakemate.presentation.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -30,10 +35,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -43,20 +53,38 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import id.haonlabs.wakemate.R
+import id.haonlabs.wakemate.ui.theme.Motion
+import id.haonlabs.wakemate.ui.theme.SignalRed
+import id.haonlabs.wakemate.ui.theme.Wake
+import id.haonlabs.wakemate.ui.theme.hardShadow
+import id.haonlabs.wakemate.ui.theme.pulsing
+import id.haonlabs.wakemate.ui.theme.rememberReducedMotion
+import kotlinx.coroutines.delay
 
-/** Label seksi huruf kapital, opsional dengan keterangan teal di kanan. */
+private val BorderWidth = 2.5.dp
+
+/** Garis tepi tebal gaya poster; warnanya tinta (terang) / krem (gelap). */
+@Composable
+fun posterBorder(width: Dp = BorderWidth) = BorderStroke(width, Wake.colors.border)
+
+/** Bayangan keras dengan warna border; gambar di belakang elemen. */
+@Composable
+fun Modifier.posterShadow(shape: Shape, offset: Dp = 4.dp): Modifier = hardShadow(shape, Wake.colors.shadow, offset)
+
+/** Label seksi huruf kapital, opsional dengan keterangan di kanan. */
 @Composable
 fun SectionLabel(text: String, modifier: Modifier = Modifier, trailing: String? = null) {
     Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Text(text, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        trailing?.let { Text(it, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary) }
+        trailing?.let { Text(it, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurface) }
     }
 }
 
 /**
- * Pilihan tunggal 2–3 opsi dalam satu pil (arah perjalanan, moda). Menggantikan chip yang bisa
- * terpotong di tepi layar: semua pilihan selalu terlihat.
+ * Pilihan tunggal 2–3 opsi dalam satu pil (arah perjalanan, moda). Semua pilihan selalu terlihat;
+ * warna segmen terpilih berpindah dengan halus.
  */
 @Composable
 fun SegmentedControl(
@@ -72,16 +100,22 @@ fun SegmentedControl(
             .fillMaxWidth()
             .clip(CircleShape)
             .background(container)
+            .border2(CircleShape, Wake.colors.border)
             .padding(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         options.forEachIndexed { index, label ->
             val on = index == selected
+            val fill by animateColorAsState(if (on) MaterialTheme.colorScheme.primary else Color.Transparent, label = "segmen")
+            val content by animateColorAsState(
+                if (on) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                label = "segmen teks",
+            )
             Surface(
                 onClick = { onSelect(index) },
                 shape = CircleShape,
-                color = if (on) MaterialTheme.colorScheme.primary else Color.Transparent,
-                contentColor = if (on) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                color = fill,
+                contentColor = content,
                 modifier = Modifier
                     .weight(1f)
                     .heightIn(min = 44.dp)
@@ -96,26 +130,33 @@ fun SegmentedControl(
                         Icon(painterResource(it), contentDescription = null, modifier = Modifier.size(18.dp))
                         Box(Modifier.width(6.dp))
                     }
-                    Text(label, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(label, style = MaterialTheme.typography.labelLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
         }
     }
 }
 
-/** Chip berbentuk pil untuk filter dan pilihan ambang; yang terpilih terisi teal. */
+/** Chip pil untuk filter dan pilihan ambang; yang terpilih terisi "inverse" dan memantul sekali. */
 @Composable
 fun PillChip(label: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val scheme = MaterialTheme.colorScheme
+    val fill by animateColorAsState(if (selected) scheme.primary else scheme.surfaceContainer, label = "chip")
+    val content by animateColorAsState(if (selected) scheme.onPrimary else scheme.onSurface, label = "chip teks")
+    val scale by animateFloatAsState(if (selected) 1f else 0.97f, Motion.Pop, label = "chip skala")
     Surface(
         onClick = onClick,
         shape = CircleShape,
-        color = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent,
-        contentColor = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
-        border = if (selected) null else BorderStroke(1.5.dp, MaterialTheme.colorScheme.outlineVariant),
-        modifier = modifier.heightIn(min = 40.dp).semantics { this.selected = selected },
+        color = fill,
+        contentColor = content,
+        border = posterBorder(),
+        modifier = modifier
+            .heightIn(min = 40.dp)
+            .graphicsLayer { scaleX = scale; scaleY = scale }
+            .semantics { this.selected = selected },
     ) {
         Box(Modifier.padding(horizontal = 16.dp, vertical = 9.dp), contentAlignment = Alignment.Center) {
-            Text(label, style = MaterialTheme.typography.titleSmall)
+            Text(label, style = MaterialTheme.typography.labelLarge)
         }
     }
 }
@@ -134,7 +175,7 @@ fun <T> ChipChoices(
     }
 }
 
-/** Tombol bulat 48dp untuk bar atas yang mengambang di atas peta. */
+/** Tombol bulat 48dp untuk bar atas, termasuk yang mengambang di atas peta. */
 @Composable
 fun CircleIconButton(
     @DrawableRes icon: Int,
@@ -145,54 +186,71 @@ fun CircleIconButton(
     container: Color = MaterialTheme.colorScheme.surfaceContainer,
     size: Dp = 48.dp,
 ) {
-    Surface(onClick = onClick, shape = CircleShape, color = container, shadowElevation = 2.dp, modifier = modifier.size(size)) {
+    Surface(
+        onClick = onClick,
+        shape = CircleShape,
+        color = container,
+        border = posterBorder(),
+        modifier = modifier.size(size).posterShadow(CircleShape, 3.dp),
+    ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(painterResource(icon), contentDescription = contentDescription, tint = tint)
         }
     }
 }
 
-/** Ikon di dalam lingkaran berwarna lembut (kartu bus, tujuan terakhir). */
+/** Ikon di dalam blok berwarna (kartu bus, tujuan terakhir). [tint] = warna blok; ikon selalu tinta. */
 @Composable
-fun IconBadge(@DrawableRes icon: Int, modifier: Modifier = Modifier, size: Dp = 44.dp, tint: Color = MaterialTheme.colorScheme.primary) {
+fun IconBadge(
+    @DrawableRes icon: Int,
+    modifier: Modifier = Modifier,
+    size: Dp = 44.dp,
+    tint: Color = MaterialTheme.colorScheme.primaryContainer,
+) {
+    val shape = RoundedCornerShape(size / 3)
     Box(
-        modifier.size(size).background(tint.copy(alpha = 0.14f), CircleShape),
+        modifier.size(size).background(tint, shape).border2(shape, Wake.colors.border),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(painterResource(icon), contentDescription = null, tint = tint, modifier = Modifier.size(size / 2))
+        Icon(painterResource(icon), contentDescription = null, tint = Wake.colors.onColor, modifier = Modifier.size(size / 2))
     }
 }
 
-/** "● ALARM AKTIF" dan sejenisnya. */
+/** "● ALARM AKTIF" dan sejenisnya: pil terisi, titiknya bernapas. */
 @Composable
 fun StatusPill(text: String, modifier: Modifier = Modifier, color: Color = MaterialTheme.colorScheme.secondary) {
     Row(
-        modifier.clip(CircleShape).background(color.copy(alpha = 0.16f)).padding(horizontal = 12.dp, vertical = 7.dp),
+        modifier.clip(CircleShape).background(color).padding(horizontal = 12.dp, vertical = 7.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Box(Modifier.size(8.dp).background(color, CircleShape))
-        Text(text, style = MaterialTheme.typography.labelMedium, color = color)
+        Box(Modifier.size(8.dp).pulsing(amount = 0.5f, millis = 900).background(Wake.colors.onColor, CircleShape))
+        Text(text, style = MaterialTheme.typography.labelMedium, color = Wake.colors.onColor)
     }
 }
 
-/** "● 36 bus" — penanda bahwa angka di sebelahnya datang langsung dari feed. */
+/** "● 36 bus" — penanda bahwa angka di sebelahnya datang langsung dari feed; titik berdenyut. */
 @Composable
-fun LivePill(text: String, modifier: Modifier = Modifier) {
+fun LivePill(
+    text: String,
+    modifier: Modifier = Modifier,
+    container: Color = Wake.colors.live,
+    content: Color = Wake.colors.onColor,
+) {
     Row(
-        modifier.clip(CircleShape).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)).padding(horizontal = 8.dp, vertical = 4.dp),
+        modifier.clip(CircleShape).background(container).padding(horizontal = 10.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        Box(Modifier.size(6.dp).background(MaterialTheme.colorScheme.primary, CircleShape))
-        Text(text, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+        Box(Modifier.size(7.dp).pulsing(amount = 0.6f, millis = 1000).background(content, CircleShape))
+        Text(text, style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 0.sp), color = content)
     }
 }
 
 /**
  * Bar alarm yang menempel di atas navigasi selama alarm berjalan, di layar mana pun — status
- * jaring pengaman tidak boleh hilang hanya karena user menggulir. Saat berbunyi, bar berubah
- * amber penuh dengan tombol matikan.
+ * jaring pengaman tidak boleh hilang hanya karena user menggulir. Saat berbunyi, muncul tombol
+ * matikan dan ikonnya berdenyut.
  */
 @Composable
 fun AlarmBar(
@@ -204,14 +262,15 @@ fun AlarmBar(
     modifier: Modifier = Modifier,
 ) {
     val scheme = MaterialTheme.colorScheme
+    val shape = RoundedCornerShape(22.dp)
+    val onColor = Wake.colors.onColor
     Surface(
         onClick = onClick,
-        shape = RoundedCornerShape(18.dp),
-        color = if (ringing) scheme.secondary else scheme.surfaceContainerHighest,
-        contentColor = if (ringing) scheme.onSecondary else scheme.onSurface,
-        border = if (ringing) null else BorderStroke(1.5.dp, scheme.secondary),
-        shadowElevation = 8.dp,
-        modifier = modifier.fillMaxWidth(),
+        shape = shape,
+        color = scheme.secondary,
+        contentColor = onColor,
+        border = posterBorder(),
+        modifier = modifier.fillMaxWidth().posterShadow(shape).animateContentSize(),
     ) {
         Row(
             Modifier.padding(12.dp),
@@ -219,7 +278,7 @@ fun AlarmBar(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Box(
-                Modifier.size(40.dp).background(if (ringing) scheme.onSecondary else scheme.secondary.copy(alpha = 0.18f), CircleShape),
+                Modifier.size(40.dp).then(if (ringing) Modifier.pulsing(0.12f, 500) else Modifier).background(onColor, CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
@@ -231,20 +290,14 @@ fun AlarmBar(
             }
             Column(Modifier.weight(1f)) {
                 Text(title, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(
-                    subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = if (ringing) scheme.onSecondary else scheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                Text(subtitle, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             if (ringing) {
-                Surface(onClick = onStop, shape = CircleShape, color = scheme.onSecondary, contentColor = scheme.secondary) {
-                    Text("Matikan", style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+                Surface(onClick = onStop, shape = CircleShape, color = onColor, contentColor = scheme.secondary) {
+                    Text("Matikan", style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
                 }
             } else {
-                Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = "Buka", tint = scheme.onSurfaceVariant)
+                Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = "Buka")
             }
         }
     }
@@ -253,8 +306,8 @@ fun AlarmBar(
 enum class TimelineStatus { DEFAULT, DESTINATION, PASSED, BUS_HERE }
 
 /**
- * Satu halte/stasiun di garis waktu rute. Garis memakai warna rute (data GTFS); tujuan disorot
- * amber; bus yang sedang di halte itu digambar langsung di garis.
+ * Satu halte/stasiun di garis waktu rute. Garis memakai warna rute (data GTFS); tujuan jadi blok
+ * amber penuh; bus yang sedang di halte itu digambar langsung di garis.
  */
 @Composable
 fun TimelineRow(
@@ -271,7 +324,9 @@ fun TimelineRow(
     val scheme = MaterialTheme.colorScheme
     val passed = status == TimelineStatus.PASSED
     val destination = status == TimelineStatus.DESTINATION
+    val border = Wake.colors.border
     val line = if (passed) scheme.outline.copy(alpha = 0.5f) else lineColor
+    val onDest = scheme.onSecondaryContainer
     val content: @Composable () -> Unit = {
         Row(
             Modifier.fillMaxWidth().height(56.dp).padding(start = 4.dp, end = 16.dp),
@@ -280,64 +335,71 @@ fun TimelineRow(
         ) {
             Box(Modifier.width(32.dp).fillMaxHeight(), contentAlignment = Alignment.Center) {
                 Column(Modifier.fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Box(Modifier.width(4.dp).weight(1f).background(if (isFirst) Color.Transparent else line))
-                    Box(Modifier.width(4.dp).weight(1f).background(if (isLast) Color.Transparent else line))
+                    Box(Modifier.width(6.dp).weight(1f).background(if (isFirst) Color.Transparent else line))
+                    Box(Modifier.width(6.dp).weight(1f).background(if (isLast) Color.Transparent else line))
                 }
                 when (status) {
                     TimelineStatus.BUS_HERE -> Box(
-                        Modifier.size(28.dp).background(lineColor, CircleShape).padding(2.dp).background(lineColor, CircleShape),
+                        Modifier.size(30.dp).background(lineColor, RoundedCornerShape(10.dp)).border2(RoundedCornerShape(10.dp), border),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Icon(painterResource(R.drawable.ic_mode_tj), contentDescription = "Bus di sini", tint = Color.White, modifier = Modifier.size(16.dp))
+                        Icon(painterResource(R.drawable.ic_mode_tj), contentDescription = "Bus di sini", tint = Wake.colors.onColor, modifier = Modifier.size(16.dp))
                     }
                     TimelineStatus.DESTINATION -> Box(
-                        Modifier.size(20.dp).background(scheme.background, CircleShape).padding(3.dp).background(scheme.secondary, CircleShape)
+                        Modifier.size(22.dp).background(scheme.primary, CircleShape).border2(CircleShape, border)
                     )
                     else -> Box(
-                        Modifier.size(14.dp).background(line, CircleShape).padding(3.dp).background(scheme.background, CircleShape)
+                        Modifier.size(16.dp).background(if (passed) scheme.surfaceVariant else scheme.surfaceContainer, CircleShape).border2(CircleShape, border)
                     )
                 }
             }
             Column(Modifier.weight(1f)) {
                 Text(
                     name,
-                    style = if (destination) MaterialTheme.typography.titleMedium else MaterialTheme.typography.bodyLarge,
+                    style = if (destination) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleSmall,
                     color = when {
                         passed -> scheme.outline
-                        destination -> scheme.secondary
+                        destination -> onDest
                         else -> scheme.onSurface
                     },
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                if (destination) Text("TURUN DI SINI", style = MaterialTheme.typography.labelMedium, color = scheme.secondary)
+                if (destination) Text("TURUN DI SINI", style = MaterialTheme.typography.labelMedium, color = onDest)
             }
             if (eta != null || detail != null) {
                 Column(horizontalAlignment = Alignment.End) {
                     eta?.let {
                         Text(
                             it,
-                            style = MaterialTheme.typography.titleSmall,
+                            style = MaterialTheme.typography.labelLarge,
                             color = when {
                                 passed -> scheme.outline
-                                destination -> scheme.secondary
-                                else -> scheme.primary
+                                destination -> onDest
+                                else -> scheme.onSurface
                             },
                             textAlign = TextAlign.End,
                         )
                     }
-                    detail?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = scheme.outline) }
+                    detail?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = if (destination) onDest else scheme.outline) }
                 }
             }
         }
     }
-    val shape = RoundedCornerShape(14.dp)
+    val shape = RoundedCornerShape(18.dp)
+    // Baris tujuan membesar dengan spring saat muncul/berpindah, dan punya border + bayangan sendiri.
+    val rowModifier = if (destination) {
+        modifier.fillMaxWidth().posterShadow(shape, 3.dp)
+    } else modifier.fillMaxWidth()
     val color = if (destination) scheme.secondaryContainer else Color.Transparent
-    if (onClick != null) Surface(onClick = onClick, shape = shape, color = color, modifier = modifier.fillMaxWidth()) { content() }
-    else Surface(shape = shape, color = color, modifier = modifier.fillMaxWidth()) { content() }
+    val border2 = if (destination) posterBorder() else null
+    if (onClick != null) Surface(onClick = onClick, shape = shape, color = color, border = border2, modifier = rowModifier) { content() }
+    else Surface(shape = shape, color = color, border = border2, modifier = rowModifier) { content() }
 }
 
-/** Kartu bus besar (80dp) — aman diketuk di bus yang bergoyang. */
+private fun Modifier.border2(shape: Shape, color: Color) = border(BorderWidth, color, shape)
+
+/** Kartu bus besar (80dp) — aman diketuk di bus yang bergoyang. Yang disorot terisi mint. */
 @Composable
 fun BusCard(
     busNo: String,
@@ -347,27 +409,32 @@ fun BusCard(
     modifier: Modifier = Modifier,
     highlighted: Boolean = false,
 ) {
+    val scheme = MaterialTheme.colorScheme
+    val shape = RoundedCornerShape(22.dp)
+    val fill by animateColorAsState(if (highlighted) scheme.primaryContainer else scheme.surfaceContainer, label = "kartu bus")
+    val content = if (highlighted) scheme.onPrimaryContainer else scheme.onSurface
     Surface(
         onClick = onClick,
-        shape = RoundedCornerShape(18.dp),
-        color = MaterialTheme.colorScheme.surfaceContainer,
-        border = if (highlighted) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
-        modifier = modifier.fillMaxWidth(),
+        shape = shape,
+        color = fill,
+        contentColor = content,
+        border = posterBorder(if (highlighted) 3.5.dp else BorderWidth),
+        modifier = modifier.fillMaxWidth().posterShadow(shape, if (highlighted) 5.dp else 3.dp),
     ) {
         Row(
             Modifier.padding(16.dp).heightIn(min = 48.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            IconBadge(R.drawable.ic_mode_tj, size = 48.dp)
+            IconBadge(R.drawable.ic_mode_tj, size = 48.dp, tint = SignalRed)
             Column(Modifier.weight(1f)) {
                 Text(busNo, style = MaterialTheme.typography.titleMedium)
-                Text(info, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(info, style = MaterialTheme.typography.bodySmall, color = if (highlighted) content else scheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             distance?.let {
                 Column(horizontalAlignment = Alignment.End) {
-                    Text(it, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
-                    Text("darimu", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+                    Text(it, style = MaterialTheme.typography.titleMedium)
+                    Text("darimu", style = MaterialTheme.typography.labelSmall, color = if (highlighted) content else scheme.outline)
                 }
             }
         }
@@ -376,7 +443,7 @@ fun BusCard(
 
 /**
  * Kartu hitung mundur untuk perjalanan aktif (live maupun GPS): angka besar yang terbaca sekilas,
- * bar progres, dan titik tempat alarm akan berbunyi.
+ * bar segmen yang terisi satu per satu, dan titik tempat alarm akan berbunyi.
  */
 @Composable
 fun CountdownCard(
@@ -391,35 +458,58 @@ fun CountdownCard(
     legend: String? = null,
 ) {
     val scheme = MaterialTheme.colorScheme
-    Surface(shape = RoundedCornerShape(22.dp), color = scheme.surfaceContainer, modifier = modifier.fillMaxWidth()) {
+    val shape = RoundedCornerShape(28.dp)
+    Surface(
+        shape = shape,
+        color = scheme.surfaceContainer,
+        border = posterBorder(),
+        modifier = modifier.fillMaxWidth().posterShadow(shape, 5.dp),
+    ) {
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(eyebrow, style = MaterialTheme.typography.labelMedium, color = scheme.onSurfaceVariant)
-            Text(title, style = MaterialTheme.typography.headlineSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(title, style = MaterialTheme.typography.headlineMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
             Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                // Digeser ke atas saat berganti supaya terbaca sebagai hitungan mundur, bukan kedipan.
+                // Angka berguling ke atas saat berganti supaya terbaca sebagai hitungan mundur, bukan kedipan.
                 AnimatedContent(
                     targetState = count,
-                    transitionSpec = { (slideInVertically { it / 2 } + fadeIn()) togetherWith (slideOutVertically { -it / 2 } + fadeOut()) },
+                    transitionSpec = { (slideInVertically { it } + fadeIn()) togetherWith (slideOutVertically { -it } + fadeOut()) },
                     label = "hitungan",
-                ) { value -> Text(value, style = MaterialTheme.typography.displayMedium, color = scheme.primary) }
-                Text(unit, style = MaterialTheme.typography.titleMedium, color = scheme.onSurfaceVariant, modifier = Modifier.padding(bottom = 10.dp))
+                ) { value -> Text(value, style = MaterialTheme.typography.displayLarge) }
+                Text(unit, style = MaterialTheme.typography.titleMedium, color = scheme.onSurface, modifier = Modifier.padding(bottom = 12.dp))
             }
             if (segments > 0) {
-                Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                     repeat(segments) { i ->
-                        val color = when {
-                            i < done -> scheme.primary
-                            i == wakeAt -> scheme.secondary
-                            else -> scheme.surfaceContainerHighest
+                        val target = when {
+                            i < done -> Wake.colors.live
+                            i == wakeAt -> Wake.colors.alarm
+                            else -> scheme.surfaceVariant
                         }
-                        Box(Modifier.weight(1f).height(6.dp).clip(CircleShape).background(color))
+                        val color by animateColorAsState(target, label = "segmen")
+                        val reveal = remember { Animatable(0f) }
+                        val reduced = rememberReducedMotion()
+                        LaunchedEffect(Unit) {
+                            if (reduced) reveal.snapTo(1f) else {
+                                delay(250L + i * 70L)
+                                reveal.animateTo(1f, Motion.Settle)
+                            }
+                        }
+                        Box(
+                            Modifier
+                                .weight(1f)
+                                .height(14.dp)
+                                .graphicsLayer { alpha = reveal.value.coerceIn(0f, 1f); scaleY = 0.4f + 0.6f * reveal.value }
+                                .clip(CircleShape)
+                                .background(color)
+                                .border2(CircleShape, Wake.colors.border),
+                        )
                     }
                 }
             }
             legend?.let {
-                Row(Modifier.padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Icon(painterResource(R.drawable.ic_alarm), contentDescription = null, tint = scheme.secondary, modifier = Modifier.size(16.dp))
-                    Text(it, style = MaterialTheme.typography.bodySmall, color = scheme.secondary)
+                Row(Modifier.padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Box(Modifier.size(10.dp).background(Wake.colors.alarm, CircleShape).border2(CircleShape, Wake.colors.border))
+                    Text(it, style = MaterialTheme.typography.bodySmall, color = scheme.onSurface)
                 }
             }
         }
@@ -433,12 +523,13 @@ fun InfoRow(
     title: String,
     modifier: Modifier = Modifier,
     subtitle: String? = null,
-    iconTint: Color = MaterialTheme.colorScheme.primary,
+    iconTint: Color = MaterialTheme.colorScheme.onSurface,
     container: Color = MaterialTheme.colorScheme.surfaceContainer,
     contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
 ) {
+    val shape = RoundedCornerShape(20.dp)
     Row(
-        modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(container).padding(contentPadding),
+        modifier.fillMaxWidth().clip(shape).background(container).border2(shape, Wake.colors.border).padding(contentPadding),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {

@@ -1,6 +1,7 @@
 package id.haonlabs.wakemate.presentation.live
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -31,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -48,6 +51,15 @@ import id.haonlabs.wakemate.domain.live.TjRoute
 import id.haonlabs.wakemate.presentation.components.LivePill
 import id.haonlabs.wakemate.presentation.components.PillChip
 import id.haonlabs.wakemate.presentation.components.SectionLabel
+import id.haonlabs.wakemate.presentation.components.StatusPill
+import id.haonlabs.wakemate.presentation.components.posterBorder
+import id.haonlabs.wakemate.presentation.components.posterShadow
+import id.haonlabs.wakemate.ui.theme.Motion
+import id.haonlabs.wakemate.ui.theme.SignalRed
+import id.haonlabs.wakemate.ui.theme.SignalYellow
+import id.haonlabs.wakemate.ui.theme.Wake
+import id.haonlabs.wakemate.ui.theme.enterIn
+import id.haonlabs.wakemate.ui.theme.popIn
 import id.haonlabs.wakemate.service.LiveAlarms
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -163,12 +175,12 @@ fun LiveRoutesScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item(key = "judul") {
-                Column {
-                    Text("WAKEMATE LIVE", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-                    Text("Bus Transjakarta", style = MaterialTheme.typography.headlineSmall)
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.enterIn(0)) {
+                    StatusPill("WAKEMATE LIVE", color = SignalYellow, modifier = Modifier.padding(end = 8.dp))
+                    Text("Bus\nTransjakarta", style = MaterialTheme.typography.displaySmall)
                 }
             }
-            item(key = "cari") { SearchField(state.query, viewModel::onQueryChanged) }
+            item(key = "cari") { SearchField(state.query, viewModel::onQueryChanged, Modifier.enterIn(1)) }
             item(key = "jenis") {
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(RouteKind.entries, key = { it.name }) { k ->
@@ -185,8 +197,8 @@ fun LiveRoutesScreen(
                         item(key = "terakhir-judul") { SectionLabel("TERAKHIR DIBUKA") }
                         item(key = "terakhir") {
                             LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                items(state.recent, key = { it.id }) { route ->
-                                    RecentCard(route, state.liveCounts[route.id], onClick = { onRouteSelected(route.id) })
+                                itemsIndexed(state.recent, key = { _, r -> r.id }) { index, route ->
+                                    RecentCard(route, state.liveCounts[route.id], onClick = { onRouteSelected(route.id) }, modifier = Modifier.popIn(300L + index * 110L, from = 0.6f))
                                 }
                             }
                         }
@@ -204,14 +216,16 @@ fun LiveRoutesScreen(
                             )
                         }
                     }
-                    items(state.routes, key = { it.id }) { route ->
+                    itemsIndexed(state.routes, key = { _, r -> r.id }) { index, route ->
                         RouteCard(
                             route = route,
                             live = state.liveCounts[route.id],
                             favorite = route.id in state.favorites,
                             onClick = { onRouteSelected(route.id) },
                             onFavorite = { viewModel.toggleFavorite(route.id) },
-                            modifier = Modifier.animateItem(fadeInSpec = tween(180), placementSpec = tween(220)),
+                            modifier = Modifier
+                                .animateItem(fadeInSpec = tween(180), placementSpec = tween(220))
+                                .enterIn(index + 3, fromX = 96.dp, fromY = 0.dp),
                         )
                     }
                 }
@@ -221,7 +235,9 @@ fun LiveRoutesScreen(
 }
 
 @Composable
-private fun SearchField(query: String, onChange: (String) -> Unit) {
+private fun SearchField(query: String, onChange: (String) -> Unit, modifier: Modifier = Modifier) {
+    val shape = RoundedCornerShape(28.dp)
+    val border = Wake.colors.border
     OutlinedTextField(
         value = query,
         onValueChange = onChange,
@@ -233,23 +249,36 @@ private fun SearchField(query: String, onChange: (String) -> Unit) {
             }
         },
         singleLine = true,
-        shape = RoundedCornerShape(22.dp),
+        shape = shape,
+        textStyle = MaterialTheme.typography.bodyMedium,
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
             unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-            unfocusedBorderColor = Color.Transparent,
+            focusedBorderColor = border,
+            unfocusedBorderColor = border,
         ),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().posterShadow(shape),
     )
 }
 
+/** Kartu "terakhir dibuka": blok penuh warna resmi rute (GTFS), nomor besar, jumlah bus live. */
 @Composable
-private fun RecentCard(route: TjRoute, live: Int?, onClick: () -> Unit) {
-    Surface(onClick = onClick, shape = RoundedCornerShape(18.dp), color = MaterialTheme.colorScheme.surfaceContainer, modifier = Modifier.width(156.dp)) {
-        Column(Modifier.padding(12.dp).heightIn(min = 104.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            RouteBadge(route)
+private fun RecentCard(route: TjRoute, live: Int?, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val shape = RoundedCornerShape(28.dp)
+    val fill = parseRouteColor(route.color, MaterialTheme.colorScheme.primaryContainer)
+    val onFill = parseRouteColor(route.textColor, Wake.colors.onColor)
+    Surface(
+        onClick = onClick,
+        shape = shape,
+        color = fill,
+        contentColor = onFill,
+        border = posterBorder(),
+        modifier = modifier.width(172.dp).posterShadow(shape),
+    ) {
+        Column(Modifier.padding(16.dp).heightIn(min = 112.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(route.shortName, style = MaterialTheme.typography.displaySmall, maxLines = 1)
             Text(route.longName, style = MaterialTheme.typography.titleSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            live?.let { LivePill("$it bus") }
+            live?.let { LivePill("$it bus", container = Wake.colors.onColor, content = Wake.colors.live) }
         }
     }
 }
@@ -263,24 +292,33 @@ private fun RouteCard(
     onFavorite: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(onClick = onClick, modifier = modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp), color = MaterialTheme.colorScheme.surfaceContainer) {
+    val shape = RoundedCornerShape(24.dp)
+    // Bintang memantul saat dijadikan favorit.
+    val star by animateFloatAsState(if (favorite) 1.2f else 1f, Motion.Pop, label = "bintang")
+    Surface(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth().posterShadow(shape),
+        shape = shape,
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        border = posterBorder(),
+    ) {
         Row(
-            Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
+            Modifier.heightIn(min = 72.dp).padding(start = 12.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             RouteBadge(route)
-            Column(Modifier.weight(1f)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(route.longName, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(route.kind, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (live != null) LivePill("$live bus")
+                else Text(route.kind, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            live?.let { LivePill("$it bus") }
             IconButton(onClick = onFavorite) {
                 Icon(
                     painterResource(if (favorite) R.drawable.ic_star_filled else R.drawable.ic_star),
                     contentDescription = if (favorite) "Hapus dari favorit" else "Jadikan favorit",
-                    tint = if (favorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.size(24.dp),
+                    tint = if (favorite) SignalRed else MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(28.dp).graphicsLayer { scaleX = star; scaleY = star },
                 )
             }
         }

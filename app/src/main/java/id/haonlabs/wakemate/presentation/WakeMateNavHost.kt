@@ -25,6 +25,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -49,9 +51,12 @@ import id.haonlabs.wakemate.presentation.live.LiveTripScreen
 import id.haonlabs.wakemate.presentation.live.RouteLiveScreen
 import id.haonlabs.wakemate.presentation.trip.ActiveTripScreen
 import id.haonlabs.wakemate.presentation.trip.TripSetupScreen
+import id.haonlabs.wakemate.ui.theme.Wake
 import kotlinx.serialization.Serializable
 
-private val SLIDE = tween<androidx.compose.ui.unit.IntOffset>(durationMillis = 280, easing = FastOutSlowInEasing)
+// Melambat tajam di akhir (cubic-bezier .2,.9,.3,1, sama dengan sheet di Figma): terasa 'mendarat'.
+private val Landing = androidx.compose.animation.core.CubicBezierEasing(0.2f, 0.9f, 0.3f, 1f)
+private val SLIDE = tween<androidx.compose.ui.unit.IntOffset>(durationMillis = 340, easing = Landing)
 private val FADE = tween<Float>(durationMillis = 220, easing = FastOutSlowInEasing)
 
 @Serializable
@@ -118,24 +123,32 @@ fun WakeMateNavHost(
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                             )
                         }
-                        NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceContainerLow) {
+                        val borderColor = Wake.colors.border
+                        NavigationBar(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                            tonalElevation = 0.dp,
+                            // Garis atas tebal pemisah konten, sama dengan border kartu.
+                            modifier = Modifier.drawBehind { drawLine(borderColor, Offset.Zero, Offset(size.width, 0f), strokeWidth = 2.5.dp.toPx()) },
+                        ) {
                             val colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = MaterialTheme.colorScheme.primary,
-                                selectedTextColor = MaterialTheme.colorScheme.primary,
-                                indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.14f),
+                                selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                                selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                                indicatorColor = MaterialTheme.colorScheme.primary,
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             NavigationBarItem(
                                 selected = destination?.hasRoute<LiveRoutes>() == true,
                                 onClick = { navController.switchTab(LiveRoutes) },
                                 icon = { Icon(painterResource(R.drawable.ic_mode_tj), contentDescription = null) },
-                                label = { Text("Live TJ") },
+                                label = { Text("Live TJ", style = MaterialTheme.typography.labelLarge) },
                                 colors = colors,
                             )
                             NavigationBarItem(
                                 selected = destination?.hasRoute<Home>() == true,
                                 onClick = { navController.switchTab(Home) },
                                 icon = { Icon(painterResource(R.drawable.ic_alarm), contentDescription = null) },
-                                label = { Text("Alarm GPS") },
+                                label = { Text("Alarm GPS", style = MaterialTheme.typography.labelLarge) },
                                 colors = colors,
                             )
                         }
