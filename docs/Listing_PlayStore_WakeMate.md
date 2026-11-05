@@ -2,33 +2,40 @@
 
 Batas Play: short description **80 karakter**, full description **4.000 karakter**.
 
-**Diperbarui 12 Oktober 2026** untuk fitur Live TJ. Klaim lama "tanpa internet" dan "tidak meminta
-izin INTERNET" sudah tidak berlaku dan dihapus dari semua teks di bawah.
+**Ditulis ulang 5 November 2026** untuk redesign "Signal Pop", Peta Rute multimoda, tab Sekitar, dan
+alarm "Bangunin". Fitur bus live Transjakarta sudah dihapus (feed-nya ditolak broker), jadi semua
+klaim "posisi bus langsung", "Saya di bus ini", dan "pengingat bus hampir tiba" dibuang.
 
-Karena teks ini menyebut Transjakarta dan memakai data armadanya, listing perlu menyatakan dengan
-jelas bahwa WakeMate **bukan aplikasi resmi Transjakarta**. Kebijakan Play melarang listing yang
-bisa disangka berasal dari pihak lain.
+Dua hal yang wajib tetap jujur di listing:
+
+1. **Tidak ada posisi kendaraan nyata.** Kereta di peta KRL adalah simulasi dari jadwal, dan label
+   itu harus ikut tertulis di teks listing. Play menolak listing yang menyesatkan.
+2. **Bukan aplikasi resmi.** WakeMate memakai nama Transjakarta, KRL, MRT, dan LRT dan data
+   pihak ketiga, jadi pernyataan independen dan atribusi CC-BY (Open-KRL) harus ada.
+
+Screenshot: `design/playstore/screenshots-v3/01..08` (1080×1920). Ikon `design/playstore/icon-512.png`,
+feature graphic `design/playstore/feature-graphic-v3.png`.
 
 ---
 
 ## Short description
 
-**Pilihan A (disarankan): tracker dan alarm sekaligus**
+**Pilihan A (disarankan): tiga fungsi sekaligus**
 
 ```
-Bus Transjakarta live dan alarm sebelum halte tujuan. KRL dan MRT juga bisa.
+Rute KRL, MRT, LRT, TJ di sekitarmu, plus alarm turun yang bangunin kamu.
 ```
 
 **Pilihan B: menonjolkan tidur tenang**
 
 ```
-Tidur tenang di bus, KRL, dan MRT. Dibangunkan sebelum halte/stasiun tujuan.
+Tidur tenang di KRL, MRT, LRT, dan bus. Dibangunin sebelum stasiun tujuan.
 ```
 
-**Pilihan C: menonjolkan sisi privasi**
+**Pilihan C: menonjolkan privasi**
 
 ```
-Bus TJ live dan alarm turun. Tanpa akun, tanpa iklan, lokasimu tetap di ponsel.
+Alarm turun KRL, MRT, LRT, TJ. Tanpa akun, tanpa iklan, lokasi tetap di ponsel.
 ```
 
 ---
@@ -36,107 +43,97 @@ Bus TJ live dan alarm turun. Tanpa akun, tanpa iklan, lokasimu tetap di ponsel.
 ## Full description
 
 ```
-Kamu ingin tidur di perjalanan, tapi takut kebablasan. Kamu juga ingin tahu bus berikutnya masih seberapa jauh, tanpa menebak-nebak di halte.
+Ketiduran di KRL lalu kebablasan itu menyebalkan. Bingung bus atau kereta apa yang lewat di dekatmu juga sama menyebalkannya.
 
-WakeMate menunjukkan posisi bus Transjakarta secara langsung, lalu membangunkanmu sebelum sampai di halte atau stasiun tujuan.
-
-
-BUS TRANSJAKARTA SECARA LANGSUNG
-
-• Posisi bus di peta, diperbarui terus-menerus
-• Perkiraan tiba di setiap halte, sesuai arah perjalanan
-• Bus terdekat darimu ditampilkan paling depan
-• 240 rute: BRT, Angkutan Umum Integrasi, Mikrotrans, Transjabodetabek, Rusun, Royaltrans, dan Bus Wisata
+WakeMate menjawab keduanya: lihat transportasi di sekitarmu, buka petanya, lalu tidur tenang karena kami bangunin sebelum sampai tujuan.
 
 
-BANGUNKAN AKU DARI BUS YANG KUNAIKI
+SEKITAR: APA SAJA YANG LEWAT DI DEKATMU
 
-Pilih bus yang sedang kamu naiki, ketuk halte tempat kamu turun, lalu tentukan kapan dibangunkan: beberapa halte atau beberapa menit sebelumnya. WakeMate memantau bus itu dan membangunkanmu tepat waktu, bahkan saat layar terkunci.
-
-
-INGATKAN SAAT BUS HAMPIR TIBA
-
-Menunggu di halte? Pasang pengingat, lalu lakukan hal lain. WakeMate memberi tahu saat bus ke arahmu tinggal beberapa menit lagi.
+• Halte dan stasiun terdekat, lengkap dengan jarak dan waktu jalan kaki
+• Rute apa saja yang lewat, dan kendaraan berikutnya menurut jadwal
+• Atur jangkauan 500 m sampai 5 km, saring per moda: bus, KRL, MRT, LRT
+• Ketuk satu titik untuk melihat semua rute dan tujuannya
 
 
-ALARM GPS UNTUK KRL DAN MRT
+PETA RUTE: KRL, MRT, LRT, DAN TRANSJAKARTA
 
-Untuk KRL Commuter Line, MRT Jakarta, dan koridor BRT, WakeMate juga bisa memantau posisimu lewat GPS. Pilih stasiun tujuan, tentukan mau dibangunkan berapa stasiun sebelumnya, lalu simpan ponsel di saku. Fitur ini tetap bekerja tanpa internet.
+• 251 rute dalam satu aplikasi: 6 lin KRL Commuter Line, MRT Jakarta, 3 rute LRT (LRT Jakarta, LRT Jabodebek Cibubur dan Bekasi), serta Transjakarta (BRT, Angkutan Umum Integrasi, Mikrotrans, Transjabodetabek, Royaltrans, Rusun, Bus Wisata)
+• Jalur dan semua halte atau stasiun tergambar di peta, per arah perjalanan
+• Perkiraan kereta atau bus berikutnya di tiap halte, menurut jadwal
+• Di peta KRL ada kereta simulasi yang bergerak menurut jadwal. Ini bukan posisi nyata kereta, dan ditandai jelas di peta
+• Simpan rute favorit, dan rute yang terakhir dibuka mudah dicari lagi
 
+
+BANGUNIN: ALARM TURUN BERBASIS GPS
+
+Pilih stasiun atau halte tujuan, tentukan mau dibangunkan berapa stasiun sebelumnya, lalu simpan ponsel di saku. Dari peta rute, tinggal ketuk "Bangunkan saya di sini" di stasiun tujuanmu.
+
+• Untuk KRL, MRT, LRT, dan koridor BRT
+• Jalan tanpa internet, cukup GPS ponsel
 • Tahu arah perjalananmu, dan memperingatkan kalau kamu naik jalur yang salah
 • Tetap menghitung saat sinyal GPS hilang di terowongan
-• Menghemat baterai dengan mempertajam pelacakan hanya saat mendekati tujuan
-• Menunjukkan jarak sebenarnya dari tiap pilihan ambang, karena "2 stasiun" di Lin Bogor berarti belasan kilometer
+• Hemat baterai: pelacakan dipertajam hanya saat mendekati tujuan
+• Menunjukkan jarak sebenarnya tiap pilihan, karena "2 stasiun" di Lin Bogor bisa belasan kilometer
 
 
 ALARM YANG SOPAN DI TEMPAT UMUM
 
-Alarm yang meraung di gerbong penuh membuat orang berhenti memakainya. WakeMate dirancang sebaliknya, bertahap:
+Alarm yang meraung di gerbong penuh membuat orang berhenti memakainya. WakeMate dirancang bertahap:
 
 • Dimulai dari getaran
 • Bunyi diarahkan ke headset atau TWS kalau tersambung, bukan ke speaker
 • Speaker hanya dipakai sebagai upaya terakhir, dan bisa kamu matikan sepenuhnya
 
-Alarm tetap berbunyi meski ponsel dalam mode senyap, karena memakai jalur alarm sistem, sama seperti alarm bangun tidur. Sesi juga berhenti sendiri kalau ditinggalkan, supaya baterai tidak terkuras.
+Alarm tetap berbunyi meski ponsel dalam mode senyap karena memakai jalur alarm sistem, sama seperti alarm bangun tidur. Sesi berhenti sendiri kalau ditinggalkan, supaya baterai tidak terkuras.
 
 
 PRIVASI
 
-• Lokasimu diproses di dalam ponsel dan tidak pernah dikirim ke mana pun
-• Internet hanya dipakai untuk menerima posisi bus dan gambar peta
-• Alarm dari bus yang kamu naiki tidak memakai lokasimu sama sekali
+• Lokasimu diproses di dalam ponsel dan tidak dikirim WakeMate ke mana pun
+• Lokasi hanya dipakai saat aplikasi terbuka atau saat alarm perjalanan aktif
+• Internet hanya untuk gambar peta
 • Tanpa akun, tanpa iklan, tanpa analitik, tanpa pelacakan
-• Notifikasi selalu terlihat selama pemantauan aktif, jadi kamu tahu persis kapan WakeMate bekerja
-
-
-CAKUPAN SAAT INI
-
-Transjakarta (live): 240 rute
-KRL Commuter Line (GPS): Lin Bogor, Lin Bogor (Nambo), Lin Lingkar Cikarang, Lin Rangkasbitung, Lin Tangerang, Lin Tanjung Priuk, dan Lin Bandara Soekarno-Hatta
-MRT Jakarta (GPS): Lin Utara-Selatan, Lebak Bulus sampai Bundaran HI
+• Notifikasi selalu terlihat selama alarm aktif, jadi kamu tahu persis kapan WakeMate bekerja
 
 
 YANG PERLU DIKETAHUI
 
-• Data bus langsung berasal dari Transjakarta. Kalau datanya sedang tidak tersedia, rute dan halte tetap bisa dilihat, dan alarm memberi tahu kalau berhenti.
-• Posisi kereta KRL dan MRT secara langsung belum tersedia.
+• Semua waktu kedatangan adalah perkiraan menurut jadwal, bukan posisi kendaraan secara langsung. Jadwal bisa berubah tanpa pemberitahuan.
+• Jadwal KRL berlaku untuk hari kerja dan Minggu, sampai 31 Desember 2026. Jadwal hari Sabtu belum tersedia, dan aplikasi akan bilang begitu, bukan menebak.
+• MRT dan LRT belum punya jadwal di aplikasi. Rutenya tetap bisa dilihat, dan alarm tetap bekerja.
 
-WakeMate adalah aplikasi independen dan tidak berafiliasi dengan PT Transportasi Jakarta, KAI Commuter, maupun MRT Jakarta.
+WakeMate adalah aplikasi independen dan tidak berafiliasi dengan PT Transportasi Jakarta, KAI Commuter, MRT Jakarta, maupun LRT Jakarta dan LRT Jabodebek.
 
-Data rute dan halte Transjakarta dari GTFS yang dipublikasikan Transjakarta. Data stasiun dan peta © kontributor OpenStreetMap (ODbL). Peta oleh OpenFreeMap.
+Data KRL: KRL Commuter Line GTFS data compiled and verified by Open-KRL (CC-BY 4.0). Data rute dan halte Transjakarta dari GTFS yang dipublikasikan Transjakarta. Data stasiun, jalur, dan peta © kontributor OpenStreetMap (ODbL). Peta oleh OpenFreeMap.
 ```
 
 ---
 
 ## Release name
 
-Hanya terlihat olehmu di Play Console, tidak pernah ditampilkan ke pengguna. Batas 50 karakter.
-Google mengisinya otomatis dari `versionName (versionCode)`. Biarkan sesuai default supaya mudah
-dicocokkan dengan berkas `.aab` yang diunggah.
-
-Setiap unggahan baru wajib memakai `versionCode` yang lebih tinggi. Saat ini masih `1` / `1.0` di
-`app/build.gradle.kts`, jadi naikkan dulu, misalnya ke:
-
-```
-1.1 (2)
-```
+Hanya terlihat olehmu di Play Console. Batas 50 karakter. Biarkan default `versionName (versionCode)`
+supaya cocok dengan berkas `.aab`. Saat ini `app/build.gradle.kts` berisi `1.1 (3)`; setiap unggahan
+baru wajib memakai `versionCode` lebih tinggi.
 
 ---
 
 ## Release notes (What's new)
 
-**Terlihat oleh pengguna** di halaman aplikasi dan tab Update. Batas 500 karakter per bahasa.
+**Terlihat oleh pengguna.** Batas 500 karakter per bahasa.
 
-**Kalau versi 1.0 sudah pernah tayang ke pengguna (id-ID)**
+**Untuk pengguna lama (id-ID)**
 
 ```
-Yang baru di 1.1
+Tampilan baru dan fitur baru:
 
-• Bus Transjakarta secara langsung: posisi bus di peta dan perkiraan tiba di tiap halte, untuk 240 rute
-• Bangunkan aku dari bus yang kunaiki: pilih bus dan halte turun, alarm berbunyi sebelum sampai
-• Pengingat saat bus ke arahmu hampir tiba di halte
+• Tab Sekitar: halte dan stasiun terdekat beserta rute yang lewat
+• Peta Rute: KRL, MRT, LRT, dan Transjakarta dalam satu peta, dengan perkiraan tiba menurut jadwal
+• Alarm GPS berganti nama jadi Bangunin, sekarang termasuk LRT
+• Ketuk "Bangunkan saya di sini" langsung dari peta rute
+• Logo baru
 
-Alarm GPS untuk KRL dan MRT tetap ada di tab Alarm GPS, dan tetap bekerja tanpa internet.
+Posisi bus langsung dihapus karena datanya tidak lagi tersedia.
 ```
 
 **Kalau ini rilis pertama yang tayang (id-ID)**
@@ -144,12 +141,22 @@ Alarm GPS untuk KRL dan MRT tetap ada di tab Alarm GPS, dan tetap bekerja tanpa 
 ```
 Rilis pertama WakeMate.
 
-Lihat posisi bus Transjakarta secara langsung, lalu tidur tenang. Pilih bus yang kamu naiki dan halte tujuan, WakeMate membangunkanmu sebelum sampai: getar dulu, lewat headset kalau tersambung, speaker hanya sebagai upaya terakhir.
+Lihat KRL, MRT, LRT, dan bus Transjakarta di sekitarmu, buka peta rutenya, lalu tidur tenang. Pilih stasiun tujuan, WakeMate membangunkanmu sebelum sampai: getar dulu, lewat headset kalau tersambung, speaker hanya sebagai upaya terakhir.
 
-Untuk KRL dan MRT tersedia alarm GPS yang bekerja tanpa internet. Tanpa akun, tanpa iklan.
+Alarm GPS jalan tanpa internet. Tanpa akun, tanpa iklan.
 ```
 
 **Pola untuk rilis berikutnya**
 
 Tulis dari sudut pandang pengguna, bukan changelog teknis. Sebut yang mereka rasakan, bukan nama
 kelas yang diubah.
+
+---
+
+## Pengingat perawatan
+
+- Jadwal KRL **kedaluwarsa 31 Des 2026**. Setelah itu aplikasi menyembunyikan ETA dan kereta
+  simulasi dan menampilkan pesan. Perbarui lewat `tools/generate_rail_static.py` dengan rilis
+  Open-KRL yang baru, lalu rilis versi baru sebelum tanggal itu.
+- Daftar tampilan (screenshot) memakai build debug di emulator. Tombol "Audio" khusus debug sudah
+  ditutup di `07-bangunin.png`; build rilis memang tidak menampilkannya.
