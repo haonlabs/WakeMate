@@ -128,7 +128,7 @@ fun WakeMateNavHost(
                             NavigationBarItem(
                                 selected = destination?.hasRoute<LiveRoutes>() == true,
                                 onClick = { navController.switchTab(LiveRoutes) },
-                                icon = { Icon(painterResource(R.drawable.ic_mode_tj), contentDescription = null) },
+                                icon = { Icon(painterResource(R.drawable.ic_map), contentDescription = null) },
                                 label = { Text("Peta Rute", style = MaterialTheme.typography.labelLarge) },
                                 colors = colors,
                             )
