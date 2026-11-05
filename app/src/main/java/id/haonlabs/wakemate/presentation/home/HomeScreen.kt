@@ -42,13 +42,12 @@ import id.haonlabs.wakemate.presentation.components.SegmentedControl
 import id.haonlabs.wakemate.presentation.components.StatusPill
 import id.haonlabs.wakemate.presentation.components.posterBorder
 import id.haonlabs.wakemate.presentation.components.posterShadow
+import id.haonlabs.wakemate.presentation.blockColor
 import id.haonlabs.wakemate.presentation.iconRes
-import id.haonlabs.wakemate.ui.theme.SignalBlue
-import id.haonlabs.wakemate.ui.theme.SignalRed
 import id.haonlabs.wakemate.ui.theme.SignalYellow
 import id.haonlabs.wakemate.ui.theme.enterIn
 
-/** GPS1: alarm berbasis GPS ponsel untuk KRL, MRT, dan koridor BRT — bekerja tanpa internet. */
+/** GPS1: alarm berbasis GPS ponsel untuk KRL, MRT, LRT, dan koridor BRT — bekerja tanpa internet. */
 @Composable
 fun HomeScreen(
     onStationSelected: (Station) -> Unit,
@@ -130,14 +129,8 @@ fun HomeScreen(
 private fun TransitMode.shortLabel() = when (this) {
     TransitMode.KRL -> "KRL"
     TransitMode.MRT -> "MRT"
+    TransitMode.LRT -> "LRT"
     TransitMode.TRANSJAKARTA -> "TJ"
-}
-
-/** Warna blok moda (data identitas moda, seperti di Figma GPS1); ikon di atasnya selalu tinta. */
-private fun TransitMode.blockColor(): Color = when (this) {
-    TransitMode.KRL -> Color(0xFFFF9A3D)
-    TransitMode.MRT -> SignalBlue
-    TransitMode.TRANSJAKARTA -> SignalRed
 }
 
 @Composable
@@ -152,7 +145,7 @@ private fun Header(onOpenDiagnostics: () -> Unit, modifier: Modifier = Modifier)
             if (BuildConfig.DEBUG) TextButton(onClick = onOpenDiagnostics) { Text("Audio") }
         }
         Text(
-            "Untuk KRL, MRT, dan koridor BRT. Bekerja tanpa internet — posisimu dibaca dari GPS ponsel.",
+            "Untuk KRL, MRT, LRT, dan koridor BRT. Bekerja tanpa internet — posisimu dibaca dari GPS ponsel.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

@@ -1,6 +1,6 @@
 {
- "version": 1,
- "generatedAt": "2026-09-10T02:36:10Z",
+ "version": 2,
+ "generatedAt": "2026-11-05T07:51:51Z",
  "source": "OpenStreetMap via Overpass API (ODbL)",
  "modes": [
   {
@@ -1294,6 +1294,288 @@
        "lat": -6.191849,
        "lng": 106.823062,
        "sequence": 12
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "mode": "LRT",
+   "lines": [
+    {
+     "id": "lrt-jabodebek-bekasi",
+     "name": "LRT Jabodebek Lin Bekasi",
+     "stations": [
+      {
+       "id": "lrt-jabodebek-bekasi:jatimulya",
+       "name": "Jatimulya",
+       "lat": -6.264088,
+       "lng": 107.02167,
+       "sequence": 0
+      },
+      {
+       "id": "lrt-jabodebek-bekasi:bekasi-barat",
+       "name": "Bekasi Barat",
+       "lat": -6.252924,
+       "lng": 106.990437,
+       "sequence": 1
+      },
+      {
+       "id": "lrt-jabodebek-bekasi:cikunir-2",
+       "name": "Cikunir 2",
+       "lat": -6.254649,
+       "lng": 106.96317,
+       "sequence": 2
+      },
+      {
+       "id": "lrt-jabodebek-bekasi:cikunir-1",
+       "name": "Cikunir 1",
+       "lat": -6.256581,
+       "lng": 106.951878,
+       "sequence": 3
+      },
+      {
+       "id": "lrt-jabodebek-bekasi:jatibening-baru",
+       "name": "Jatibening Baru",
+       "lat": -6.257704,
+       "lng": 106.927916,
+       "sequence": 4
+      },
+      {
+       "id": "lrt-jabodebek-bekasi:halim",
+       "name": "Halim",
+       "lat": -6.245852,
+       "lng": 106.88728,
+       "sequence": 5
+      },
+      {
+       "id": "lrt-jabodebek-bekasi:cawang",
+       "name": "Cawang",
+       "lat": -6.245889,
+       "lng": 106.871234,
+       "sequence": 6
+      },
+      {
+       "id": "lrt-jabodebek-bekasi:ciliwung",
+       "name": "Ciliwung",
+       "lat": -6.243429,
+       "lng": 106.863972,
+       "sequence": 7
+      },
+      {
+       "id": "lrt-jabodebek-bekasi:cikoko",
+       "name": "Cikoko",
+       "lat": -6.243447,
+       "lng": 106.857073,
+       "sequence": 8
+      },
+      {
+       "id": "lrt-jabodebek-bekasi:pancoran",
+       "name": "Pancoran",
+       "lat": -6.242113,
+       "lng": 106.838522,
+       "sequence": 9
+      },
+      {
+       "id": "lrt-jabodebek-bekasi:kuningan",
+       "name": "Kuningan",
+       "lat": -6.228782,
+       "lng": 106.833223,
+       "sequence": 10
+      },
+      {
+       "id": "lrt-jabodebek-bekasi:rasuna-said",
+       "name": "Rasuna Said",
+       "lat": -6.221629,
+       "lng": 106.832265,
+       "sequence": 11
+      },
+      {
+       "id": "lrt-jabodebek-bekasi:setiabudi",
+       "name": "Setiabudi",
+       "lat": -6.209335,
+       "lng": 106.830263,
+       "sequence": 12
+      },
+      {
+       "id": "lrt-jabodebek-bekasi:dukuh-atas-bank-syariah-indonesia",
+       "name": "Dukuh Atas Bank Syariah Indonesia",
+       "lat": -6.204805,
+       "lng": 106.825536,
+       "sequence": 13
+      }
+     ]
+    },
+    {
+     "id": "lrt-jabodebek-cibubur",
+     "name": "LRT Jabodebek Lin Cibubur",
+     "stations": [
+      {
+       "id": "lrt-jabodebek-cibubur:dukuh-atas-bank-syariah-indonesia",
+       "name": "Dukuh Atas Bank Syariah Indonesia",
+       "lat": -6.204851,
+       "lng": 106.825525,
+       "sequence": 0
+      },
+      {
+       "id": "lrt-jabodebek-cibubur:setiabudi",
+       "name": "Setiabudi",
+       "lat": -6.209343,
+       "lng": 106.830218,
+       "sequence": 1
+      },
+      {
+       "id": "lrt-jabodebek-cibubur:rasuna-said",
+       "name": "Rasuna Said",
+       "lat": -6.221645,
+       "lng": 106.83222,
+       "sequence": 2
+      },
+      {
+       "id": "lrt-jabodebek-cibubur:kuningan",
+       "name": "Kuningan",
+       "lat": -6.228787,
+       "lng": 106.833182,
+       "sequence": 3
+      },
+      {
+       "id": "lrt-jabodebek-cibubur:pancoran",
+       "name": "Pancoran",
+       "lat": -6.242158,
+       "lng": 106.838513,
+       "sequence": 4
+      },
+      {
+       "id": "lrt-jabodebek-cibubur:cikoko",
+       "name": "Cikoko",
+       "lat": -6.243487,
+       "lng": 106.857072,
+       "sequence": 5
+      },
+      {
+       "id": "lrt-jabodebek-cibubur:ciliwung",
+       "name": "Ciliwung",
+       "lat": -6.243464,
+       "lng": 106.86397,
+       "sequence": 6
+      },
+      {
+       "id": "lrt-jabodebek-cibubur:cawang",
+       "name": "Cawang",
+       "lat": -6.245926,
+       "lng": 106.871223,
+       "sequence": 7
+      },
+      {
+       "id": "lrt-jabodebek-cibubur:taman-mini",
+       "name": "Taman Mini",
+       "lat": -6.292911,
+       "lng": 106.880543,
+       "sequence": 8
+      },
+      {
+       "id": "lrt-jabodebek-cibubur:kampung-rambutan",
+       "name": "Kampung Rambutan",
+       "lat": -6.309552,
+       "lng": 106.884358,
+       "sequence": 9
+      },
+      {
+       "id": "lrt-jabodebek-cibubur:ciracas",
+       "name": "Ciracas",
+       "lat": -6.323768,
+       "lng": 106.886616,
+       "sequence": 10
+      },
+      {
+       "id": "lrt-jabodebek-cibubur:harjamukti",
+       "name": "Harjamukti",
+       "lat": -6.373896,
+       "lng": 106.895652,
+       "sequence": 11
+      }
+     ]
+    },
+    {
+     "id": "lrt-jakarta-selatan",
+     "name": "LRT Jakarta Lin Selatan",
+     "stations": [
+      {
+       "id": "lrt-jakarta-selatan:manggarai",
+       "name": "Manggarai",
+       "lat": -6.208748,
+       "lng": 106.845904,
+       "sequence": 0
+      },
+      {
+       "id": "lrt-jakarta-selatan:proklamasi",
+       "name": "Proklamasi",
+       "lat": -6.201956,
+       "lng": 106.850482,
+       "sequence": 1
+      },
+      {
+       "id": "lrt-jakarta-selatan:matraman",
+       "name": "Matraman",
+       "lat": -6.194999,
+       "lng": 106.860151,
+       "sequence": 2
+      },
+      {
+       "id": "lrt-jakarta-selatan:pramuka",
+       "name": "Pramuka",
+       "lat": -6.192004,
+       "lng": 106.87109,
+       "sequence": 3
+      },
+      {
+       "id": "lrt-jakarta-selatan:rawamangun",
+       "name": "Rawamangun",
+       "lat": -6.193187,
+       "lng": 106.882768,
+       "sequence": 4
+      },
+      {
+       "id": "lrt-jakarta-selatan:velodrome",
+       "name": "Velodrome",
+       "lat": -6.191926,
+       "lng": 106.891218,
+       "sequence": 5
+      },
+      {
+       "id": "lrt-jakarta-selatan:equestrian",
+       "name": "Equestrian",
+       "lat": -6.183375,
+       "lng": 106.891393,
+       "sequence": 6
+      },
+      {
+       "id": "lrt-jakarta-selatan:pulomas",
+       "name": "Pulomas",
+       "lat": -6.177077,
+       "lng": 106.893572,
+       "sequence": 7
+      },
+      {
+       "id": "lrt-jakarta-selatan:boulevard-selatan",
+       "name": "Boulevard Selatan",
+       "lat": -6.169022,
+       "lng": 106.9,
+       "sequence": 8
+      },
+      {
+       "id": "lrt-jakarta-selatan:boulevard-utara-summarecon-mall",
+       "name": "Boulevard Utara Summarecon Mall",
+       "lat": -6.15928,
+       "lng": 106.906134,
+       "sequence": 9
+      },
+      {
+       "id": "lrt-jakarta-selatan:kelapa-gading",
+       "name": "Kelapa Gading",
+       "lat": -6.15742,
+       "lng": 106.914132,
+       "sequence": 10
       }
      ]
     }

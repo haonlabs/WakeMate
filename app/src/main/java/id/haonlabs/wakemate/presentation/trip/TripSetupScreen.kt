@@ -59,9 +59,9 @@ import id.haonlabs.wakemate.presentation.components.PosterButton
 import id.haonlabs.wakemate.presentation.components.SectionLabel
 import id.haonlabs.wakemate.presentation.components.posterBorder
 import id.haonlabs.wakemate.presentation.components.posterShadow
+import id.haonlabs.wakemate.presentation.KrlOrange
+import id.haonlabs.wakemate.presentation.blockColor
 import id.haonlabs.wakemate.presentation.iconRes
-import id.haonlabs.wakemate.ui.theme.SignalBlue
-import id.haonlabs.wakemate.ui.theme.SignalRed
 import id.haonlabs.wakemate.ui.theme.Wake
 import id.haonlabs.wakemate.ui.theme.enterIn
 import id.haonlabs.wakemate.ui.theme.popIn
@@ -114,7 +114,7 @@ fun TripSetupScreen(
                     stationName = state.station?.name ?: "Memuat...",
                     lineName = state.lineName,
                     modeIconRes = state.station?.mode?.iconRes() ?: R.drawable.ic_mode_krl,
-                    blockColor = state.station?.mode?.blockColor() ?: TransitModeKrlColor,
+                    blockColor = state.station?.mode?.blockColor() ?: KrlOrange,
                     modifier = Modifier.fillMaxWidth().enterIn(1),
                 )
 
@@ -187,16 +187,6 @@ fun TripSetupScreen(
             text = { Text("Tanpa izin lokasi, WakeMate tidak bisa tahu kamu sudah sampai mana.") },
         )
     }
-}
-
-/** Oranye moda KRL (di Figma GPS1/GPS2); dipakai juga untuk kartu tujuan. */
-private val TransitModeKrlColor = Color(0xFFFF9A3D)
-
-/** Warna blok moda (data identitas moda, seperti di Figma GPS1); ikon di atasnya selalu tinta. */
-private fun TransitMode.blockColor(): Color = when (this) {
-    TransitMode.KRL -> TransitModeKrlColor
-    TransitMode.MRT -> SignalBlue
-    TransitMode.TRANSJAKARTA -> SignalRed
 }
 
 /** Kartu tujuan gaya poster: blok warna moda, label "TURUN DI", nama tujuan besar. */

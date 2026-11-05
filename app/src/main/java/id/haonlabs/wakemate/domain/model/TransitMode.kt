@@ -19,5 +19,7 @@ enum class TransitMode(
 ) {
     KRL("KRL Commuter Line", offRouteToleranceMeters = 1_500.0, arrivalRadiusMeters = 250.0),
     MRT("MRT Jakarta", offRouteToleranceMeters = 1_000.0, arrivalRadiusMeters = 200.0),
+    /** LRT Jakarta dan LRT Jabodebek: jalur layang, jarak antar stasiun 1–3 km, setara MRT. */
+    LRT("LRT", offRouteToleranceMeters = 1_000.0, arrivalRadiusMeters = 200.0),
     TRANSJAKARTA("Transjakarta", offRouteToleranceMeters = 700.0, arrivalRadiusMeters = 100.0),
 }

@@ -25,6 +25,9 @@ RAIL_LINES = {
     17193008: ("KRL", "krl-tanjung-priuk", "Lin Tanjung Priuk"),
     17675694: ("KRL", "krl-bandara", "Lin Bandara Soekarno-Hatta"),
     9677669:  ("MRT", "mrt-north-south", "MRT Lin Utara-Selatan"),
+    10693119: ("LRT", "lrt-jakarta-selatan", "LRT Jakarta Lin Selatan"),
+    16036440: ("LRT", "lrt-jabodebek-cibubur", "LRT Jabodebek Lin Cibubur"),
+    16079478: ("LRT", "lrt-jabodebek-bekasi", "LRT Jabodebek Lin Bekasi"),
 }
 
 
@@ -99,11 +102,15 @@ def stops_of(rel, names):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("-o", "--out", default="app/src/main/assets/stations_seed.json")
+    ap.add_argument("--only-modes", help="comma-separated modes (e.g. LRT): fetch just those and merge them into the "
+                    "existing OUT file (other modes untouched, `version` +1 so the app reseeds)")
     args = ap.parse_args()
+    only = set(args.only_modes.split(",")) if args.only_modes else None
 
-    print("Discovering Transjakarta BRT corridors...")
-    catalog = dict(RAIL_LINES)
-    catalog.update(discover_brt_relations())
+    catalog = {k: v for k, v in RAIL_LINES.items() if only is None or v[0] in only}
+    if only is None or "TRANSJAKARTA" in only:
+        print("Discovering Transjakarta BRT corridors...")
+        catalog.update(discover_brt_relations())
     print(f"Fetching {len(catalog)} route relations...")
     rels, names = fetch_relations(catalog)
 
@@ -125,11 +132,17 @@ def main():
         modes.setdefault(mode, []).append({"id": line_id, "name": line_name, "stations": stations})
         print(f"  {line_id}: {len(stations)} stations")
 
+    previous = {}
+    if only:
+        previous = json.load(open(args.out, encoding="utf-8"))
+        for m in previous["modes"]:
+            if m["mode"] not in only:
+                modes[m["mode"]] = m["lines"]
     seed = {
-        "version": 1,
+        "version": previous.get("version", 0) + 1 if only else 1,
         "generatedAt": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source": "OpenStreetMap via Overpass API (ODbL)",
-        "modes": [{"mode": m, "lines": modes[m]} for m in ("KRL", "MRT", "TRANSJAKARTA") if m in modes],
+        "modes": [{"mode": m, "lines": modes[m]} for m in ("KRL", "MRT", "LRT", "TRANSJAKARTA") if m in modes],
     }
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(seed, f, ensure_ascii=False, indent=1)
