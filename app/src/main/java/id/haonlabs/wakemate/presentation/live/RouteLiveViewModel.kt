@@ -28,6 +28,7 @@ import id.haonlabs.wakemate.domain.live.TjTrip
 import id.haonlabs.wakemate.domain.live.WakePreview
 import id.haonlabs.wakemate.domain.live.approachOf
 import id.haonlabs.wakemate.domain.live.nextArrival
+import id.haonlabs.wakemate.domain.live.scheduleEtas
 import id.haonlabs.wakemate.domain.live.wakePreview
 import id.haonlabs.wakemate.presentation.RouteLive
 import id.haonlabs.wakemate.presentation.TripPermissions
@@ -38,11 +39,21 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 /** [busHere] = bus searah yang sedang berada di halte ini (digambar langsung di garis waktu). */
-data class HalteRow(val halte: Halte, val next: Approach?, val busHere: LiveBus? = null)
+data class HalteRow(
+    val halte: Halte,
+    val next: Approach?,
+    /** Menit dari sekarang menurut jadwal GTFS; hanya diisi saat data live tidak bisa dipakai. */
+    val scheduleEta: Int? = null,
+    val busHere: LiveBus? = null,
+)
 
 data class BusItem(val bus: LiveBus, val distanceMeters: Float?)
 
@@ -110,6 +121,9 @@ class RouteLiveViewModel @Inject constructor(
     )
     private val userLocation = MutableStateFlow<Location?>(null)
 
+    /** Berdetak per 30 dtk supaya ETA jadwal terendah ikut dihitung ulang tanpa data baru. */
+    private val clock = MutableStateFlow(0L)
+
     // Ikut siklus layar: begitu layar ditinggal, subscription MQTT rute ini ikut dilepas.
     private val buses = feed.route(routeId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyMap())
@@ -117,6 +131,8 @@ class RouteLiveViewModel @Inject constructor(
     private val extras = combine(feed.status, watches.state, userLocation, prefs.favorites) { status, watch, location, favs ->
         Extras(status, watch, location, routeId in favs)
     }
+        // Tick jam: ETA jadwal berkurang seiring waktu walau tidak ada data yang berubah.
+        .combine(clock) { ex, _ -> ex }
 
     val state: StateFlow<RouteLiveUi> = combine(network, buses, selection, extras, ::build)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), RouteLiveUi())
@@ -130,16 +146,23 @@ class RouteLiveViewModel @Inject constructor(
         } ?: 0
         val direction = directions.getOrNull(directionIndex)
         val towardIds = direction?.let { net?.tripIdsToward(it) }.orEmpty()
+        val towardTrips = towardIds.mapNotNull { net?.tripById?.get(it) }
         val items = live.values.map { BusItem(it, ex.location?.distanceTo(it.lat, it.lng)) }
         val byDistance = compareBy<BusItem, Float?>(nullsLast()) { it.distanceMeters }.thenBy { it.bus.busNo }
         val toward = items.filter { it.bus.tripId in towardIds }.sortedWith(byDistance)
         val towardBuses = toward.map { it.bus }
+
+        // Data live tidak dipakai-able (broker menolak, jaringan jelek, atau belum ada bus) →
+        // tampilkan jadwal resmi supaya daftar halte tetap berguna. ETA live kalau ada selalu menang.
+        val scheduleFallback = ex.feed != FeedStatus.LIVE || towardBuses.isEmpty()
+        val scheduleNow = if (scheduleFallback) ZonedDateTime.now(JAKARTA) else null
 
         val halteRows = if (net == null || direction == null) emptyList() else direction.halteIds.mapNotNull { id ->
             net.halte[id]?.let { h ->
                 HalteRow(
                     halte = h,
                     next = nextArrival(towardBuses, id),
+                    scheduleEta = scheduleNow?.let { scheduleEtas(towardTrips, id, it).firstOrNull() },
                     // Halte pertama di feed tanpa ETA = bus sedang/baru di halte itu.
                     busHere = towardBuses.firstOrNull { b ->
                         b.remaining.firstOrNull()?.let { it.halteId == id && (it.etaMin ?: 0) <= 0 } == true
@@ -178,6 +201,7 @@ class RouteLiveViewModel @Inject constructor(
     init {
         viewModelScope.launch { network.value = staticSource.network() }
         viewModelScope.launch { prefs.markOpened(routeId) }
+        viewModelScope.launch { while (isActive) { delay(30_000); clock.value = System.currentTimeMillis() } }
         locate()
     }
 
@@ -267,3 +291,6 @@ private fun Location.distanceTo(lat: Double, lng: Double): Float {
     Location.distanceBetween(latitude, longitude, lat, lng, result)
     return result[0]
 }
+
+/** Semua waktu jadwal mengikuti jam operasi Transjakarta (WIB), bukan zona device. */
+private val JAKARTA = ZoneId.of("Asia/Jakarta")

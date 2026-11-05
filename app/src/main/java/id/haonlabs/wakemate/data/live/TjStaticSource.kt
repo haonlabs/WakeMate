@@ -2,6 +2,7 @@ package id.haonlabs.wakemate.data.live
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
+import id.haonlabs.wakemate.domain.live.Frequency
 import id.haonlabs.wakemate.domain.live.Halte
 import id.haonlabs.wakemate.domain.live.TjNetwork
 import id.haonlabs.wakemate.domain.live.TjRoute
@@ -43,7 +44,17 @@ class TjStaticSource @Inject constructor(
             halte = file.halte.mapValues { (id, row) ->
                 Halte(id, row[0].jsonPrimitive.content, row[1].jsonPrimitive.double, row[2].jsonPrimitive.double)
             },
-            trips = file.trips.map { TjTrip(it.id, it.route, it.head, it.name, it.stops, it.shape) },
+            trips = file.trips.map { TjTrip(
+                id = it.id,
+                routeId = it.route,
+                headsign = it.head,
+                name = it.name,
+                halteIds = it.stops,
+                shape = it.shape,
+                arrivals = it.arr,
+                days = it.days,
+                freqs = it.freq.map { f -> Frequency(f[0], f[1], f[2]) },
+            ) },
         )
     }
 
@@ -73,6 +84,10 @@ class TjStaticSource @Inject constructor(
         val name: String,
         val stops: List<String>,
         val shape: String,
+        val arr: List<Int> = emptyList(),
+        val days: Int = 0,
+        /** [mulai, selesai, headway] dalam detik; di JSON "freq" adalah list list angka. */
+        val freq: List<List<Int>> = emptyList(),
     )
 
     private companion object {

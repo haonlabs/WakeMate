@@ -23,7 +23,18 @@ data class TjTrip(
     val halteIds: List<String>,
     /** Google encoded polyline, presisi 5. */
     val shape: String,
-)
+    /** Detik tiba dari tengah malam di tiap [halteIds]; sejajar dengannya (lihat generate_tj_static.py). */
+    val arrivals: List<Int> = emptyList(),
+    /** Bitmask hari layanan: bit 0 = Senin ... bit 6 = Minggu; 0 = tidak ada jadwal aktif. */
+    val days: Int = 0,
+    /** Jendela beroperasi GTFS frequencies.txt: [mulai, selesai, headway] dalam detik dari tengah malam. */
+    val freqs: List<Frequency> = emptyList(),
+) {
+    fun runsOn(dayOfWeekNumber: Int): Boolean = days and (1 shl (dayOfWeekNumber - 1)) != 0
+}
+
+/** Satu jendela headway dari frequencies.txt GTFS, dalam detik sejak tengah malam. */
+data class Frequency(val start: Int, val end: Int, val headway: Int)
 
 class TjNetwork(
     val routes: List<TjRoute>,
