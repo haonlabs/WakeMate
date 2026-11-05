@@ -9,4 +9,4 @@ perjalanan), dua lampu amber; latar mint; kontur tinta + bayangan keras (gaya Si
 - Sumber desain: Figma "WakeMate — Redesign UI/UX", halaman `🎨 v3 Logo` (kit konsep A/B/C lengkap).
 - Di app: `res/drawable/ic_launcher_{background,foreground,monochrome}.xml` (adaptive icon + ikon bertema)
   dan `ic_stat_wakemate.xml` (siluet notifikasi). PNG mipmap lama dihapus (minSdk 26 memakai adaptive icon).
-- Screenshot Play Store di `screenshots/` dan teks listing masih menggambarkan fitur live bus (usang).
+- Screenshot Play Store terbaru: `screenshots-v3/01..08`. Folder `screenshots/` (era live bus) usang. Listing: `docs/Listing_PlayStore_WakeMate.md`.
