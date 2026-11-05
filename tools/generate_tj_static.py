@@ -7,6 +7,12 @@ GTFS parent station id, so this file has to come from the same GTFS — OSM ids 
 Shapes are simplified (Douglas-Peucker) and stored as Google encoded polylines (precision 5),
 which MapLibre's `LineString.fromPolyline` reads directly.
 
+Schedule data for the "±jadwal" fallback is stored per trip:
+- `arr`: arrival seconds from midnight at each halte (aligned with `stops`),
+- `freq`: [start_sec, end_sec, headway_sec] windows (GTFS frequencies.txt),
+- `days`: weekday bitmask (bit 0 = Monday) from calendar.txt, only for services whose
+  date range still includes the generation date — expired services get 0.
+
 Usage: python3 tools/generate_tj_static.py [--gtfs file_gtfs.zip] [-o OUT]
 """
 import argparse, csv, io, json, math, urllib.request, zipfile
@@ -14,6 +20,12 @@ from datetime import datetime, timezone
 
 GTFS_URL = "https://gtfs.transjakarta.co.id/files/file_gtfs.zip"
 SIMPLIFY_METERS = 8.0
+
+
+def hms_to_sec(value):
+    """GTFS time "HH:MM:SS" (hour may exceed 23) -> seconds from midnight."""
+    h, m, s = value.split(":")
+    return int(h) * 3600 + int(m) * 60 + int(s)
 
 
 def read(zf, name):
@@ -86,17 +98,43 @@ def main():
 
     stop_times = {}
     for st in read(zf, "stop_times.txt"):
-        stop_times.setdefault(st["trip_id"], []).append((int(st["stop_sequence"]), st["stop_id"]))
+        stop_times.setdefault(st["trip_id"], []).append(
+            (int(st["stop_sequence"]), st["stop_id"], hms_to_sec(st["arrival_time"])))
 
     shapes = {}
     for p in read(zf, "shapes.txt"):
         shapes.setdefault(p["shape_id"], []).append(
             (int(p["shape_pt_sequence"]), float(p["shape_pt_lat"]), float(p["shape_pt_lon"])))
 
+    frequencies = {}
+    for f in read(zf, "frequencies.txt"):
+        frequencies.setdefault(f["trip_id"], []).append(
+            [hms_to_sec(f["start_time"]), hms_to_sec(f["end_time"]), int(f["headway_secs"])])
+
+    # Layanan masih aktif pada tanggal pembuatan: hari yang kadaluarsa (mis. layanan khusus
+    # berakhir) tidak boleh ikut masuk mask, supaya ETA jadwal tidak muncul untuk trip mati.
+    today = datetime.now(timezone.utc).strftime("%Y%m%d")
+    day_names = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+    service_days = {}
+    for c in read(zf, "calendar.txt"):
+        if c["start_date"] <= today <= c["end_date"]:
+            service_days[c["service_id"]] = sum(
+                1 << i for i, name in enumerate(day_names) if c[name] == "1")
+
     trips, used_halte, routes_with_trips = [], set(), set()
     for t in read(zf, "trips.txt"):
-        seq = [parent.get(sid, sid) for _, sid in sorted(stop_times.get(t["trip_id"], []))]
-        halte = [h for i, h in enumerate(seq) if i == 0 or h != seq[i - 1]]
+        rows = sorted(stop_times.get(t["trip_id"], []))
+        if not rows:
+            continue
+        seq = [parent.get(sid, sid) for _, sid, _ in rows]
+        # Halte berurutan yang sama digabung (halte besar = expand pelan-pelan di data live);
+        # waktu yang dipakai adalah tiba pertama pada deretan halte berulang itu.
+        halte, arr = [], []
+        for (_, _, sec_val), station in zip(rows, seq):
+            if halte and halte[-1] == station:
+                continue
+            halte.append(station)
+            arr.append(sec_val)
         if len(halte) < 2:
             continue
         pts = [(lat, lng) for _, lat, lng in sorted(shapes.get(t["shape_id"], []))]
@@ -106,6 +144,9 @@ def main():
             "head": t["trip_headsign"],
             "name": t["trip_short_name"],
             "stops": halte,
+            "arr": arr,
+            "days": service_days.get(t["service_id"], 0),
+            "freq": frequencies.get(t["trip_id"], []),
             "shape": encode_polyline(simplify(pts, SIMPLIFY_METERS)) if len(pts) >= 2 else "",
         })
         used_halte.update(halte)

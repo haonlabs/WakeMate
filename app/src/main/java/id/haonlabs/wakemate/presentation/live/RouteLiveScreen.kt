@@ -25,10 +25,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -49,6 +46,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
@@ -56,6 +57,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -74,15 +76,39 @@ import id.haonlabs.wakemate.presentation.components.CircleIconButton
 import id.haonlabs.wakemate.presentation.components.IconBadge
 import id.haonlabs.wakemate.presentation.components.InfoRow
 import id.haonlabs.wakemate.presentation.components.PillChip
+import id.haonlabs.wakemate.presentation.components.PosterButton
 import id.haonlabs.wakemate.presentation.components.SectionLabel
 import id.haonlabs.wakemate.presentation.components.SegmentedControl
+import id.haonlabs.wakemate.presentation.components.StatusPill
 import id.haonlabs.wakemate.presentation.components.TimelineRow
 import id.haonlabs.wakemate.presentation.components.TimelineStatus
+import id.haonlabs.wakemate.presentation.components.posterBorder
+import id.haonlabs.wakemate.presentation.components.posterShadow
+import id.haonlabs.wakemate.ui.theme.Wake
+import id.haonlabs.wakemate.ui.theme.enterIn
+import id.haonlabs.wakemate.ui.theme.popIn
 import kotlinx.coroutines.launch
 
 private val PEEK = 400.dp
 private val ONBOARD_LEADS = listOf(LiveLead.Stops(1), LiveLead.Stops(2), LiveLead.Stops(3), LiveLead.Minutes(3), LiveLead.Minutes(5))
 private val ARRIVAL_LEADS = listOf(LiveLead.Minutes(3), LiveLead.Minutes(5), LiveLead.Minutes(10), LiveLead.Stops(1), LiveLead.Stops(2))
+
+/** Border poster di tepi atas dan samping sheet — tepi bawah menempel nav bar, tak perlu garis. */
+@Composable
+private fun Modifier.topSideBorder(cornerRadius: Dp, color: Color = Wake.colors.border): Modifier = drawBehind {
+    val width = 2.5.dp.toPx()
+    val inset = width / 2f
+    val r = cornerRadius.toPx()
+    val path = Path().apply {
+        moveTo(inset, size.height)
+        lineTo(inset, r)
+        quadraticTo(inset, 0f, inset + r, 0f)
+        lineTo(size.width - inset - r, 0f)
+        quadraticTo(size.width - inset, 0f, size.width - inset, r)
+        lineTo(size.width - inset, size.height)
+    }
+    drawPath(path, color, style = Stroke(width))
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -145,14 +171,15 @@ fun RouteLiveScreen(
         BottomSheetScaffold(
             scaffoldState = scaffold,
             sheetPeekHeight = PEEK,
-            sheetShape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-            sheetContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+            sheetShape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
+            sheetContainerColor = MaterialTheme.colorScheme.background,
+            sheetTonalElevation = 0.dp,
             sheetSwipeEnabled = !choosing,
-            sheetDragHandle = { BottomSheetDefaults.DragHandle(color = MaterialTheme.colorScheme.outline) },
+            sheetDragHandle = { BottomSheetDefaults.DragHandle(color = Wake.colors.border) },
             sheetContent = {
                 val bottomInset = if (state.mode is SheetMode.Boarding) panelHeight + 16.dp else 24.dp
                 LazyColumn(
-                    Modifier.fillMaxWidth().heightIn(max = sheetMax),
+                    Modifier.fillMaxWidth().heightIn(max = sheetMax).topSideBorder(32.dp),
                     state = listState,
                     contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = bottomInset),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -257,15 +284,20 @@ private fun TopOverlay(state: RouteLiveUi, onBack: () -> Unit, onFavorite: () ->
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         CircleIconButton(R.drawable.ic_arrow_back, "Kembali", onBack)
-        Surface(shape = CircleShape, color = MaterialTheme.colorScheme.surfaceContainer, shadowElevation = 2.dp, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) {
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.surfaceContainer,
+            border = posterBorder(),
+            modifier = Modifier.weight(1f).heightIn(min = 48.dp).enterIn(0, fromY = (-40).dp).posterShadow(CircleShape, 3.dp),
+        ) {
             Row(Modifier.padding(start = 6.dp, end = 16.dp, top = 6.dp, bottom = 6.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 state.route?.let { RouteBadge(it) }
                 Column(Modifier.weight(1f)) {
                     Text(state.route?.longName.orEmpty(), style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     val (text, color) = when (state.feed) {
                         FeedStatus.LIVE -> "Live · ${state.buses.size} bus" to MaterialTheme.colorScheme.primary
-                        FeedStatus.OFFLINE -> "Data live tidak tersedia" to MaterialTheme.colorScheme.error
-                        FeedStatus.UNAVAILABLE -> "Live Transjakarta sedang tidak tersedia" to MaterialTheme.colorScheme.error
+                        FeedStatus.OFFLINE -> "Data live tidak tersedia · menampilkan jadwal" to MaterialTheme.colorScheme.error
+                        FeedStatus.UNAVAILABLE -> "Live Transjakarta tidak tersedia · menampilkan jadwal" to MaterialTheme.colorScheme.error
                         else -> "Menghubungkan..." to MaterialTheme.colorScheme.onSurfaceVariant
                     }
                     Text(text, style = MaterialTheme.typography.labelSmall, color = color)
@@ -346,24 +378,19 @@ private fun androidx.compose.foundation.lazy.LazyListScope.browseItems(
     }
     item(key = "aksi") {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Button(
+            PosterButton(
+                label = "Saya di bus ini",
                 onClick = onPickBus,
                 enabled = state.towardBuses.isNotEmpty() || state.buses.isNotEmpty(),
-                shape = RoundedCornerShape(18.dp),
-                contentPadding = PaddingValues(vertical = 16.dp),
                 modifier = Modifier.weight(1f),
-            ) { Text("Saya di bus ini", style = MaterialTheme.typography.titleSmall) }
-            FilledTonalButton(
+            )
+            PosterButton(
+                label = "Tunggu di halte",
                 onClick = onWaitAtHalte,
-                // Tonal bawaan memakai secondaryContainer, yang di tema ini warna alarm.
-                colors = ButtonDefaults.filledTonalButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
-                ),
-                shape = RoundedCornerShape(18.dp),
-                contentPadding = PaddingValues(vertical = 16.dp),
+                container = MaterialTheme.colorScheme.surfaceContainer,
+                content = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.weight(1f),
-            ) { Text("Tunggu di halte", style = MaterialTheme.typography.titleSmall) }
+            )
         }
     }
     hint?.let { item(key = "petunjuk") { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) } }
@@ -373,8 +400,8 @@ private fun androidx.compose.foundation.lazy.LazyListScope.browseItems(
             name = row.halte.name,
             status = if (row.busHere != null) TimelineStatus.BUS_HERE else TimelineStatus.DEFAULT,
             lineColor = routeColor,
-            eta = row.next?.etaLabel(),
-            detail = row.busHere?.busNo ?: row.next?.bus?.busNo,
+            eta = row.next?.etaLabel() ?: row.scheduleEta?.let { "±$it mnt" },
+            detail = row.busHere?.busNo ?: row.next?.bus?.busNo ?: "jadwal".takeIf { row.scheduleEta != null },
             isFirst = i == 0,
             isLast = i == state.halte.lastIndex,
             onClick = { onHalte(row.halte) },
@@ -425,20 +452,14 @@ private fun androidx.compose.foundation.lazy.LazyListScope.pickBusItems(
         val best = index == 0 && item.distanceMeters != null
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             if (best) {
-                Row(
-                    Modifier.padding(start = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    Icon(painterResource(R.drawable.ic_check), null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(0.dp))
-                    Text("PALING MUNGKIN", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-                }
+                StatusPill("PALING MUNGKIN", Modifier.padding(start = 4.dp), color = Wake.colors.live)
             }
             BusCard(
                 busNo = item.bus.busNo,
                 info = listOf(item.bus.busType, "ke ${item.bus.headsign}").filter { it.isNotBlank() }.joinToString(" · "),
                 distance = item.distanceMeters?.let(::formatDistance),
                 highlighted = best,
+                modifier = Modifier.enterIn(index + 2, fromX = 96.dp, fromY = 0.dp),
                 onClick = { onBusChosen(item.bus.busNo) },
             )
         }
@@ -476,6 +497,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.boardingItems(
             name = row.halte.name,
             status = if (isDest) TimelineStatus.DESTINATION else TimelineStatus.DEFAULT,
             lineColor = routeColor,
+            modifier = Modifier.enterIn(i + 2),
             eta = row.next?.etaLabel(),
             isFirst = i == 0,
             isLast = i == state.boardingStops.lastIndex,
@@ -491,7 +513,7 @@ private fun SheetHeader(title: String, subtitle: String, onBack: () -> Unit) {
             Icon(painterResource(R.drawable.ic_arrow_back), contentDescription = "Kembali")
         }
         Column(Modifier.weight(1f).padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(title, style = MaterialTheme.typography.titleLarge)
+            Text(title, style = MaterialTheme.typography.headlineSmall)
             Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
@@ -508,10 +530,10 @@ private const val BOARDING_HEADER_ITEMS = 1
 @Composable
 private fun BoardingPanel(state: RouteLiveUi, onLead: (LiveLead) -> Unit, onStart: () -> Unit, modifier: Modifier = Modifier) {
     Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-        color = MaterialTheme.colorScheme.surfaceContainer,
-        shadowElevation = 12.dp,
+        modifier = modifier.fillMaxWidth().enterIn(0, fromY = 120.dp),
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        border = posterBorder(),
     ) {
         val destination = state.destination
         if (destination == null) {
@@ -544,18 +566,12 @@ private fun BoardingPanel(state: RouteLiveUi, onLead: (LiveLead) -> Unit, onStar
                 iconTint = MaterialTheme.colorScheme.secondary,
                 container = MaterialTheme.colorScheme.secondaryContainer,
             )
-            Button(
+            PosterButton(
+                label = "Pasang alarm · ${destination.name}",
                 onClick = onStart,
-                shape = RoundedCornerShape(18.dp),
-                contentPadding = PaddingValues(vertical = 18.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary,
-                ),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text("Pasang alarm · ${destination.name}", style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            }
+                container = MaterialTheme.colorScheme.secondary,
+                content = MaterialTheme.colorScheme.onSecondary,
+            )
         }
     }
 }
@@ -567,30 +583,53 @@ private fun ArrivalSheet(halte: Halte, state: RouteLiveUi, onDismiss: () -> Unit
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
+        containerColor = MaterialTheme.colorScheme.background,
+        tonalElevation = 0.dp,
+        dragHandle = { BottomSheetDefaults.DragHandle(color = Wake.colors.border) },
     ) {
-        Column(Modifier.navigationBarsPadding().padding(start = 16.dp, end = 16.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Column(
+            Modifier.topSideBorder(32.dp).navigationBarsPadding().padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("Ingatkan saat bus tiba di ${halte.name}", style = MaterialTheme.typography.titleLarge)
+                Text("Ingatkan saat bus tiba di ${halte.name}", style = MaterialTheme.typography.headlineSmall)
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     state.route?.let { RouteBadge(it) }
                     Text("Ke ${state.direction?.headsign.orEmpty()}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
-            val next = state.halte.firstOrNull { it.halte.id == halte.id }?.next
+            val row = state.halte.firstOrNull { it.halte.id == halte.id }
+            val next = row?.next
             Row(
                 Modifier.fillMaxWidth().padding(0.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Surface(shape = RoundedCornerShape(18.dp), color = MaterialTheme.colorScheme.surfaceContainer, modifier = Modifier.fillMaxWidth()) {
+                val cardShape = RoundedCornerShape(22.dp)
+                Surface(
+                    shape = cardShape,
+                    color = MaterialTheme.colorScheme.surfaceContainer,
+                    border = posterBorder(),
+                    modifier = Modifier.fillMaxWidth().posterShadow(cardShape, 3.dp).popIn(150),
+                ) {
                     Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         IconBadge(R.drawable.ic_mode_tj, size = 40.dp)
                         Column(Modifier.weight(1f)) {
                             Text("Bus berikutnya", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text(next?.bus?.busNo ?: "Belum ada yang menuju ke sini", style = MaterialTheme.typography.titleSmall)
+                            Text(
+                                next?.bus?.busNo ?: if (row?.scheduleEta != null) "menurut jadwal" else "Belum ada yang menuju ke sini",
+                                style = MaterialTheme.typography.titleSmall,
+                            )
                         }
                         next?.let { Text(it.etaLabel(), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary) }
+                            ?: row?.scheduleEta?.let {
+                                Text(
+                                    "±$it mnt",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
                     }
                 }
             }
@@ -601,12 +640,7 @@ private fun ArrivalSheet(halte: Halte, state: RouteLiveUi, onDismiss: () -> Unit
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.outline,
             )
-            Button(
-                onClick = { onStart(lead) },
-                shape = RoundedCornerShape(18.dp),
-                contentPadding = PaddingValues(vertical = 18.dp),
-                modifier = Modifier.fillMaxWidth(),
-            ) { Text("Pasang pengingat", style = MaterialTheme.typography.titleMedium) }
+            PosterButton(label = "Pasang pengingat", onClick = { onStart(lead) }, modifier = Modifier.fillMaxWidth())
             TextButton(onClick = onDismiss, modifier = Modifier.align(Alignment.CenterHorizontally)) { Text("Batal") }
         }
     }
