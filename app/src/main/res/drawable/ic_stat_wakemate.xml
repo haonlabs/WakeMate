@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ikon status bar: siluet putih, mengikuti bentuk pin di ikon aplikasi supaya notifikasi
-     dan peluncur terbaca sebagai satu identitas. -->
+<!-- Ikon status bar: siluet putih gerbong "Jendela Kereta" (sama dengan ikon aplikasi), jendela dan
+     lampu dilubangi. Gambar 108x108 dipadatkan ke 24dp: gerbong (52x56) diskalakan 0,393 dan
+     dipusatkan. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
-    android:viewportWidth="512"
-    android:viewportHeight="512"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
     android:tint="#FFFFFF">
     <group
-        android:pivotX="256"
-        android:pivotY="250"
-        android:scaleX="1.8"
-        android:scaleY="1.8"
-        android:translateY="6">
+        android:scaleX="0.393"
+        android:scaleY="0.393"
+        android:translateX="-9.2"
+        android:translateY="-9.2">
         <path
             android:fillColor="@android:color/white"
             android:fillType="evenOdd"
-            android:pathData="M256,122 C198,122 152,168 152,226 C152,278 206,338 245.5,373.2 C251.5,378.5 260.5,378.5 266.5,373.2 C306,338 360,278 360,226 C360,168 314,122 256,122 Z M276,182 C241.5,182 215,208.5 215,243 C215,268 229.5,289.5 251,299 C244,290 239.5,278.5 239.5,266 C239.5,236 264,211.5 294,211.5 C301.5,211.5 308.5,213 315,215.8 C306,195.8 292.5,182 276,182 Z" />
+            android:pathData="M41,26H67a13,13 0 0 1 13,13V69a13,13 0 0 1 -13,13H41a13,13 0 0 1 -13,-13V39a13,13 0 0 1 13,-13ZM42,33a7,7 0 0 0 -7,7V51a7,7 0 0 0 7,7H66a7,7 0 0 0 7,-7V40a7,7 0 0 0 -7,-7ZM35.3,69a4.2,4.2 0 1,0 8.4,0a4.2,4.2 0 1,0 -8.4,0ZM64.3,69a4.2,4.2 0 1,0 8.4,0a4.2,4.2 0 1,0 -8.4,0Z" />
     </group>
 </vector>

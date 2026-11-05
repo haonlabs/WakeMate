@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="midnight">#051426</color>
+    <!-- Tinta Signal Pop: latar jendela dan splash, sama dengan background tema gelap Compose. -->
+    <color name="window_ink">#14110F</color>
 </resources>

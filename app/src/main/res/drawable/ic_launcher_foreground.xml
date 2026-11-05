@@ -1,127 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Muka adaptive icon dari design/stitch/app-icon.svg.
-     Orbit putus-putus di sumbernya dilewati: VectorDrawable tidak mengenal stroke-dasharray,
-     dan pada ukuran peluncur garis itu memang tidak terlihat.
-     Grup pembungkus mengecilkan dan memusatkan karya ke zona aman 66%. -->
+<!-- Muka adaptive icon "Jendela Kereta": gerbong tampak depan, di jendelanya bulan dan "z"
+     (tidur di perjalanan), dua lampu amber. Gaya Signal Pop: kontur tinta + bayangan keras.
+     Grup mengecilkan karya ke 92% di sekitar titik tengah supaya sudut bayangan tidak terpotong
+     mask bulat (zona aman 66% = radius 33; setelah 92% titik terjauh ±34 dari tengah, masih di
+     dalam area terlihat radius 36). -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
-    android:viewportWidth="512"
-    android:viewportHeight="512">
-
+    android:viewportWidth="108"
+    android:viewportHeight="108">
     <group
-        android:pivotX="266"
-        android:pivotY="267"
-        android:scaleX="0.9"
-        android:scaleY="0.9"
-        android:translateX="-10"
-        android:translateY="-11">
+        android:pivotX="54"
+        android:pivotY="54"
+        android:scaleX="0.92"
+        android:scaleY="0.92">
 
-        <!-- Badan pin -->
-        <path android:pathData="M256,122 C198,122 152,168 152,226 C152,278 206,338 245.5,373.2 C251.5,378.5 260.5,378.5 266.5,373.2 C306,338 360,278 360,226 C360,168 314,122 256,122 Z">
-            <aapt:attr name="android:fillColor">
-                <gradient
-                    android:type="linear"
-                    android:startX="193.6"
-                    android:startY="147.6"
-                    android:endX="318.4"
-                    android:endY="378"
-                    android:startColor="#2DD4BF"
-                    android:centerColor="#14B8A6"
-                    android:endColor="#0D9488" />
-            </aapt:attr>
-        </path>
+        <!-- Bayangan keras -->
+        <path
+            android:fillColor="#14110F"
+            android:pathData="M44.2,29.2H70.2a13,13 0 0 1 13,13V72.2a13,13 0 0 1 -13,13H44.2a13,13 0 0 1 -13,-13V42.2a13,13 0 0 1 13,-13Z" />
 
-        <!-- Cakram dalam pin: jendela malam -->
-        <path android:pathData="M188,226 a68,68 0 1,0 136,0 a68,68 0 1,0 -136,0 Z">
-            <aapt:attr name="android:fillColor">
-                <gradient
-                    android:type="linear"
-                    android:startX="188"
-                    android:startY="158"
-                    android:endX="324"
-                    android:endY="294"
-                    android:startColor="#071E33"
-                    android:endColor="#041220" />
-            </aapt:attr>
-        </path>
+        <!-- Badan gerbong -->
+        <path
+            android:fillColor="#FFF3DC"
+            android:strokeColor="#14110F"
+            android:strokeWidth="3.2"
+            android:strokeLineJoin="round"
+            android:pathData="M41,26H67a13,13 0 0 1 13,13V69a13,13 0 0 1 -13,13H41a13,13 0 0 1 -13,-13V39a13,13 0 0 1 13,-13Z" />
+
+        <!-- Kaca depan: langit malam -->
+        <path
+            android:fillColor="#14110F"
+            android:pathData="M42,33H66a7,7 0 0 1 7,7V51a7,7 0 0 1 -7,7H42a7,7 0 0 1 -7,-7V40a7,7 0 0 1 7,-7Z" />
 
         <!-- Bulan sabit -->
         <path
-            android:pathData="M276,182 C241.5,182 215,208.5 215,243 C215,268 229.5,289.5 251,299 C244,290 239.5,278.5 239.5,266 C239.5,236 264,211.5 294,211.5 C301.5,211.5 308.5,213 315,215.8 C306,195.8 292.5,182 276,182 Z"
-            android:fillColor="#E2E8F0"
-            android:fillAlpha="0.95" />
+            android:fillColor="#FFF3DC"
+            android:pathData="M52,37.5a8.5,8.5 0 1 0 7.6,12.6a7,7 0 0 1 -7.6,-12.6z" />
 
+        <!-- "z" tidur -->
         <path
-            android:pathData="M230,250 C235,257 245,257 250,250"
-            android:strokeColor="#94A3B8"
-            android:strokeWidth="3"
-            android:strokeLineCap="round"
-            android:strokeAlpha="0.6" />
-
-        <!-- Motif Z tidur -->
-        <path
-            android:pathData="M270,236 L282,236 L270,250 L282,250"
-            android:strokeColor="#67E8F9"
-            android:strokeWidth="3.5"
+            android:strokeColor="#FFB020"
+            android:strokeWidth="1.9"
             android:strokeLineCap="round"
             android:strokeLineJoin="round"
-            android:strokeAlpha="0.75" />
-        <path
-            android:pathData="M288,220 L297,220 L288,230 L297,230"
-            android:strokeColor="#67E8F9"
-            android:strokeWidth="2.5"
-            android:strokeLineCap="round"
-            android:strokeLineJoin="round"
-            android:strokeAlpha="0.6" />
+            android:pathData="M61,38h5l-5,5h5" />
 
-        <!-- Gelombang alert -->
+        <!-- Lampu -->
         <path
-            android:pathData="M334,148 C348,162 355,178 357,194"
-            android:strokeColor="#F59E0B"
-            android:strokeWidth="5"
-            android:strokeLineCap="round"
-            android:strokeAlpha="0.9" />
+            android:fillColor="#FFB020"
+            android:strokeColor="#14110F"
+            android:strokeWidth="2.4"
+            android:pathData="M35.3,69a4.2,4.2 0 1,0 8.4,0a4.2,4.2 0 1,0 -8.4,0Z" />
         <path
-            android:pathData="M349,133 C369,153 378,174 380,196"
-            android:strokeColor="#F59E0B"
-            android:strokeWidth="4"
-            android:strokeLineCap="round"
-            android:strokeAlpha="0.55" />
-
-        <!-- Kilau bangun -->
-        <path android:pathData="M320,144 C320,154 328,160 338,160 C328,160 320,166 320,176 C320,166 312,160 302,160 C312,160 320,154 320,144 Z">
-            <aapt:attr name="android:fillColor">
-                <gradient
-                    android:type="linear"
-                    android:startX="302"
-                    android:startY="144"
-                    android:endX="338"
-                    android:endY="176"
-                    android:startColor="#FDE047"
-                    android:centerColor="#F59E0B"
-                    android:endColor="#EA580C" />
-            </aapt:attr>
-        </path>
-        <path
-            android:pathData="M345.5,125 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0 Z"
-            android:fillColor="#FDE047" />
-
-        <!-- Titik stasiun tujuan di kaki pin -->
-        <path
-            android:pathData="M214,404 a42,10 0 1,0 84,0 a42,10 0 1,0 -84,0 Z"
-            android:fillColor="#051220"
-            android:fillAlpha="0.5" />
-        <path
-            android:pathData="M232,402 a24,6 0 1,0 48,0 a24,6 0 1,0 -48,0 Z"
-            android:fillColor="#14B8A6"
-            android:fillAlpha="0.35" />
-        <path
-            android:pathData="M249,402 a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 Z"
-            android:fillColor="#F59E0B" />
-        <path
-            android:pathData="M252.5,402 a3.5,3.5 0 1,0 7,0 a3.5,3.5 0 1,0 -7,0 Z"
-            android:fillColor="#FEF3C7" />
+            android:fillColor="#FFB020"
+            android:strokeColor="#14110F"
+            android:strokeWidth="2.4"
+            android:pathData="M64.3,69a4.2,4.2 0 1,0 8.4,0a4.2,4.2 0 1,0 -8.4,0Z" />
     </group>
 </vector>
