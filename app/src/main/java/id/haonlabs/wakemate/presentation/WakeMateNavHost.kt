@@ -136,7 +136,7 @@ fun WakeMateNavHost(
                                 selected = destination?.hasRoute<Home>() == true,
                                 onClick = { navController.switchTab(Home) },
                                 icon = { Icon(painterResource(R.drawable.ic_alarm), contentDescription = null) },
-                                label = { Text("Alarm GPS", style = MaterialTheme.typography.labelLarge) },
+                                label = { Text("Bangunin", style = MaterialTheme.typography.labelLarge) },
                                 colors = colors,
                             )
                         }

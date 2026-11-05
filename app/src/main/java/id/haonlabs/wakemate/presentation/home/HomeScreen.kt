@@ -47,7 +47,7 @@ import id.haonlabs.wakemate.presentation.iconRes
 import id.haonlabs.wakemate.ui.theme.SignalYellow
 import id.haonlabs.wakemate.ui.theme.enterIn
 
-/** GPS1: alarm berbasis GPS ponsel untuk KRL, MRT, LRT, dan koridor BRT — bekerja tanpa internet. */
+/** GPS1 ("Bangunin"): alarm berbasis GPS ponsel untuk KRL, MRT, LRT, dan koridor BRT — bekerja tanpa internet. */
 @Composable
 fun HomeScreen(
     onStationSelected: (Station) -> Unit,
@@ -138,14 +138,14 @@ private fun Header(onOpenDiagnostics: () -> Unit, modifier: Modifier = Modifier)
     Column(modifier.enterIn(0), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                StatusPill("WAKEMATE", color = SignalYellow)
-                Text("Alarm GPS", style = MaterialTheme.typography.displaySmall)
+                StatusPill("BANGUNIN", color = SignalYellow)
+                Text("Mau turun\ndi mana?", style = MaterialTheme.typography.displaySmall)
             }
             // Alat ukur internal; tidak dimunculkan di rilis.
             if (BuildConfig.DEBUG) TextButton(onClick = onOpenDiagnostics) { Text("Audio") }
         }
         Text(
-            "Untuk KRL, MRT, LRT, dan koridor BRT. Bekerja tanpa internet — posisimu dibaca dari GPS ponsel.",
+            "Tidur aja, nanti kami bangunin sebelum sampai. Untuk KRL, MRT, LRT, dan koridor BRT — jalan tanpa internet, pakai GPS ponselmu.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

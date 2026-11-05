@@ -236,8 +236,8 @@ private fun HalteSheet(
                 )
                 state.alarmResolved -> InfoRow(
                     R.drawable.ic_bell,
-                    title = "Alarm GPS belum tersedia untuk $unit ini",
-                    subtitle = "Alarm GPS mencakup KRL, MRT, LRT, dan koridor BRT.",
+                    title = "Bangunin belum tersedia untuk $unit ini",
+                    subtitle = "Bangunin mencakup KRL, MRT, LRT, dan koridor BRT.",
                     iconTint = MaterialTheme.colorScheme.outline,
                 )
             }
