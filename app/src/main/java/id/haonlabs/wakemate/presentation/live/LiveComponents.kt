@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import id.haonlabs.wakemate.domain.live.TjRoute
 import id.haonlabs.wakemate.presentation.components.posterBorder
 
@@ -34,6 +35,26 @@ fun RouteBadge(route: TjRoute, modifier: Modifier = Modifier) {
             textAlign = TextAlign.Center,
             maxLines = 1,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+        )
+    }
+}
+
+/** Lencana rute versi kecil untuk kartu padat (daftar "Sekitar Saya"). */
+@Composable
+fun RouteBadgeSmall(route: TjRoute, modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier.widthIn(min = 32.dp),
+        shape = RoundedCornerShape(8.dp),
+        color = parseRouteColor(route.color, MaterialTheme.colorScheme.primaryContainer),
+        contentColor = parseRouteColor(route.textColor, Color.Black),
+        border = posterBorder(2.dp),
+    ) {
+        Text(
+            route.shortName,
+            style = MaterialTheme.typography.titleSmall.copy(fontSize = 11.sp),
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
         )
     }
 }

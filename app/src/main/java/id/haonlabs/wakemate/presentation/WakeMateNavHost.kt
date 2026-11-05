@@ -44,6 +44,7 @@ import id.haonlabs.wakemate.presentation.components.AlarmBar
 import id.haonlabs.wakemate.presentation.diagnostics.AudioRoutingScreen
 import id.haonlabs.wakemate.presentation.home.HomeScreen
 import id.haonlabs.wakemate.presentation.live.LiveRoutesScreen
+import id.haonlabs.wakemate.presentation.live.NearbyScreen
 import id.haonlabs.wakemate.presentation.live.RouteLiveScreen
 import id.haonlabs.wakemate.presentation.trip.ActiveTripScreen
 import id.haonlabs.wakemate.presentation.trip.TripSetupScreen
@@ -54,6 +55,10 @@ import kotlinx.serialization.Serializable
 private val Landing = androidx.compose.animation.core.CubicBezierEasing(0.2f, 0.9f, 0.3f, 1f)
 private val SLIDE = tween<androidx.compose.ui.unit.IntOffset>(durationMillis = 340, easing = Landing)
 private val FADE = tween<Float>(durationMillis = 220, easing = FastOutSlowInEasing)
+
+/** Tab "Sekitar": halte/stasiun terdekat dari lokasi user. */
+@Serializable
+object Nearby
 
 @Serializable
 object LiveRoutes
@@ -89,7 +94,7 @@ fun WakeMateNavHost(
 
     val backStack by navController.currentBackStackEntryAsState()
     val destination = backStack?.destination
-    val onTab = destination?.hasRoute<LiveRoutes>() == true || destination?.hasRoute<Home>() == true
+    val onTab = destination?.hasRoute<Nearby>() == true || destination?.hasRoute<LiveRoutes>() == true || destination?.hasRoute<Home>() == true
 
     Box(Modifier.fillMaxSize()) {
         // Insets diurus tiap layar sendiri; Scaffold ini hanya menyisakan ruang untuk bar bawah.
@@ -126,6 +131,13 @@ fun WakeMateNavHost(
                                 unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             NavigationBarItem(
+                                selected = destination?.hasRoute<Nearby>() == true,
+                                onClick = { navController.switchTab(Nearby) },
+                                icon = { Icon(painterResource(R.drawable.ic_place), contentDescription = null) },
+                                label = { Text("Sekitar", style = MaterialTheme.typography.labelLarge) },
+                                colors = colors,
+                            )
+                            NavigationBarItem(
                                 selected = destination?.hasRoute<LiveRoutes>() == true,
                                 onClick = { navController.switchTab(LiveRoutes) },
                                 icon = { Icon(painterResource(R.drawable.ic_map), contentDescription = null) },
@@ -148,13 +160,20 @@ fun WakeMateNavHost(
             // muncul begitu saja terasa seperti aplikasi yang tersendat.
             NavHost(
                 navController = navController,
-                startDestination = LiveRoutes,
+                startDestination = Nearby,
                 modifier = Modifier.padding(padding),
                 enterTransition = { slideInHorizontally(SLIDE) { it / 5 } + fadeIn(FADE) },
                 exitTransition = { slideOutHorizontally(SLIDE) { -it / 8 } + fadeOut(FADE) },
                 popEnterTransition = { slideInHorizontally(SLIDE) { -it / 8 } + fadeIn(FADE) },
                 popExitTransition = { slideOutHorizontally(SLIDE) { it / 5 } + fadeOut(FADE) },
             ) {
+                composable<Nearby> {
+                    NearbyScreen(
+                        onOpenRoute = { navController.navigate(RouteLive(it)) },
+                        onWakeAt = { stationId, lineId -> navController.navigate(TripSetup(stationId, lineId)) },
+                        onBrowseRoutes = { navController.switchTab(LiveRoutes) },
+                    )
+                }
                 composable<LiveRoutes> {
                     LiveRoutesScreen(onRouteSelected = { navController.navigate(RouteLive(it)) })
                 }

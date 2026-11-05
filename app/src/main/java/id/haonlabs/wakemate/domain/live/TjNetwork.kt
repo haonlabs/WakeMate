@@ -50,6 +50,20 @@ class TjNetwork(
     val tripById: Map<String, TjTrip> = trips.associateBy { it.id }
     private val tripsByRoute: Map<String, List<TjTrip>> = trips.groupBy { it.routeId }
 
+    /** Trip yang melewati tiap halte/stasiun (id halte -> trip). Dihitung sekali, dipakai fitur "Sekitar". */
+    val tripsByHalte: Map<String, List<TjTrip>> by lazy {
+        val index = HashMap<String, MutableList<TjTrip>>()
+        for (trip in tripById.values) for (id in trip.halteIds.distinct()) index.getOrPut(id) { ArrayList() }.add(trip)
+        index
+    }
+
+    private val routeOrder: Map<String, Int> = routes.withIndex().associate { (i, r) -> r.id to i }
+
+    /** Rute yang melewati [halteId], urutan sama dengan daftar rute (rel dulu, lalu BRT, dst.). */
+    fun routesAt(halteId: String): List<TjRoute> =
+        tripsByHalte[halteId].orEmpty().map { it.routeId }.distinct()
+            .mapNotNull { routeById[it] }.sortedBy { routeOrder[it.id] ?: Int.MAX_VALUE }
+
     /**
      * Semua varian trip searah [direction]. Halte BRT dipakai dua arah dengan id yang sama, jadi
      * arah bus harus dikenali dari trip-nya, bukan dari halte yang akan dilewatinya.

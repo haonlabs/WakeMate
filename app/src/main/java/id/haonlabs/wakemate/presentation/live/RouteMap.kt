@@ -39,8 +39,8 @@ import org.maplibre.geojson.LineString
 import org.maplibre.geojson.Point
 
 /** Style gratis tanpa API key, berbasis data OpenStreetMap; gelap/terang mengikuti tema. */
-private const val STYLE_DARK = "https://tiles.openfreemap.org/styles/dark"
-private const val STYLE_LIGHT = "https://tiles.openfreemap.org/styles/positron"
+internal const val STYLE_DARK = "https://tiles.openfreemap.org/styles/dark"
+internal const val STYLE_LIGHT = "https://tiles.openfreemap.org/styles/positron"
 
 /** Permintaan memindah kamera; [id] baru memicu ulang walau koordinatnya sama (tombol lokasiku). */
 data class CameraTarget(val lat: Double, val lng: Double, val zoom: Double = 15.0, val id: Long = 0)

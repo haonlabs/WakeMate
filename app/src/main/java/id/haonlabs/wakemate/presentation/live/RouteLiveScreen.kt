@@ -75,7 +75,7 @@ private val PEEK = 400.dp
 
 /** Border poster di tepi atas dan samping sheet — tepi bawah menempel nav bar, tak perlu garis. */
 @Composable
-private fun Modifier.topSideBorder(cornerRadius: Dp, color: Color = Wake.colors.border): Modifier = drawBehind {
+internal fun Modifier.topSideBorder(cornerRadius: Dp, color: Color = Wake.colors.border): Modifier = drawBehind {
     val width = 2.5.dp.toPx()
     val inset = width / 2f
     val r = cornerRadius.toPx()
