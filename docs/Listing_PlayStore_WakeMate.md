@@ -92,7 +92,7 @@ PRIVASI
 
 • Lokasimu diproses di dalam ponsel dan tidak dikirim WakeMate ke mana pun
 • Lokasi hanya dipakai saat aplikasi terbuka atau saat alarm perjalanan aktif
-• Internet hanya untuk gambar peta
+• Internet hanya untuk gambar peta (OpenFreeMap). Di tab Sekitar, area peta yang diunduh ada di sekitar posisimu
 • Tanpa akun, tanpa iklan, tanpa analitik, tanpa pelacakan
 • Notifikasi selalu terlihat selama alarm aktif, jadi kamu tahu persis kapan WakeMate bekerja
 
@@ -113,8 +113,8 @@ Data KRL: KRL Commuter Line GTFS data compiled and verified by Open-KRL (CC-BY 4
 ## Release name
 
 Hanya terlihat olehmu di Play Console. Batas 50 karakter. Biarkan default `versionName (versionCode)`
-supaya cocok dengan berkas `.aab`. Saat ini `app/build.gradle.kts` berisi `1.1 (3)`; setiap unggahan
-baru wajib memakai `versionCode` lebih tinggi.
+supaya cocok dengan berkas `.aab`. Rilis ini: `1.2 (4)`. `1.1 (3)` sudah pernah diajukan ke Play (ditolak soal feature graphic,
+banding diajukan 12 Okt), jadi `versionCode` wajib naik.
 
 ---
 
