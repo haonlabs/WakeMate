@@ -4,27 +4,33 @@ import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -35,19 +41,31 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import id.haonlabs.wakemate.R
 import id.haonlabs.wakemate.domain.model.AlertThreshold
+import id.haonlabs.wakemate.domain.model.TransitMode
 import id.haonlabs.wakemate.presentation.TripPermissions
 import id.haonlabs.wakemate.presentation.components.CircleIconButton
 import id.haonlabs.wakemate.presentation.components.IconBadge
+import id.haonlabs.wakemate.presentation.components.PosterButton
 import id.haonlabs.wakemate.presentation.components.SectionLabel
+import id.haonlabs.wakemate.presentation.components.posterBorder
+import id.haonlabs.wakemate.presentation.components.posterShadow
 import id.haonlabs.wakemate.presentation.iconRes
+import id.haonlabs.wakemate.ui.theme.SignalBlue
+import id.haonlabs.wakemate.ui.theme.SignalRed
+import id.haonlabs.wakemate.ui.theme.Wake
+import id.haonlabs.wakemate.ui.theme.enterIn
+import id.haonlabs.wakemate.ui.theme.popIn
+import id.haonlabs.wakemate.ui.theme.pulsing
 import java.util.Locale
 
 /** GPS2: tujuan, ambang dengan jarak sebenarnya, speaker cadangan, lalu mulai. */
@@ -83,35 +101,36 @@ fun TripSetupScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(18.dp),
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.enterIn(0),
+                ) {
                     CircleIconButton(R.drawable.ic_arrow_back, "Kembali", onBack)
                     Text("Atur pengingat", style = MaterialTheme.typography.titleLarge)
                 }
 
-                Surface(shape = RoundedCornerShape(22.dp), color = MaterialTheme.colorScheme.surfaceContainer, modifier = Modifier.fillMaxWidth()) {
-                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                        IconBadge(state.station?.mode?.iconRes() ?: R.drawable.ic_mode_krl, size = 48.dp)
-                        Column(Modifier.weight(1f)) {
-                            Text("TURUN DI", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text(state.station?.name ?: "Memuat...", style = MaterialTheme.typography.titleLarge)
-                            Text(state.lineName, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                    }
-                }
+                DestinationCard(
+                    stationName = state.station?.name ?: "Memuat...",
+                    lineName = state.lineName,
+                    modeIconRes = state.station?.mode?.iconRes() ?: R.drawable.ic_mode_krl,
+                    blockColor = state.station?.mode?.blockColor() ?: TransitModeKrlColor,
+                    modifier = Modifier.fillMaxWidth().enterIn(1),
+                )
 
                 SectionLabel("BANGUNKAN SAYA")
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    TripSetupViewModel.STATION_OPTIONS.forEach { count ->
+                    TripSetupViewModel.STATION_OPTIONS.forEachIndexed { index, count ->
                         ThresholdOption(
                             selected = state.threshold == AlertThreshold.StationCount(count),
-                            title = "$count stasiun",
+                            count = count,
                             // Angka jarak ini nyata, dihitung dari rute line yang dipilih.
                             distance = state.leadDistanceMeters[count]
                                 ?.let { String.format(Locale.US, "± %.1f km", it / 1000).replace('.', ',') }
                                 ?: "-",
                             recommended = count == 2,
                             onClick = { viewModel.onThresholdChanged(AlertThreshold.StationCount(count)) },
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.weight(1f).popIn(delayMs = 200L + 120L * index),
                         )
                     }
                 }
@@ -121,37 +140,32 @@ fun TripSetupScreen(
                     color = MaterialTheme.colorScheme.outline,
                 )
 
-                Surface(shape = RoundedCornerShape(18.dp), color = MaterialTheme.colorScheme.surfaceContainer, modifier = Modifier.fillMaxWidth()) {
-                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            Text("Speaker sebagai cadangan", style = MaterialTheme.typography.titleSmall)
-                            Text(
-                                if (state.speakerFallback) "Getar dan headset dulu. Speaker hanya bunyi kalau kamu tidak merespons."
-                                else "Speaker tidak dipakai sama sekali. Tanpa headset di telinga, hanya getar yang membangunkan.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        Switch(checked = state.speakerFallback, onCheckedChange = viewModel::onSpeakerFallbackChanged)
-                    }
-                }
+                SpeakerFallbackCard(
+                    checked = state.speakerFallback,
+                    onCheckedChange = viewModel::onSpeakerFallbackChanged,
+                    modifier = Modifier.fillMaxWidth().enterIn(3),
+                )
 
-                if (TripPermissions.isBatteryOptimized(context)) BatteryOptimizationCard(context)
+                if (TripPermissions.isBatteryOptimized(context)) BatteryOptimizationCard(
+                    context = context,
+                    modifier = Modifier.fillMaxWidth().enterIn(4),
+                )
             }
 
             // Menempel di bawah: tombol mulai selalu terjangkau jempol tanpa menggulir.
             Surface(color = MaterialTheme.colorScheme.background) {
-                Button(
+                PosterButton(
+                    label = "Mulai perjalanan",
                     onClick = { startWithPermissions(context, foregroundLauncher::launch) { viewModel.onStart() } },
+                    container = MaterialTheme.colorScheme.secondary,
+                    content = MaterialTheme.colorScheme.onSecondary,
                     enabled = state.station != null,
-                    shape = RoundedCornerShape(18.dp),
-                    contentPadding = PaddingValues(vertical = 18.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.onSecondary,
-                    ),
-                    modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(16.dp),
-                ) { Text("Mulai perjalanan", style = MaterialTheme.typography.titleMedium) }
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding()
+                        .padding(16.dp)
+                        .enterIn(5),
+                )
             }
         }
     }
@@ -175,20 +189,181 @@ fun TripSetupScreen(
     }
 }
 
+/** Oranye moda KRL (di Figma GPS1/GPS2); dipakai juga untuk kartu tujuan. */
+private val TransitModeKrlColor = Color(0xFFFF9A3D)
+
+/** Warna blok moda (data identitas moda, seperti di Figma GPS1); ikon di atasnya selalu tinta. */
+private fun TransitMode.blockColor(): Color = when (this) {
+    TransitMode.KRL -> TransitModeKrlColor
+    TransitMode.MRT -> SignalBlue
+    TransitMode.TRANSJAKARTA -> SignalRed
+}
+
+/** Kartu tujuan gaya poster: blok warna moda, label "TURUN DI", nama tujuan besar. */
 @Composable
-private fun BatteryOptimizationCard(context: Context) {
-    Surface(shape = RoundedCornerShape(18.dp), color = MaterialTheme.colorScheme.surfaceContainerHigh, modifier = Modifier.fillMaxWidth()) {
+private fun DestinationCard(
+    stationName: String,
+    lineName: String,
+    modeIconRes: Int,
+    blockColor: Color,
+    modifier: Modifier = Modifier,
+) {
+    val scheme = MaterialTheme.colorScheme
+    val shape = RoundedCornerShape(28.dp)
+    Surface(
+        shape = shape,
+        color = scheme.surfaceContainer,
+        border = posterBorder(),
+        modifier = modifier.posterShadow(shape, 5.dp),
+    ) {
+        Row(
+            Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            IconBadge(modeIconRes, size = 48.dp, tint = blockColor)
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text("TURUN DI", style = MaterialTheme.typography.labelMedium, color = scheme.onSurfaceVariant)
+                Text(stationName, style = MaterialTheme.typography.headlineMedium)
+                Text(lineName, style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant)
+            }
+        }
+    }
+}
+
+/** Tiga kartu ambang: terpilih terisi amber (wake/wake semua soal), perpindahan warnanya halus. */
+@Composable
+private fun ThresholdOption(
+    selected: Boolean,
+    count: Int,
+    distance: String,
+    recommended: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val scheme = MaterialTheme.colorScheme
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        // Ruang pil yang kosong disiapkan agar semua kartu berada pada tinggi yang sama.
+        Box(Modifier.height(22.dp)) {
+            if (recommended) RecommendedPill(modifier = Modifier.align(Alignment.Center))
+        }
+        val container by animateColorAsState(
+            if (selected) scheme.secondaryContainer else scheme.surfaceContainer,
+            label = "isi ambang",
+        )
+        val content by animateColorAsState(
+            if (selected) scheme.onSecondaryContainer else scheme.onSurface,
+            label = "teks ambang",
+        )
+        val caption by animateColorAsState(
+            if (selected) scheme.onSecondaryContainer else scheme.onSurfaceVariant,
+            label = "keterangan ambang",
+        )
+        val borderWidth by animateDpAsState(if (selected) 3.5.dp else 2.5.dp, label = "tepi ambang")
+        val shadowOffset by animateDpAsState(if (selected) 5.dp else 3.dp, label = "bayangan ambang")
+        val shape = RoundedCornerShape(22.dp)
+        Surface(
+            onClick = onClick,
+            shape = shape,
+            color = container,
+            contentColor = content,
+            border = BorderStroke(borderWidth, Wake.colors.border),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 116.dp).posterShadow(shape, shadowOffset),
+        ) {
+            Column(
+                Modifier.padding(vertical = 14.dp, horizontal = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(count.toString(), style = MaterialTheme.typography.displaySmall)
+                    Text("stasiun", style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(bottom = 8.dp))
+                }
+                Text("sebelumnya", style = MaterialTheme.typography.bodySmall, color = caption)
+                Text(distance, style = MaterialTheme.typography.labelMedium, color = content)
+            }
+        }
+    }
+}
+
+/** "DISARANKAN" versi pil gelap: latar primary, teks onPrimary agar tetap terbaca di tema terang. */
+@Composable
+private fun RecommendedPill(modifier: Modifier = Modifier) {
+    val scheme = MaterialTheme.colorScheme
+    Row(
+        modifier.clip(CircleShape).background(scheme.primary).padding(horizontal = 10.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Box(Modifier.size(6.dp).pulsing(amount = 0.5f, millis = 900).background(scheme.onPrimary, CircleShape))
+        Text("DISARANKAN", style = MaterialTheme.typography.labelSmall, color = scheme.onPrimary)
+    }
+}
+
+/** Toggle speaker cadangan: kartu poster; track mint saat aktif, ikut gaya "Signal Pop". */
+@Composable
+private fun SpeakerFallbackCard(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val scheme = MaterialTheme.colorScheme
+    val shape = RoundedCornerShape(20.dp)
+    Surface(
+        shape = shape,
+        color = scheme.surfaceContainer,
+        border = posterBorder(),
+        modifier = modifier.posterShadow(shape, 3.dp),
+    ) {
+        Row(
+            Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text("Speaker sebagai cadangan", style = MaterialTheme.typography.titleSmall)
+                Text(
+                    if (checked) "Getar dan headset dulu. Speaker hanya bunyi kalau kamu tidak merespons."
+                    else "Speaker tidak dipakai sama sekali. Tanpa headset di telinga, hanya getar yang membangunkan.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = scheme.onSurfaceVariant,
+                )
+            }
+            Switch(
+                checked = checked,
+                onCheckedChange = onCheckedChange,
+                colors = SwitchDefaults.colors(
+                    checkedBorderColor = Wake.colors.border,
+                    checkedTrackColor = Wake.colors.live,
+                    checkedThumbColor = scheme.primary,
+                    uncheckedTrackColor = scheme.surfaceVariant,
+                ),
+            )
+        }
+    }
+}
+
+@Composable
+private fun BatteryOptimizationCard(context: Context, modifier: Modifier = Modifier) {
+    val scheme = MaterialTheme.colorScheme
+    val shape = RoundedCornerShape(20.dp)
+    Surface(
+        shape = shape,
+        color = scheme.surfaceContainerHigh,
+        border = posterBorder(),
+        modifier = modifier.posterShadow(shape, 3.dp),
+    ) {
         Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Icon(painterResource(R.drawable.ic_battery_saver), contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(20.dp))
+            Icon(painterResource(R.drawable.ic_battery_saver), contentDescription = null, tint = scheme.error, modifier = Modifier.size(20.dp))
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text("Optimasi baterai aktif", style = MaterialTheme.typography.titleSmall)
                 Text(
                     "Sebagian HP mematikan aplikasi di latar belakang. Kecualikan WakeMate agar alarm aman.",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = scheme.onSurfaceVariant,
                 )
                 TextButton(onClick = { context.startActivity(TripPermissions.batteryOptimizationSettings()) }, contentPadding = PaddingValues(0.dp)) {
-                    Text("Buka setelan", style = MaterialTheme.typography.titleSmall)
+                    Text("Buka setelan", style = MaterialTheme.typography.titleSmall, textDecoration = TextDecoration.Underline)
                 }
             }
         }
@@ -204,44 +379,5 @@ private inline fun startWithPermissions(
         !TripPermissions.hasForegroundLocation(context) || !TripPermissions.hasNotifications(context) ->
             requestForeground(TripPermissions.foreground)
         else -> start()
-    }
-}
-
-/** Kartu ambang: amber saat terpilih, karena ini soal alarm. */
-@Composable
-private fun ThresholdOption(
-    selected: Boolean,
-    title: String,
-    distance: String,
-    recommended: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val border by animateColorAsState(
-        if (selected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.outlineVariant,
-        label = "tepi",
-    )
-    val container by animateColorAsState(
-        if (selected) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent,
-        label = "isi",
-    )
-    val accent = if (selected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurface
-    Surface(
-        onClick = onClick,
-        modifier = modifier,
-        shape = RoundedCornerShape(18.dp),
-        color = container,
-        border = BorderStroke(if (selected) 2.dp else 1.5.dp, border),
-    ) {
-        Column(
-            Modifier.padding(vertical = 14.dp, horizontal = 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-        ) {
-            Text(if (recommended) "DISARANKAN" else " ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary)
-            Text(title, style = MaterialTheme.typography.titleMedium, color = accent)
-            Text("sebelumnya", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(distance, style = MaterialTheme.typography.labelMedium, color = if (selected) accent else MaterialTheme.colorScheme.outline)
-        }
     }
 }

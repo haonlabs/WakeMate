@@ -10,9 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,10 +29,12 @@ import id.haonlabs.wakemate.domain.trip.ActiveTrip
 import id.haonlabs.wakemate.presentation.components.CircleIconButton
 import id.haonlabs.wakemate.presentation.components.CountdownCard
 import id.haonlabs.wakemate.presentation.components.InfoRow
+import id.haonlabs.wakemate.presentation.components.PosterButton
 import id.haonlabs.wakemate.presentation.components.SectionLabel
 import id.haonlabs.wakemate.presentation.components.StatusPill
 import id.haonlabs.wakemate.presentation.components.TimelineRow
 import id.haonlabs.wakemate.presentation.components.TimelineStatus
+import id.haonlabs.wakemate.ui.theme.enterIn
 import java.util.Locale
 
 /**
@@ -64,7 +64,11 @@ fun ActiveTripScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             item(key = "atas") {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.enterIn(0),
+                ) {
                     CircleIconButton(R.drawable.ic_arrow_back, "Kembali", onBack)
                     StatusPill("ALARM AKTIF")
                 }
@@ -89,9 +93,10 @@ fun ActiveTripScreen(
                     done = currentIndex.coerceAtLeast(0),
                     wakeAt = stops.indexOfFirst { it.status == StopStatus.WAKE_POINT }.takeIf { it >= 0 },
                     legend = stops.firstOrNull { it.status == StopStatus.WAKE_POINT }?.let { "Bunyi di ${it.station.name}" },
+                    modifier = Modifier.enterIn(1),
                 )
             }
-            item(key = "sinyal") { SignalRow(proximity, current) }
+            item(key = "sinyal") { SignalRow(proximity, current, Modifier.enterIn(2)) }
 
             if (stops.isNotEmpty()) {
                 item(key = "judul-stasiun") { SectionLabel("STASIUN BERIKUTNYA", trailing = current.lineName) }
@@ -112,23 +117,21 @@ fun ActiveTripScreen(
                         },
                         isFirst = index == 0,
                         isLast = index == stops.lastIndex,
-                        modifier = Modifier.animateItem(placementSpec = tween(250)),
+                        modifier = Modifier.animateItem(placementSpec = tween(250)).enterIn(index + 2),
                     )
                 }
             }
 
             item(key = "batal") {
-                OutlinedButton(
+                PosterButton(
+                    label = if (current.hasAlerted) "Batalkan tanpa menandai sampai" else "Batalkan pantauan",
                     onClick = { viewModel.onCancel() },
-                    shape = RoundedCornerShape(18.dp),
-                    contentPadding = PaddingValues(vertical = 16.dp),
-                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
-                ) {
-                    Text(
-                        if (current.hasAlerted) "Batalkan tanpa menandai sampai" else "Batalkan pantauan",
-                        style = MaterialTheme.typography.titleSmall,
-                    )
-                }
+                    container = MaterialTheme.colorScheme.error,
+                    content = MaterialTheme.colorScheme.onError,
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .enterIn(stops.size + 3),
+                )
             }
             item(key = "catatan") {
                 Text(
@@ -145,7 +148,7 @@ fun ActiveTripScreen(
 
 /** Status sinyal selalu terlihat — termasuk peringatan salah jalur dan estimasi di terowongan. */
 @Composable
-private fun SignalRow(proximity: ProximityState?, trip: ActiveTrip) {
+private fun SignalRow(proximity: ProximityState?, trip: ActiveTrip, modifier: Modifier = Modifier) {
     val scheme = MaterialTheme.colorScheme
     val (title, subtitle, warn) = when {
         proximity == null -> Triple("Menunggu sinyal GPS pertama...", "Pastikan lokasi ponsel menyala.", false)
@@ -160,5 +163,6 @@ private fun SignalRow(proximity: ProximityState?, trip: ActiveTrip) {
         subtitle = subtitle,
         iconTint = if (warn) scheme.error else scheme.primary,
         container = if (warn) scheme.errorContainer else scheme.surfaceContainer,
+        modifier = modifier,
     )
 }

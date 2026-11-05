@@ -2,6 +2,7 @@ package id.haonlabs.wakemate.presentation.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,7 +33,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -539,4 +544,77 @@ fun InfoRow(
             subtitle?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
         }
     }
+}
+
+/** Tinggi minimum semua tombol besar — aman diketuk dengan jempol saat berjalan atau di bus. */
+private val ButtonMinHeight = 58.dp
+
+/**
+ * Tombol aksi utama gaya poster: blok warna penuh lebar, border tebal, bayangan keras. Warna
+ * diisi pemanggil: alarm = `secondary`/`onSecondary`, netral = `surfaceContainer`/`onSurface`,
+ * batal/berbahaya = `error`/`onError`.
+ */
+@Composable
+fun PosterButton(
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    container: Color = MaterialTheme.colorScheme.primaryContainer,
+    content: Color = MaterialTheme.colorScheme.onPrimaryContainer,
+    enabled: Boolean = true,
+) {
+    val shape = RoundedCornerShape(22.dp)
+    Surface(
+        onClick = onClick,
+        enabled = enabled,
+        shape = shape,
+        color = container,
+        contentColor = content,
+        border = posterBorder(),
+        modifier = modifier.fillMaxWidth().heightIn(min = ButtonMinHeight).posterShadow(shape, 4.dp),
+    ) {
+        Box(
+            Modifier.defaultMinSize(minHeight = ButtonMinHeight).padding(horizontal = 20.dp, vertical = 12.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(label, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
+        }
+    }
+}
+
+/** Bidang cari gaya poster: kartu sel, border tebal, bayangan keras; silang muncul saat terisi. */
+@Composable
+fun PosterSearchField(
+    query: String,
+    onChange: (String) -> Unit,
+    placeholder: String,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) {
+    val shape = RoundedCornerShape(28.dp)
+    val border = Wake.colors.border
+    OutlinedTextField(
+        value = query,
+        onValueChange = onChange,
+        enabled = enabled,
+        placeholder = { Text(placeholder) },
+        leadingIcon = { Icon(painterResource(R.drawable.ic_search), contentDescription = null) },
+        trailingIcon = {
+            AnimatedVisibility(query.isNotEmpty(), enter = fadeIn(), exit = fadeOut()) {
+                IconButton(onClick = { onChange("") }) { Icon(painterResource(R.drawable.ic_close), contentDescription = "Hapus pencarian") }
+            }
+        },
+        singleLine = true,
+        shape = shape,
+        textStyle = MaterialTheme.typography.bodyMedium,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            focusedBorderColor = border,
+            unfocusedBorderColor = border,
+            disabledBorderColor = border,
+        ),
+        modifier = modifier.fillMaxWidth().posterShadow(shape),
+    )
 }

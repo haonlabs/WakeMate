@@ -13,10 +13,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,8 +42,12 @@ import id.haonlabs.wakemate.domain.live.TjNetwork
 import id.haonlabs.wakemate.domain.live.label
 import id.haonlabs.wakemate.presentation.components.CircleIconButton
 import id.haonlabs.wakemate.presentation.components.CountdownCard
+import id.haonlabs.wakemate.presentation.components.PosterButton
 import id.haonlabs.wakemate.presentation.components.StatusPill
+import id.haonlabs.wakemate.presentation.components.posterBorder
+import id.haonlabs.wakemate.presentation.components.posterShadow
 import id.haonlabs.wakemate.service.LiveAlarms
+import id.haonlabs.wakemate.ui.theme.enterIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -111,7 +112,11 @@ fun LiveTripScreen(
             Modifier.fillMaxSize().statusBarsPadding().verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.enterIn(0),
+            ) {
                 CircleIconButton(R.drawable.ic_arrow_back, "Kembali", onBack)
                 StatusPill(if (watch is LiveWatch.Onboard) "ALARM AKTIF" else "PENGINGAT AKTIF")
             }
@@ -130,6 +135,7 @@ fun LiveTripScreen(
                         done = if (total != null && remaining != null) total - remaining else 0,
                         wakeAt = wakeAt,
                         legend = "Bunyi ${watch.lead.label()}",
+                        modifier = Modifier.enterIn(1),
                     )
                 }
                 is LiveWatch.Arrival -> CountdownCard(
@@ -142,26 +148,42 @@ fun LiveTripScreen(
                         else -> "halte lagi · ${approach.bus.busNo}"
                     },
                     legend = "Notifikasi ${watch.lead.label()}",
+                    modifier = Modifier.enterIn(1),
                 )
             }
 
+            // Peta mini: kartu poster besar supaya sama dengan kartu lain di halaman ini.
             val direction = bus?.let { b -> ui.network?.tripById?.get(b.tripId) }
-            Box(Modifier.fillMaxWidth().height(210.dp).clip(RoundedCornerShape(22.dp))) {
-                LiveMap(
-                    shape = direction?.shape.orEmpty(),
-                    halte = direction?.halteIds?.mapNotNull { ui.network?.halte?.get(it) }.orEmpty(),
-                    buses = listOfNotNull(bus),
-                    activeTripIds = emptySet(),
-                    selectedBusNo = bus?.busNo,
-                    routeColor = routeColor.toArgb(),
-                    onBusClick = {},
-                    target = bus?.let { CameraTarget(it.lat, it.lng, zoom = 14.5) },
-                    interactive = false,
-                    modifier = Modifier.fillMaxSize(),
-                )
+            val mapShape = RoundedCornerShape(28.dp)
+            Surface(
+                shape = mapShape,
+                color = MaterialTheme.colorScheme.surfaceContainer,
+                border = posterBorder(),
+                modifier = Modifier.fillMaxWidth().posterShadow(mapShape, 5.dp).enterIn(2),
+            ) {
+                Box(Modifier.fillMaxWidth().height(210.dp).clip(RoundedCornerShape(24.dp))) {
+                    LiveMap(
+                        shape = direction?.shape.orEmpty(),
+                        halte = direction?.halteIds?.mapNotNull { ui.network?.halte?.get(it) }.orEmpty(),
+                        buses = listOfNotNull(bus),
+                        activeTripIds = emptySet(),
+                        selectedBusNo = bus?.busNo,
+                        routeColor = routeColor.toArgb(),
+                        onBusClick = {},
+                        target = bus?.let { CameraTarget(it.lat, it.lng, zoom = 14.5) },
+                        interactive = false,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
             }
 
-            Surface(shape = RoundedCornerShape(18.dp), color = MaterialTheme.colorScheme.surfaceContainer, modifier = Modifier.fillMaxWidth()) {
+            val cardShape = RoundedCornerShape(20.dp)
+            Surface(
+                shape = cardShape,
+                color = MaterialTheme.colorScheme.surfaceContainer,
+                border = posterBorder(),
+                modifier = Modifier.fillMaxWidth().posterShadow(cardShape, 3.dp).enterIn(3),
+            ) {
                 Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     route?.let { RouteBadge(it) }
                     Column(Modifier.weight(1f)) {
@@ -186,25 +208,26 @@ fun LiveTripScreen(
                 modifier = Modifier.fillMaxWidth(),
             )
 
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth().enterIn(4),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
                 if (watch is LiveWatch.Onboard) {
-                    FilledTonalButton(
+                    PosterButton(
+                        label = "Ubah halte",
                         onClick = { onChangeStop(watch.routeId, watch.busNo) },
-                        colors = ButtonDefaults.filledTonalButtonColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                            contentColor = MaterialTheme.colorScheme.onSurface,
-                        ),
-                        shape = RoundedCornerShape(18.dp),
-                        contentPadding = PaddingValues(vertical = 16.dp),
+                        container = MaterialTheme.colorScheme.surfaceContainer,
+                        content = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.weight(1f),
-                    ) { Text("Ubah halte", style = MaterialTheme.typography.titleSmall) }
+                    )
                 }
-                OutlinedButton(
+                PosterButton(
+                    label = if (watch is LiveWatch.Onboard) "Batalkan alarm" else "Batalkan pengingat",
                     onClick = viewModel::cancel,
-                    shape = RoundedCornerShape(18.dp),
-                    contentPadding = PaddingValues(vertical = 16.dp),
+                    container = MaterialTheme.colorScheme.error,
+                    content = MaterialTheme.colorScheme.onError,
                     modifier = Modifier.weight(1f),
-                ) { Text(if (watch is LiveWatch.Onboard) "Batalkan alarm" else "Batalkan pengingat", style = MaterialTheme.typography.titleSmall) }
+                )
             }
         }
     }

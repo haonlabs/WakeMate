@@ -1,10 +1,7 @@
 package id.haonlabs.wakemate.presentation.live
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,15 +21,12 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -50,6 +44,7 @@ import id.haonlabs.wakemate.data.live.TjStaticSource
 import id.haonlabs.wakemate.domain.live.TjRoute
 import id.haonlabs.wakemate.presentation.components.LivePill
 import id.haonlabs.wakemate.presentation.components.PillChip
+import id.haonlabs.wakemate.presentation.components.PosterSearchField
 import id.haonlabs.wakemate.presentation.components.SectionLabel
 import id.haonlabs.wakemate.presentation.components.StatusPill
 import id.haonlabs.wakemate.presentation.components.posterBorder
@@ -167,7 +162,6 @@ fun LiveRoutesScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val searching = state.query.isNotBlank()
-
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -180,7 +174,7 @@ fun LiveRoutesScreen(
                     Text("Bus\nTransjakarta", style = MaterialTheme.typography.displaySmall)
                 }
             }
-            item(key = "cari") { SearchField(state.query, viewModel::onQueryChanged, Modifier.enterIn(1)) }
+            item(key = "cari") { PosterSearchField(state.query, viewModel::onQueryChanged, "Cari rute: 1, 9D, JAK.31, Blok M…", Modifier.enterIn(1)) }
             item(key = "jenis") {
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(RouteKind.entries, key = { it.name }) { k ->
@@ -232,33 +226,6 @@ fun LiveRoutesScreen(
             }
         }
     }
-}
-
-@Composable
-private fun SearchField(query: String, onChange: (String) -> Unit, modifier: Modifier = Modifier) {
-    val shape = RoundedCornerShape(28.dp)
-    val border = Wake.colors.border
-    OutlinedTextField(
-        value = query,
-        onValueChange = onChange,
-        placeholder = { Text("Cari rute: 1, 9D, JAK.31, Blok M…") },
-        leadingIcon = { Icon(painterResource(R.drawable.ic_search), contentDescription = null) },
-        trailingIcon = {
-            AnimatedVisibility(query.isNotEmpty(), enter = fadeIn(), exit = fadeOut()) {
-                IconButton(onClick = { onChange("") }) { Icon(painterResource(R.drawable.ic_close), contentDescription = "Hapus pencarian") }
-            }
-        },
-        singleLine = true,
-        shape = shape,
-        textStyle = MaterialTheme.typography.bodyMedium,
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-            focusedBorderColor = border,
-            unfocusedBorderColor = border,
-        ),
-        modifier = modifier.fillMaxWidth().posterShadow(shape),
-    )
 }
 
 /** Kartu "terakhir dibuka": blok penuh warna resmi rute (GTFS), nomor besar, jumlah bus live. */

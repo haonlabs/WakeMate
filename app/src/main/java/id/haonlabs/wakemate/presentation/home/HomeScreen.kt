@@ -1,9 +1,6 @@
 package id.haonlabs.wakemate.presentation.home
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,15 +11,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -43,9 +36,17 @@ import id.haonlabs.wakemate.domain.model.Station
 import id.haonlabs.wakemate.domain.model.StationWithLine
 import id.haonlabs.wakemate.domain.model.TransitMode
 import id.haonlabs.wakemate.presentation.components.IconBadge
+import id.haonlabs.wakemate.presentation.components.PosterSearchField
 import id.haonlabs.wakemate.presentation.components.SectionLabel
 import id.haonlabs.wakemate.presentation.components.SegmentedControl
+import id.haonlabs.wakemate.presentation.components.StatusPill
+import id.haonlabs.wakemate.presentation.components.posterBorder
+import id.haonlabs.wakemate.presentation.components.posterShadow
 import id.haonlabs.wakemate.presentation.iconRes
+import id.haonlabs.wakemate.ui.theme.SignalBlue
+import id.haonlabs.wakemate.ui.theme.SignalRed
+import id.haonlabs.wakemate.ui.theme.SignalYellow
+import id.haonlabs.wakemate.ui.theme.enterIn
 
 /** GPS1: alarm berbasis GPS ponsel untuk KRL, MRT, dan koridor BRT — bekerja tanpa internet. */
 @Composable
@@ -78,9 +79,18 @@ fun HomeScreen(
                     onSelect = { viewModel.onModeSelected(TransitMode.entries[it]) },
                     icons = TransitMode.entries.map { it.iconRes() },
                     container = MaterialTheme.colorScheme.surfaceContainer,
+                    modifier = Modifier.enterIn(1),
                 )
             }
-            item(key = "cari") { SearchField(query, viewModel::onQueryChanged, enabled = isReady) }
+            item(key = "cari") {
+                PosterSearchField(
+                    query = query,
+                    onChange = viewModel::onQueryChanged,
+                    placeholder = "Cari stasiun tujuan",
+                    enabled = isReady,
+                    modifier = Modifier.enterIn(2),
+                )
+            }
 
             when {
                 !isReady -> item(key = "memuat") { SeedingState() }
@@ -89,22 +99,25 @@ fun HomeScreen(
                         SectionLabel("HASIL PENCARIAN", trailing = if (results.isEmpty()) "Tidak ada" else "${results.size} stasiun")
                     }
                     if (results.isEmpty()) item(key = "kosong") { EmptyState(query) }
-                    items(results, key = { it.station.id }) { result ->
+                    itemsIndexed(results, key = { _, it -> it.station.id }) { index, result ->
                         StationRow(
                             result = result,
                             meta = result.lineName,
-                            modifier = Modifier.animateItem(fadeInSpec = tween(200), placementSpec = tween(220)),
                             onClick = { onStationSelected(result.station) },
+                            modifier = Modifier
+                                .animateItem(fadeInSpec = tween(200), placementSpec = tween(220))
+                                .enterIn(index + 2, fromX = 96.dp, fromY = 0.dp),
                         )
                     }
                 }
                 recent.isNotEmpty() -> {
                     item(key = "terakhir-judul") { SectionLabel("TUJUAN TERAKHIR") }
-                    items(recent, key = { "r-" + it.station.id }) { result ->
+                    itemsIndexed(recent, key = { _, it -> "r-" + it.station.id }) { index, result ->
                         StationRow(
                             result = result,
                             meta = "${result.lineName} · ${result.station.mode.shortLabel()}",
                             onClick = { onStationSelected(result.station) },
+                            modifier = Modifier.enterIn(index + 2, fromX = 96.dp, fromY = 0.dp),
                         )
                     }
                 }
@@ -120,13 +133,20 @@ private fun TransitMode.shortLabel() = when (this) {
     TransitMode.TRANSJAKARTA -> "TJ"
 }
 
+/** Warna blok moda (data identitas moda, seperti di Figma GPS1); ikon di atasnya selalu tinta. */
+private fun TransitMode.blockColor(): Color = when (this) {
+    TransitMode.KRL -> Color(0xFFFF9A3D)
+    TransitMode.MRT -> SignalBlue
+    TransitMode.TRANSJAKARTA -> SignalRed
+}
+
 @Composable
-private fun Header(onOpenDiagnostics: () -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+private fun Header(onOpenDiagnostics: () -> Unit, modifier: Modifier = Modifier) {
+    Column(modifier.enterIn(0), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Text("WAKEMATE", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-                Text("Alarm GPS", style = MaterialTheme.typography.headlineSmall)
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                StatusPill("WAKEMATE", color = SignalYellow)
+                Text("Alarm GPS", style = MaterialTheme.typography.displaySmall)
             }
             // Alat ukur internal; tidak dimunculkan di rilis.
             if (BuildConfig.DEBUG) TextButton(onClick = onOpenDiagnostics) { Text("Audio") }
@@ -139,49 +159,29 @@ private fun Header(onOpenDiagnostics: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun SearchField(query: String, onQueryChanged: (String) -> Unit, enabled: Boolean) {
-    OutlinedTextField(
-        value = query,
-        onValueChange = onQueryChanged,
-        enabled = enabled,
-        placeholder = { Text("Cari stasiun tujuan") },
-        leadingIcon = { Icon(painterResource(R.drawable.ic_search), contentDescription = null) },
-        trailingIcon = {
-            AnimatedVisibility(query.isNotEmpty(), enter = fadeIn(), exit = fadeOut()) {
-                IconButton(onClick = { onQueryChanged("") }) {
-                    Icon(painterResource(R.drawable.ic_close), contentDescription = "Hapus pencarian")
-                }
-            }
-        },
-        singleLine = true,
-        shape = RoundedCornerShape(22.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-            disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-            unfocusedBorderColor = Color.Transparent,
-            disabledBorderColor = Color.Transparent,
-        ),
-        modifier = Modifier.fillMaxWidth(),
-    )
-}
-
+/** Baris tujuan: kartu poster dengan blok warna moda dan panah — lebih besar supaya aman diketuk. */
 @Composable
 private fun StationRow(result: StationWithLine, meta: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Surface(onClick = onClick, modifier = modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp), color = MaterialTheme.colorScheme.surfaceContainer) {
+    val scheme = MaterialTheme.colorScheme
+    val shape = RoundedCornerShape(24.dp)
+    Surface(
+        onClick = onClick,
+        shape = shape,
+        color = scheme.surfaceContainer,
+        border = posterBorder(),
+        modifier = modifier.fillMaxWidth().posterShadow(shape, 3.dp),
+    ) {
         Row(
             Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            IconBadge(result.station.mode.iconRes())
+            IconBadge(result.station.mode.iconRes(), tint = result.station.mode.blockColor())
             Column(Modifier.weight(1f)) {
                 Text(result.station.name, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(meta, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(meta, style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
-            Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null, tint = MaterialTheme.colorScheme.outline)
+            Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null, tint = scheme.outline)
         }
     }
 }
