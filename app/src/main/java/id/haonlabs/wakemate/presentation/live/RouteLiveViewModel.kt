@@ -41,11 +41,19 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.Inject
 
-/** [scheduleEta] = menit dari sekarang menurut jadwal; null kalau rute ini tidak punya data jadwal. */
+/**
+ * [scheduleEta] = menit dari sekarang menurut jadwal, [scheduleAt] = jamnya ("15:12"); keduanya null
+ * kalau rute ini tidak punya data jadwal. Jam ditampilkan bersama menit karena kereta berikutnya
+ * di tiap stasiun belum tentu kereta yang sama — jam lebih mudah dibaca daripada deretan menit.
+ */
 data class HalteRow(
     val halte: Halte,
     val scheduleEta: Int? = null,
+    val scheduleAt: String? = null,
 )
+
+/** Satu keberangkatan menurut jadwal untuk sheet stasiun. */
+data class Departure(val minutes: Int, val at: String)
 
 data class RouteLiveUi(
     val route: TjRoute? = null,
@@ -58,8 +66,9 @@ data class RouteLiveUi(
     val trains: List<SimTrain> = emptyList(),
     val favorite: Boolean = false,
     val userLocation: Location? = null,
-    /** Halte/stasiun yang sedang dibuka sheet-nya. */
+    /** Halte/stasiun yang sedang dibuka sheet-nya, dan tiga kedatangan berikutnya di sana. */
     val selected: HalteRow? = null,
+    val selectedNext: List<Departure> = emptyList(),
     /** Stasiun yang cocok di data alarm GPS; null + [alarmResolved] = tidak ada yang cocok. */
     val alarmStation: Station? = null,
     val alarmResolved: Boolean = false,
@@ -100,7 +109,10 @@ class RouteLiveViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), RouteLiveUi())
 
     private fun build(net: TjNetwork?, chosen: Int?, location: Location?, favorite: Boolean, picked: Pick): RouteLiveUi {
-        val directions = net?.directions(routeId).orEmpty()
+        // Rute dengan banyak tujuan (KRL Cikarang punya 10) menampilkan yang paling sering dilayani dulu.
+        val directions = net?.directions(routeId).orEmpty().let { all ->
+            if (net == null || all.size <= MANY_DIRECTIONS) all else all.sortedByDescending { net.tripIdsToward(it).size }
+        }
         val now = ZonedDateTime.now(JAKARTA)
         // Arah pertama yang punya trip beroperasi hari ini: varian pertama di GTFS sering trip khusus
         // yang sedang tidak jalan, dan daftar halte tanpa satu pun jadwal tidak berguna.
@@ -114,8 +126,14 @@ class RouteLiveViewModel @Inject constructor(
         val towardTrips = direction?.let { d -> net?.tripIdsToward(d)?.mapNotNull { net.tripById[it] } }.orEmpty()
         val expired = note != null && note.startsWith(EXPIRED_PREFIX)
         val rows = if (net == null || direction == null) emptyList() else direction.halteIds.mapNotNull { id ->
-            net.halte[id]?.let { HalteRow(it, if (expired) null else scheduleEtas(towardTrips, id, now).firstOrNull()) }
+            net.halte[id]?.let {
+                val eta = if (expired) null else scheduleEtas(towardTrips, id, now).firstOrNull()
+                HalteRow(it, eta, eta?.let { m -> clockAt(now, m) })
+            }
         }
+        val selectedRow = picked.halte?.let { h -> rows.firstOrNull { it.halte.id == h.id } }
+        val selectedNext = if (selectedRow == null || expired) emptyList()
+        else scheduleEtas(towardTrips, selectedRow.halte.id, now, limit = 3).map { Departure(it, clockAt(now, it)) }
         return RouteLiveUi(
             route = route,
             directions = directions,
@@ -125,7 +143,8 @@ class RouteLiveViewModel @Inject constructor(
             trains = if (note == null && net != null && towardTrips.isNotEmpty()) simulatedTrains(towardTrips, net.halte, now) else emptyList(),
             favorite = favorite,
             userLocation = location,
-            selected = picked.halte?.let { h -> rows.firstOrNull { it.halte.id == h.id } },
+            selected = selectedRow,
+            selectedNext = selectedNext,
             alarmStation = picked.station,
             alarmResolved = picked.resolved,
         )
@@ -166,6 +185,14 @@ class RouteLiveViewModel @Inject constructor(
             .addOnSuccessListener { loc -> if (loc != null) userLocation.value = loc }
     }
 }
+
+/** Jam tiba dari "N menit lagi"; N sudah dibulatkan ke atas, jadi jamnya paling telat satu menit. */
+private fun clockAt(now: ZonedDateTime, minutes: Int): String = now.plusMinutes(minutes.toLong()).format(CLOCK)
+
+private val CLOCK = DateTimeFormatter.ofPattern("HH:mm")
+
+/** Lebih dari ini, pemilih arah diringkas jadi dua chip + "lainnya". */
+private const val MANY_DIRECTIONS = 3
 
 /**
  * KRL memakai jadwal tetap yang punya masa berlaku dan tidak mencakup hari Sabtu (sumber datanya

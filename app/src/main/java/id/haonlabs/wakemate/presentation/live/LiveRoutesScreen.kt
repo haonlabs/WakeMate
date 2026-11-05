@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -206,10 +207,10 @@ fun LiveRoutesScreen(
     }
 }
 
-/** Kartu "terakhir dibuka": blok penuh warna resmi rute (GTFS), nomor besar, jenis rute. */
+/** Kartu "terakhir dibuka": ringkas (nomor + nama) supaya daftar bercampur moda tidak terdorong ke bawah. */
 @Composable
 private fun RecentCard(route: TjRoute, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    val shape = RoundedCornerShape(28.dp)
+    val shape = RoundedCornerShape(22.dp)
     val fill = parseRouteColor(route.color, MaterialTheme.colorScheme.primaryContainer)
     val onFill = parseRouteColor(route.textColor, Wake.colors.onColor)
     Surface(
@@ -218,12 +219,11 @@ private fun RecentCard(route: TjRoute, onClick: () -> Unit, modifier: Modifier =
         color = fill,
         contentColor = onFill,
         border = posterBorder(),
-        modifier = modifier.width(172.dp).posterShadow(shape),
+        modifier = modifier.width(148.dp).posterShadow(shape, 3.dp),
     ) {
-        Column(Modifier.padding(16.dp).heightIn(min = 112.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(route.shortName, style = MaterialTheme.typography.displaySmall, maxLines = 1)
-            Text(route.longName, style = MaterialTheme.typography.titleSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            Text(route.kind, style = MaterialTheme.typography.labelMedium)
+        Column(Modifier.padding(14.dp).heightIn(min = 56.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(route.shortName, style = MaterialTheme.typography.displaySmall.copy(fontSize = 22.sp), maxLines = 1)
+            Text(route.longName, style = MaterialTheme.typography.titleSmall.copy(fontSize = 12.sp), maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
     }
 }

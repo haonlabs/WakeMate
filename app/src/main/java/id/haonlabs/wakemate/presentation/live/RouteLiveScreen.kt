@@ -2,6 +2,7 @@ package id.haonlabs.wakemate.presentation.live
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Box
@@ -10,11 +11,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -39,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -47,6 +49,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import id.haonlabs.wakemate.R
@@ -56,6 +59,7 @@ import id.haonlabs.wakemate.domain.live.isRail
 import id.haonlabs.wakemate.presentation.TripPermissions
 import id.haonlabs.wakemate.presentation.components.CircleIconButton
 import id.haonlabs.wakemate.presentation.components.InfoRow
+import id.haonlabs.wakemate.presentation.components.ChipChoices
 import id.haonlabs.wakemate.presentation.components.PillChip
 import id.haonlabs.wakemate.presentation.components.PosterButton
 import id.haonlabs.wakemate.presentation.components.SectionLabel
@@ -136,9 +140,16 @@ fun RouteLiveScreen(
                     target = cameraTarget,
                     modifier = Modifier.fillMaxSize(),
                 )
+                // Gradasi lembut di atas peta: teks status bar dan kapsul judul tetap terbaca di atas peta yang ramai.
+                Box(
+                    Modifier.fillMaxWidth().height(140.dp).background(
+                        Brush.verticalGradient(listOf(MaterialTheme.colorScheme.background.copy(alpha = 0.92f), Color.Transparent))
+                    ),
+                )
                 TopOverlay(state, onBack = onBack, onFavorite = viewModel::toggleFavorite)
                 if (state.route?.kind == "KRL" && state.scheduleNote == null) {
-                    ScheduleLabel(Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(top = 72.dp))
+                    // Di kiri-bawah, sebaris dengan tombol lokasiku: tidak menutupi jalur dan judul di atas.
+                    ScheduleLabel(Modifier.align(Alignment.BottomStart).padding(start = 16.dp, bottom = PEEK + 26.dp))
                 }
                 CircleIconButton(
                     icon = R.drawable.ic_my_location,
@@ -195,12 +206,26 @@ private fun HalteSheet(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            InfoRow(
-                R.drawable.ic_alarm,
-                title = row.scheduleEta?.let { "Berikutnya ±$it mnt" } ?: "Perkiraan tiba belum tersedia",
-                subtitle = if (row.scheduleEta != null) "Menurut jadwal, arah ke ${state.direction?.headsign.orEmpty()}" else state.scheduleNote,
-                iconTint = MaterialTheme.colorScheme.outline,
-            )
+            if (state.selectedNext.isNotEmpty()) {
+                val vehicle = if (state.route?.isRail() == true) "KERETA" else "BUS"
+                SectionLabel("$vehicle BERIKUTNYA · KE ${state.direction?.headsign.orEmpty().uppercase()}")
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    state.selectedNext.forEachIndexed { i, d ->
+                        DepartureCard(d, highlighted = i == 0, modifier = Modifier.weight(1f))
+                    }
+                    repeat(3 - state.selectedNext.size) { Box(Modifier.weight(1f)) }
+                }
+            } else {
+                InfoRow(
+                    R.drawable.ic_alarm,
+                    title = "Perkiraan tiba belum tersedia",
+                    subtitle = state.scheduleNote,
+                    iconTint = MaterialTheme.colorScheme.outline,
+                )
+            }
+            sheetNote(state.route?.kind)?.let {
+                Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
             val station = state.alarmStation
             when {
                 station != null -> PosterButton(
@@ -300,6 +325,16 @@ private fun androidx.compose.foundation.lazy.LazyListScope.routeItems(
             trailing = "${state.halte.size} $unit",
         )
     }
+    if (state.halte.any { it.scheduleEta != null }) {
+        item(key = "keterangan-jadwal") {
+            val vehicle = if (state.route?.isRail() == true) "Kereta" else "Bus"
+            Text(
+                "$vehicle berikutnya di tiap $unit, menurut jadwal",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
     if (state.halte.isNotEmpty() && state.halte.none { it.scheduleEta != null }) {
         item(key = "tanpa-jadwal") {
             InfoRow(
@@ -316,7 +351,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.routeItems(
             status = TimelineStatus.DEFAULT,
             lineColor = routeColor,
             eta = row.scheduleEta?.let { "±$it mnt" },
-            detail = "jadwal".takeIf { row.scheduleEta != null },
+            detail = row.scheduleAt,
             isFirst = i == 0,
             isLast = i == state.halte.lastIndex,
             onClick = { onHalte(row.halte) },
@@ -336,14 +371,67 @@ private fun sourceNote(kind: String): String = when {
     else -> "Rute, halte, dan jadwal: GTFS Transjakarta. Perkiraan menurut jadwal, bukan posisi bus."
 }
 
+/**
+ * Pemilih arah untuk rute bertujuan banyak (KRL Cikarang: 10): dua chip pertama + "+N lainnya" yang
+ * membuka daftar lengkap, bukan deretan chip melebar. Arah yang dipilih dari daftar menggantikan
+ * chip kedua supaya selalu terlihat.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DirectionChips(state: RouteLiveUi, onSelect: (Int) -> Unit) {
-    val listState = rememberLazyListState()
-    // Arah default dipilih otomatis dan bisa jatuh di luar layar.
-    LaunchedEffect(state.directionIndex) { listState.animateScrollToItem(state.directionIndex) }
-    LazyRow(state = listState, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        itemsIndexed(state.directions, key = { _, trip -> trip.id }) { index, trip ->
-            PillChip("Ke ${trip.headsign}", index == state.directionIndex, onClick = { onSelect(index) })
+    var showAll by remember { mutableStateOf(false) }
+    val visible = if (state.directionIndex >= 2) listOf(0, state.directionIndex) else listOf(0, 1)
+    val hidden = state.directions.size - visible.size
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        visible.forEach { index ->
+            PillChip("Ke ${state.directions[index].headsign}", index == state.directionIndex, onClick = { onSelect(index) })
+        }
+        PillChip("+$hidden lainnya", selected = false, onClick = { showAll = true })
+    }
+    if (showAll) {
+        ModalBottomSheet(
+            onDismissRequest = { showAll = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = MaterialTheme.colorScheme.background,
+            shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
+            tonalElevation = 0.dp,
+            dragHandle = { BottomSheetDefaults.DragHandle(color = Wake.colors.border) },
+        ) {
+            Column(Modifier.padding(horizontal = 20.dp).padding(bottom = 28.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                Text("Pilih arah", style = MaterialTheme.typography.headlineSmall)
+                ChipChoices(
+                    options = state.directions.indices.toList(),
+                    selected = state.directionIndex,
+                    label = { "Ke ${state.directions[it].headsign}" },
+                    onSelect = { onSelect(it); showAll = false },
+                )
+            }
         }
     }
+}
+
+/** Satu kedatangan menurut jadwal: jam besar + "dalam N mnt". Yang pertama (terdekat) terisi mint. */
+@Composable
+private fun DepartureCard(departure: Departure, highlighted: Boolean, modifier: Modifier = Modifier) {
+    val shape = RoundedCornerShape(22.dp)
+    Surface(
+        shape = shape,
+        color = if (highlighted) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainer,
+        contentColor = if (highlighted) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
+        border = posterBorder(if (highlighted) 3.5.dp else 2.5.dp),
+        modifier = modifier.posterShadow(shape, if (highlighted) 5.dp else 3.dp),
+    ) {
+        Column(Modifier.fillMaxWidth().padding(vertical = 14.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(departure.at, style = MaterialTheme.typography.displaySmall.copy(fontSize = 24.sp))
+            Text("dalam ${departure.minutes} mnt", style = MaterialTheme.typography.labelSmall)
+        }
+    }
+}
+
+/** Catatan sumber/ketidakpastian jadwal di sheet stasiun. */
+private fun sheetNote(kind: String?): String? = when {
+    kind == "KRL" -> "Menurut jadwal KRL (Open-KRL). Bukan posisi nyata dan bisa berubah tanpa pemberitahuan."
+    kind == "BRT" || kind == "Angkutan Umum Integrasi" || kind == "Mikrotrans" || kind == "Transjabodetabek" ->
+        "Menurut jadwal GTFS Transjakarta, bukan posisi bus."
+    else -> null
 }
